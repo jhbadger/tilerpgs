@@ -2670,8 +2670,45 @@ def make_people(rng):
                         "tile": tile, "name": ("%s %s" % (honorific, full))
                         if honorific and role not in ("mom", "dad")
                         else full, "short": short, "title": title,
-                        "alien": alien, "teen": teen}
+                        "alien": alien, "teen": teen, "hon": honorific}
     return people
+
+
+# The Boy/Girl Gun: honorifics and words that change with it.
+SWAP_HONORIFICS = {"Mr.": "Ms.", "Ms.": "Mr.", "Mrs.": "Mr."}
+SWAP_WORDS = {"mom": "dad", "dad": "mom", "brother": "sister",
+              "sister": "brother", "guy": "gal", "gal": "guy",
+              "lady": "man", "man": "lady", "girl": "boy", "boy": "girl",
+              "nephew": "niece", "niece": "nephew"}
+
+
+def swap_words(text):
+    """A title such as 'the ice cream lady', the other way round."""
+    def sub(m):
+        w = m.group(0)
+        new = SWAP_WORDS[w.lower()]
+        return cap(new) if w[0].isupper() else new
+    return re.sub(r"\b(%s)\b" % "|".join(SWAP_WORDS), sub, text,
+                  flags=re.IGNORECASE)
+
+
+def swap_person(who, role):
+    """Zapped: the other sex, with the honorific and title to match.
+    Zapped again: back as they were."""
+    if "plain" in who:
+        who.update(who.pop("plain"))
+        return
+    who["plain"] = {k: who[k] for k in ("sex", "name", "short", "title")}
+    who["sex"] = "F" if who["sex"] == "M" else "M"
+    who["title"] = swap_words(who["title"])
+    hon = SWAP_HONORIFICS.get(who["hon"], who["hon"])
+    if role in ("mom", "dad"):
+        who["name"] = who["short"] = swap_words(who["name"])
+    elif who["hon"]:
+        full = ("%s %s" % (who["first"], who["last"])).strip()
+        who["name"] = "%s %s" % (hon, full)
+        if who["last"]:
+            who["short"] = "%s %s" % (hon, who["last"])
 
 
 def make_person(world, role, x, y):
@@ -2695,6 +2732,14 @@ def fill(text, world):
                  agent_title=ag["title"], world=world["exchange_world"],
                  family=world["family"],
                  sib="brother" if p["sibling"]["sex"] == "M" else "sister")
+    for r, v in p.items():
+        m = v["sex"] == "M"
+        names.update({r + "_he": "he" if m else "she",
+                      r + "_He": "He" if m else "She",
+                      r + "_his": "his" if m else "her",
+                      r + "_him": "him" if m else "her",
+                      r + "_kin": "nephew" if m else "niece",
+                      r + "_title": v["title"]})
     return text.format(**names)
 
 
@@ -2708,10 +2753,10 @@ TOPICS = {
     "drai": "The storm drain on the beach, south of the pier. It smells "
             "awful, and lately it glows.",
     "driv": "The Starlite Drive-In, on the east side of town. Monster "
-            "movies every night. The projectionist's a nice guy.",
+            "movies every night. The projectionist's nice.",
     "form": "The Formal's Saturday at eight, in the gym. Tux & Tiara at "
             "the mall rents formalwear.",
-    "jetb": "Zeb sells jetbikes at his saucer lot, downtown.",
+    "jetb": "Zeb sells jetbikes at the saucer lot, downtown.",
     "love": "Lover's Point: up in the hills north-west of town, over the "
             "ocean. Where kids go to, um, look at the view.",
     "cras": "Something crashed up in the hills behind Lover's Point last "
@@ -2721,12 +2766,12 @@ TOPICS = {
     "pier": "The pier's on the beach. The old fisherman's always out at "
             "the end of it.",
     "snor": "Snorr? Some grey planet. Look it up at the library.",
-    "sub": "The mall's sub-basement? Ask the mall cop. He guards the "
+    "sub": "The mall's sub-basement? Ask the mall cop. {mallcop_He} guards the "
            "door.",
     "trua": "The truant officer catches kids cutting class. The mall and "
             "the arcade first, every time.",
     "blob": "A blob? Like in the old monster movies at the drive-in?",
-    "meat": "The cafeteria meat? Ask the lunch lady. On second thought, "
+    "meat": "The cafeteria meat? Ask {lunchlady_title}. On second thought, "
             "don't.",
     "keys": "Keys? The janitor at the school has keys to everything.",
     "mall": "Seaview Mall, on the east side. They've got everything.",
@@ -2829,7 +2874,7 @@ ROLE_TALK = {
     }),
     "jockkid": ("Hey, what's up?", {
         "job": "Quarterback. Also shortstop. Also I'm failing chemistry.",
-        "news": "Coach is freaking out about his gym floor.",
+        "news": "Coach is freaking out about {coach_his} gym floor.",
     }),
     "brainkid": ("Shh. I'm studying. Oh, it's fine. What?", {
         "job": "I'm going to M.I.T. Or Caltech. Or the Vegan Science "
@@ -2961,7 +3006,8 @@ ROLE_TALK = {
     "scooper": ("What'll it be, hon?", {
         "job": "I own Scoops. Thirty-one flavours and one from Neptune. "
                "Say BUY.",
-        "news": "My nephew's the projectionist at the DRIVE-in. He hasn't "
+        "news": "My {projectionist_kin}'s the projectionist at the DRIVE-in. "
+                "{projectionist_He} hasn't "
                 "slept in a week. Says the movies won't stay on the "
                 "screen.",
     }),
@@ -3137,7 +3183,8 @@ HOOKS = {
                            "the stairs in the corner.",
                      "fail": "Nobody goes down there. Not even me."},
         },
-        "scooper": {"news": "My nephew's the projectionist at the DRIVE-"
+        "scooper": {"news": "My {projectionist_kin}'s the projectionist at "
+                    "the DRIVE-"
                     "in. Says the movies won't stay on the screen."},
     },
 }
@@ -4756,6 +4803,7 @@ class Game:
             raise ValueError("bad gadget")
         self.p = p
         self.flags = set(g.get("flags", []))
+        self.swap_world()
         self.clues = list(g.get("clues", []))
         self.topics = set(g.get("topics", []))
         self.shards = list(g.get("shards", []))
@@ -6092,8 +6140,9 @@ class Game:
         if night:
             self.say("You wake up in your own bed, %s, with an ice pack on "
                      "your head. Somebody carried you home. Your mom is "
-                     "standing in the doorway with her arms folded." %
-                     self.date_text(), "quest")
+                     "standing in the doorway with %s arms folded." % (
+                         self.date_text(), fill("{mom_his}", self.world)),
+                     "quest")
             self.lose_rwp(1, "Brought home at this hour!")
         else:
             self.say("You wake up in the school nurse's office, %s, with "
@@ -6716,12 +6765,15 @@ class Game:
                          "lady", "gentleman")), mob.name.replace(
                              "the ", "")), "mad")
         else:
-            self.swap_mob(mob)
             key = "swapped:" + (mob.role or mob.name)
             if key in self.flags:
                 self.flags.discard(key)
             else:
                 self.flags.add(key)
+            self.flags.add("zapped:" + (mob.role or mob.name))
+            if mob.role:
+                swap_person(self.world["people"][mob.role], mob.role)
+            self.swap_mob(mob)
             self.say(random.choice((
                 "ZORP! %s is the other one now, pats their new hair, and "
                 "screams.",
@@ -6741,14 +6793,57 @@ class Game:
                               "with that gun.")
         self.end_turn()
 
-    @staticmethod
-    def swap_mob(mob):
+    def swap_mob(self, mob):
+        """A person's look, name and title after the gun (or after it
+        again)."""
         mob.swapped = not getattr(mob, "swapped", False)
         if mob.swapped:
-            mob.plain_tile = mob.tile
+            mob.plain_tile, mob.plain_title = mob.tile, mob.title
             mob.tile = SWAP_TILES.get(mob.tile, mob.tile)
+            mob.title = swap_words(mob.title)
         else:
             mob.tile = getattr(mob, "plain_tile", mob.tile)
+            mob.title = getattr(mob, "plain_title", mob.title)
+        if mob.role:
+            who = self.world["people"][mob.role]
+            mob.name, mob.title = who["name"], fill(who["title"], self.world)
+
+    def swap_world(self):
+        """After loading: the people the gun has already changed."""
+        for f in self.flags:
+            role = f[8:]
+            if f.startswith("swapped:") and role in self.world["people"]:
+                swap_person(self.world["people"][role], role)
+
+    def likes_change(self, mob):
+        """Some people like what the gun did. Some really don't."""
+        return random.Random("%s:%s:likes" % (
+            self.world["seed"], mob.role or mob.name)).random() < 0.5
+
+    def about_change(self, mob):
+        likes = self.likes_change(mob)
+        if getattr(mob, "swapped", False):
+            self.npc_say(mob, random.choice((
+                "Honestly? I love it. I've never felt more me. Thanks!",
+                "It's great! Everybody says the new look really works. "
+                "Don't you dare change me back.",
+                "I was mad at first. Now I'm thinking of keeping it.")
+                if likes else (
+                "Change me back! Right now!",
+                "I'm not mad. I'm extremely, extremely mad. Fix it.",
+                "My own mother didn't recognise me. Zap me back. Please.")))
+            if not likes:
+                self.say("(Zap them again to change them back.)", "info")
+            elif "liked:" + (mob.role or mob.name) not in self.flags:
+                self.flags.add("liked:" + (mob.role or mob.name))
+                self.gain_tp(1, "for making somebody's week")
+        else:
+            self.npc_say(mob, random.choice((
+                "You changed me back. Thanks... I guess. I kind of miss "
+                "it.", "Back to boring old me. Aw.")
+                if likes else (
+                "Thank you for changing me back. Never, ever do that "
+                "again.", "Phew. Me again. Keep that gun away from me.")))
 
     def apply_swaps(self, area):
         """People zapped with the Boy/Girl Gun stay zapped all week."""
@@ -7450,7 +7545,8 @@ class Game:
                       lambda: self.try_lead(lid, "talk")),
                      ("Flirt your way past (Looks, vs 5)",
                       lambda: self.try_lead(lid, "flirt")),
-                     ("Wait till he looks away, and sneak (Bod, vs 4)",
+                     (fill("Wait till {mallcop_he} looks away, and sneak "
+                            "(Bod, vs 4)", self.world),
                       lambda: self.try_lead(lid, "sneak"))]
         else:
             opts.append(("Fix the lock (Smarts, Fixit, vs %d)" % (
@@ -7529,8 +7625,9 @@ class Game:
                       "Nobody Home": "You switch off and stroll past. "
                                      "Nobody notices. Story of your life.",
                       "Swap Shop": "You swap bodies with the mall cop, "
-                                   "let yourself through, and swap back. "
-                                   "He's very confused.",
+                                   "let yourself through, and swap back. " +
+                                   fill("{mallcop_He}'s very confused.",
+                                        self.world),
                       "Talk to Aliens": "You have a heart-to-heart with "
                                         "it. It lets you in.",
                       "Connections": "'I know your boss's cousin.' "
@@ -7829,7 +7926,10 @@ class Game:
             st = self.side.get(e["id"])
             if st and st["state"] == "active":
                 greet = "Oh! It's you. Any luck?"
-        if p.get("date") and p.get("date") == mob.role:
+        if getattr(mob, "swapped", False):
+            greet = "Hey! Check out the new me!" if self.likes_change(mob) \
+                else "You! You did this! Change me back!"
+        elif p.get("date") and p.get("date") == mob.role:
             greet = random.choice(("Hi, you! Saturday's going to be "
                                    "great.", "Hey, date!",
                                    "I bought shoes. For Saturday."))
@@ -7879,6 +7979,8 @@ class Game:
         elif mob.role and "SNORR" in self.topics and mob.role in \
                 AGENT_ROLES:
             words.append("SNORR")
+        if "zapped:" + (mob.role or mob.name) in self.flags:
+            words.append("CHANGE")
         if mob.role in DATE_ROLES and "FORMAL" not in words:
             words.append("FORMAL")
         for w in getattr(self, "heard", []):
@@ -7938,6 +8040,10 @@ class Game:
             return
         if mob.shop and word[:3] in ("buy", "pur", "sho", "sel"):
             self.list_offers(mob)
+            return
+        if word[:4] in ("chan", "zap", "zapp", "swit", "swap", "gun") and \
+                "zapped:" + (mob.role or mob.name) in self.flags:
+            self.about_change(mob)
             return
         if mob.role in ("mom", "dad") and word[:4] in ("mone", "allo",
                                                        "cash"):
