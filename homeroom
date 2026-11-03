@@ -393,8 +393,8 @@ ITEMS = {
     "spring shoes": ("Spring Shoes: bounce like you had the power", 15),
     "rocket sneakers": ("Rocket Sneakers: as fast as a jetbike, an inch "
                         "off the ground", 30),
-    "boy/girl gun": ("a Boy/Girl Gun: one jolt, and you're the other one",
-                     30),
+    "boy/girl gun": ("a Boy/Girl Gun: one jolt, and you (or whoever you "
+                     "point it at) are the other one", 30),
     "timestop makeup": ("a Timestop Makeup Kit: Looks +1 (permanent until "
                         "cold cream)", 10),
     "corsage": ("a corsage: for asking someone to the Formal", 5),
@@ -754,6 +754,23 @@ PEOPLE = {
     "bully": person("M", "#1a1a1a", "#4a3020", pants="#2a2a6a",
                     shoes="#1a1a1a"),
 }
+# What the Boy/Girl Gun makes of people: each look and its opposite.
+SWAP_TILES = {}
+for _a, _b in (("teen_m", "teen_f"), ("alien_m", "alien_f"),
+               ("nvnh_m", "nvnh_f"), ("weirdie", "weirdie_f"),
+               ("kid", "girl"), ("kid2", "girl2"), ("kid3", "girl3"),
+               ("jock", "girl2"), ("nerd", "girl"),
+               ("punk", "girl3"), ("surfer", "girl2"),
+               ("teacher", "teacher_f"), ("suit", "suit_f"),
+               ("clerk", "clerk_f"), ("dad", "mom"),
+               ("principal", "suit_f"), ("coach", "teacher_f"),
+               ("janitor", "lunchlady"), ("cop", "nurse"),
+               ("oldsalt", "lunchlady"), ("zeb", "nvnh_f"),
+               ("exchange", "nvnh_f"), ("drone", "suit_f"),
+               ("agent", "suit_f"), ("scientist", "teacher"),
+               ("bully", "girl3")):
+    SWAP_TILES.setdefault(_a, _b)
+    SWAP_TILES.setdefault(_b, _a)
 TOWNSFOLK_TILES = ["kid", "kid2", "kid3", "girl", "girl2", "girl3",
                    "surfer", "suit", "suit_f", "mom", "dad", "oldsalt"]
 TEEN_TILES = {("Human", "M"): "teen_m", ("Human", "F"): "teen_f",
@@ -4816,6 +4833,7 @@ class Game:
                 self.give_errand(m)
             if key[1] == "gym":
                 self.dress_gym(area)
+            self.apply_swaps(area)
             if key[1] == "home":
                 area.mobs = [m for m in area.mobs if m.role != "dad" or
                              not 8 <= self.now().hour < 18 or
@@ -4853,6 +4871,7 @@ class Game:
         guard.roam, guard.home = {"sand"}, (12, 26)
         snack = make_person(self.world, "snack", 16, 20)
         area.mobs = list(area.folk) + [fisher, guard, snack]
+        self.apply_swaps(area)
         for m in area.mobs:
             self.give_errand(m)
         self.release_cats(area)
@@ -6183,6 +6202,8 @@ class Game:
         self.aim = None
         if what[0] == "fire":
             self.fire(dx, dy)
+        elif what[0] == "gun":
+            self.gender_zap(dx, dy)
         else:
             self.power_at(what[1], dx, dy)
 
@@ -6672,6 +6693,70 @@ class Game:
                            "didn't quite make the trip",
                            "fit, surprisingly"))), "mad")
 
+    def aim_gun(self):
+        self.aim = ("gun",)
+        self.say("Zap who? (arrow keys, or tap)", "info")
+
+    def gender_zap(self, dx, dy):
+        """The Boy/Girl Gun, on somebody else."""
+        mob, path = self.target_in_line(dx, dy, 6, people=True)
+        self.sound.play("spell")
+        self.fly(path, "bolt")
+        if mob is None:
+            self.say("ZORP! The beam hits nothing. Somewhere, a seagull is "
+                     "very confused.", "info")
+        elif mob.ally:
+            self.say("ZORP! Your copy is the other you now. You both find "
+                     "this very weird.", "mad")
+            mob.tile = SWAP_TILES.get(mob.tile, mob.tile)
+        elif mob.hostile:
+            mob.stuck = max(mob.stuck, 2)
+            self.say("ZORP! %s is now a %s %s. It stops to think about "
+                     "that." % (cap(self.the(mob)), random.choice((
+                         "lady", "gentleman")), mob.name.replace(
+                             "the ", "")), "mad")
+        else:
+            self.swap_mob(mob)
+            key = "swapped:" + (mob.role or mob.name)
+            if key in self.flags:
+                self.flags.discard(key)
+            else:
+                self.flags.add(key)
+            self.say(random.choice((
+                "ZORP! %s is the other one now, pats their new hair, and "
+                "screams.",
+                "ZORP! %s looks down, then up, then at you. They're going "
+                "to remember this. So is their mom.",
+                "ZORP! %s's clothes didn't make the trip. Off they go, "
+                "behind a potted plant.")) % mob.name, "mad")
+            if mob.role and mob.role == self.p.get("date"):
+                self.npc_say(mob, "Hey! We're still going to the Formal, "
+                             "right? Like this?")
+            elif mob.role in ("mom", "dad"):
+                self.lose_rwp(1, "Zapping your folks!")
+            elif not mob.alien and self.area.kind == "city" and \
+                    self.phase() != "night" and not self.ok(
+                        "Luck", diff=3, quiet=True):
+                self.lose_rwp(1, "Somebody tells your folks what you did "
+                              "with that gun.")
+        self.end_turn()
+
+    @staticmethod
+    def swap_mob(mob):
+        mob.swapped = not getattr(mob, "swapped", False)
+        if mob.swapped:
+            mob.plain_tile = mob.tile
+            mob.tile = SWAP_TILES.get(mob.tile, mob.tile)
+        else:
+            mob.tile = getattr(mob, "plain_tile", mob.tile)
+
+    def apply_swaps(self, area):
+        """People zapped with the Boy/Girl Gun stay zapped all week."""
+        for m in area.mobs:
+            if "swapped:" + (m.role or m.name) in self.flags and \
+                    not getattr(m, "swapped", False):
+                self.swap_mob(m)
+
     def copies(self):
         p = self.p
         a = self.area
@@ -6893,7 +6978,11 @@ class Game:
             self.telephone()
             return
         elif n == "boy/girl gun":
-            self.boy_girl()
+            self.open_menu("Point the Boy/Girl Gun at...", [
+                ("Yourself", lambda: (self.boy_girl(), self.end_turn())),
+                ("Someone else (pick a direction)", self.aim_gun),
+                ("Never mind", lambda: None)])
+            return
         elif n == "rocket sneakers":
             p["rocket"] = not p["rocket"]
             if p["rocket"]:

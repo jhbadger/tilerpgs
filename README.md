@@ -193,7 +193,8 @@ gadgets and your Traits.
   Lucky Break, Incredible Cute, Lose It Completely and others), and all of
   them can Fake Out an alien.
 - **Gadgets:** the mall's Gadget Galaxy sells zap guns, goop guns, popcorn
-  grenades, rocket sneakers, Boy/Girl guns and a Cosmic Battle Bikini.
+  grenades, rocket sneakers, Boy/Girl guns (point one at yourself or at
+  anyone else) and a Cosmic Battle Bikini.
 - **Wheels:** humans have the family car and aliens a used saucer (unless
   they can teleport). Zeb's lot sells jetbikes and superdrives; the surf
   shop sells an antigravity boogie board.
