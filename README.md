@@ -31,6 +31,17 @@ If Python reports `No module named '_tkinter'`, install your Python's Tk
 package (for example `brew install python-tk` on macOS with Homebrew Python,
 or `sudo apt install python3-tk` on Debian and Ubuntu).
 
+To build a macOS app with an icon, run the game with `--build-app`. It
+writes `<game>.app` next to the script, or in a folder you name:
+
+```bash
+./clovervale --build-app ~/Applications
+```
+
+The app holds a copy of the game, and it starts with the Python that built
+it, so rebuild it after you change the game or that Python.
+`./<game> --icon-png SIZE [OUT.png]` writes just the icon.
+
 Every game has a few things in common:
 
 - **Saving:** the game saves itself to `~/.<game>.json` whenever you change
@@ -40,6 +51,10 @@ Every game has a few things in common:
 - **Sound:** played with `afplay` on macOS, `paplay` or `aplay` on Linux,
   or pygame's mixer; with none of these the game is silent. Music is cached
   in `~/.cache/<game>`.
+- **Icon:** drawn in code like the tiles. Miskatonic has a tentacle rising
+  from the sea, Hyperspace Homeroom a flying saucer and Clover Vale a
+  four-leaf clover with a horseshoe. It is the window icon on every system,
+  and the app icon on macOS.
 - **Self-test:** `./<game> --selftest` builds every map, room, level and
   tune of several generated games without opening a window.
 

@@ -58,6 +58,9 @@ paplay or aplay if one is available, on Android with pyjnius, or with
 pygame's mixer; otherwise the game is silent.  Music is cached in
 ~/.cache/miskatonic.
 
+App bundle (macOS):  miskatonic --build-app [DIR]   builds miskatonic.app
+                     miskatonic --icon-png SIZE [OUT.png]
+
 Keys: arrows or WASD move, Space waits, E searches, F fires and R reloads,
 C casts, U uses or readies something, I shows your investigator, J the
 journal, M the map, ? help.  The Rite of Dismissal must be spoken (C) in
@@ -79,6 +82,7 @@ import glob
 import json
 import math
 import os
+import plistlib
 import queue
 import random
 import re
@@ -7563,11 +7567,361 @@ TILE_NEEDED = {"master", "thug", "madman", "investigator", "boat", "cat"} | \
     {m.tile for m in MONSTERS.values()}
 
 
+# ------------------------------------------------ icon / macOS app bundle
+
+ICON_NAME = "miskatonic"
+
+
+def icon_mix(a, b, t):
+    t = min(max(t, 0.0), 1.0)
+    return tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(3))
+
+
+ICON_MASK_N = 512
+_icon_tentacle = None
+
+
+def icon_tentacle_mask():
+    """0 outside, 1 tentacle, 2 sucker, stamped once into a grid."""
+    global _icon_tentacle
+    if _icon_tentacle is not None:
+        return _icon_tentacle
+    n = ICON_MASK_N
+    grid = bytearray(n * n)
+    pts = []
+    steps = 500
+    length = 1.05
+    x, y, head = 0.56, 1.04, -math.pi / 2 + 0.22     # heading up
+    for i in range(steps + 1):
+        t = i / steps
+        w = 0.125 * (1 - t) ** 0.9 + 0.014
+        pts.append((x, y, w, t))
+        k = -(1.2 * math.sin(t * 9) * (t < 0.35) +       # sway, then curl
+              34 * max(0, t - 0.38) ** 1.25)
+        head += k * length / steps
+        x += math.cos(head) * length / steps
+        y += math.sin(head) * length / steps
+
+    def stamp(cx, cy, r, v):
+        x0, x1 = int((cx - r) * n), int((cx + r) * n) + 1
+        y0, y1 = int((cy - r) * n), int((cy + r) * n) + 1
+        for py in range(max(0, y0), min(n, y1)):
+            fy = (py + 0.5) / n - cy
+            for px in range(max(0, x0), min(n, x1)):
+                fx = (px + 0.5) / n - cx
+                if fx * fx + fy * fy <= r * r:
+                    grid[py * n + px] = v
+    for x, y, w, t in pts:
+        stamp(x, y, w, 1)
+    for k in range(4, len(pts) - 30, 26):           # suckers, inner side
+        x, y, w, t = pts[k]
+        x2, y2 = pts[k + 1][0], pts[k + 1][1]
+        nx, ny = -(y2 - y), x2 - x
+        d = math.hypot(nx, ny) or 1
+        stamp(x - nx / d * w * 0.55, y - ny / d * w * 0.55, w * 0.28, 2)
+    _icon_tentacle = grid
+    return grid
+
+
+def icon_art(x, y):
+    g = icon_tentacle_mask()
+    v = g[min(ICON_MASK_N - 1, int(y * ICON_MASK_N)) * ICON_MASK_N +
+          min(ICON_MASK_N - 1, int(x * ICON_MASK_N))]
+    if v == 2:
+        return (196, 214, 170)
+    if v == 1:
+        return icon_mix((70, 120, 74), (34, 70, 46), x * 1.2 - 0.2)
+    sea = 0.80 + 0.018 * math.sin(x * 26)
+    if y > sea:
+        return icon_mix((14, 34, 40), (4, 12, 18), (y - sea) / 0.2)
+    if math.hypot(x - 0.74, y - 0.22) <= 0.12:    # moon
+        return icon_mix((232, 236, 180), (196, 204, 140), (x - 0.62) / 0.24)
+    glow = max(0.0, 1 - math.hypot(x - 0.74, y - 0.22) / 0.4)
+    sky = icon_mix((10, 22, 30), (34, 62, 58), y / 0.8)
+    return icon_mix(sky, (90, 110, 80), glow * 0.45)
+
+
+def icon_rr(x, y, x0, y0, x1, y1, r):
+    """True inside the rounded rectangle (x0,y0)-(x1,y1) with corner radius r."""
+    cx = min(max(x, x0 + r), x1 - r)
+    cy = min(max(y, y0 + r), y1 - r)
+    return math.hypot(x - cx, y - cy) <= r
+
+
+def icon_sample(x, y):
+    """RGB of the icon at (x, y) in the unit square, or None (transparent)."""
+    if not icon_rr(x, y, 0.0, 0.0, 1.0, 1.0, 0.2):
+        return None
+    return icon_art(x, y)
+
+
+def icon_render_png(size):
+    n = 4 if size <= 256 else 2
+    rows = []
+    for py in range(size):
+        row = bytearray([0])                     # PNG filter type 0
+        for px in range(size):
+            ra = ga = ba = aa = 0
+            for sy in range(n):
+                for sx in range(n):
+                    c = icon_sample((px + (sx + 0.5) / n) / size,
+                                    (py + (sy + 0.5) / n) / size)
+                    if c:
+                        ra += c[0]
+                        ga += c[1]
+                        ba += c[2]
+                        aa += 1
+            if aa:
+                row += bytes((ra // aa, ga // aa, ba // aa,
+                              255 * aa // (n * n)))
+            else:
+                row += b"\0\0\0\0"
+        rows.append(bytes(row))
+
+    def chunk(tag, data):
+        return (struct.pack(">I", len(data)) + tag + data +
+                struct.pack(">I", zlib.crc32(tag + data) & 0xffffffff))
+    return (b"\x89PNG\r\n\x1a\n" +
+            chunk(b"IHDR", struct.pack(">IIBBBBB", size, size, 8, 6, 0, 0, 0)) +
+            chunk(b"IDAT", zlib.compress(b"".join(rows), 9)) +
+            chunk(b"IEND", b""))
+
+
+# ICNS entry types holding PNG data, with the pixel size of each
+ICON_ICNS_TYPES = [(b"icp4", 16), (b"icp5", 32), (b"ic11", 32), (b"ic12", 64),
+                   (b"ic07", 128), (b"ic13", 256), (b"ic08", 256),
+                   (b"ic14", 512), (b"ic09", 512)]
+
+
+def icon_make_icns():
+    """An .icns file written directly (no iconutil needed)."""
+    pngs = {}
+    body = b""
+    for tag, size in ICON_ICNS_TYPES:
+        if size not in pngs:
+            pngs[size] = icon_render_png(size)
+        body += tag + struct.pack(">I", len(pngs[size]) + 8) + pngs[size]
+    return b"icns" + struct.pack(">I", len(body) + 8) + body
+
+
+def icon_build_app(dest):
+    """Build a macOS <name>.app bundle (with icon) in dest."""
+    app = os.path.join(dest, ICON_NAME + ".app")
+    if os.path.exists(app):
+        shutil.rmtree(app)
+    macos = os.path.join(app, "Contents", "MacOS")
+    res = os.path.join(app, "Contents", "Resources")
+    os.makedirs(macos)
+    os.makedirs(res)
+    shutil.copy(os.path.abspath(__file__), os.path.join(res, ICON_NAME + ".py"))
+    launcher = os.path.join(macos, ICON_NAME)
+    with open(launcher, "w") as fh:
+        fh.write('#!/bin/sh\nexec "%s" "$(dirname "$0")/../Resources/%s.py" '
+                 '"$@"\n' % (sys.executable, ICON_NAME))
+    os.chmod(launcher, 0o755)
+    with open(os.path.join(res, ICON_NAME + ".icns"), "wb") as fh:
+        fh.write(icon_make_icns())
+    info = {
+        "CFBundleName": ICON_NAME,
+        "CFBundleDisplayName": ICON_NAME,
+        "CFBundleIdentifier": "org.badgerjh." + ICON_NAME,
+        "CFBundleExecutable": ICON_NAME,
+        "CFBundleIconFile": ICON_NAME,
+        "CFBundlePackageType": "APPL",
+        "CFBundleShortVersionString": "1.0",
+        "NSHighResolutionCapable": True,
+    }
+    with open(os.path.join(app, "Contents", "Info.plist"), "wb") as fh:
+        plistlib.dump(info, fh)
+    return app
+
+
+def icon_args(args):
+    """Handle --build-app [DIR] and --icon-png SIZE [OUT]; True if handled."""
+    if args[:1] == ["--build-app"]:
+        print(icon_build_app(args[1] if len(args) > 1 else
+                             os.path.dirname(os.path.abspath(__file__))))
+        return True
+    if args[:1] == ["--icon-png"] and len(args) >= 2:
+        with open(args[2] if len(args) > 2 else ICON_NAME + ".png", "wb") as fh:
+            fh.write(icon_render_png(int(args[1])))
+        return True
+    return False
+
+
+def set_window_icon(root):
+    try:
+        root._icon = tk.PhotoImage(data=ICON_PNG)
+        root.iconphoto(True, root._icon)
+    except tk.TclError:
+        pass
+
+
+# The window icon: icon_render_png(128), stored so startup needn't draw it.
+# A tentacle rising out of a black sea under the moon.
+ICON_PNG = (
+    "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"
+)
+
+
 def main():
+    if icon_args(sys.argv[1:]):
+        return
     if "--selftest" in sys.argv:
         selftest()
         return
     root = tk.Tk()
+    set_window_icon(root)
     Game(root)
     root.mainloop()
 
