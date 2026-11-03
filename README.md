@@ -10,6 +10,7 @@ and music, and tiles drawn in code, so there are no image or sound files.
 | [Miskatonic](#miskatonic) | Arkham, Massachusetts, 1925 | Call of Cthulhu, 5th edition |
 | [Hyperspace Homeroom](#hyperspace-homeroom) | Marigold Bay, California, prom week | Teenagers From Outer Space |
 | [Clover Vale](#clover-vale) | a valley of magic ponies, the week of the Lantern Festival | the pony roleplaying game (Renegade Game Studios) |
+| [Lazarus Deep](#lazarus-deep) | a dead ice-mining station on a frozen moon, four days before the Company arrives | Mothership (Tuesday Knight Games) |
 
 ## Running a game
 
@@ -25,6 +26,10 @@ The games need only Python 3 with Tk; there is nothing to install.
 
 ```bash
 ./clovervale
+```
+
+```bash
+./lazarus
 ```
 
 If Python reports `No module named '_tkinter'`, install your Python's Tk
@@ -52,8 +57,9 @@ Every game has a few things in common:
   or pygame's mixer; with none of these the game is silent. Music is cached
   in `~/.cache/<game>`.
 - **Icon:** drawn in code like the tiles. Miskatonic has a tentacle rising
-  from the sea, Hyperspace Homeroom a flying saucer and Clover Vale a
-  four-leaf clover with a horseshoe. It is the window icon on every system,
+  from the sea, Hyperspace Homeroom a flying saucer, Clover Vale a
+  four-leaf clover with a horseshoe, and Lazarus Deep the Dig tower on
+  the ice under a gas giant. It is the window icon on every system,
   and the app icon on macOS.
 - **Self-test:** `./<game> --selftest` builds every map, room, level and
   tune of several generated games without opening a window.
@@ -391,6 +397,142 @@ View shows the map and Start opens the menu.
 - `clovervale`: the game
 - `~/.clovervale.json`: the saved game
 - `~/.cache/clovervale/`: cached music
+
+---
+
+## Lazarus Deep
+
+*Survival horror on a dead mining station under the ice.*
+
+Lazarus Deep is a Halvorsen-Kade ice mine on Tisiphone, a frozen moon of the
+gas giant Megaera. Nineteen days ago it stopped shipping ice and stopped
+answering. You are the first of the four contract crew of the tug Patience
+to come out of cryo, and the station's mind, VESPER, has just clamped your
+ship to the docking ring and won't let it go. Something four kilometres down,
+at the bottom of the Dig, is singing. The Company's ship, the Due Diligence,
+docks on the evening of the fourth day. It isn't coming to help.
+
+There is no list of things to collect. What happened here, who is still what
+they seem, who can be saved and how to make it stop are for you to find out,
+and you probably won't manage all of it:
+
+- **Survive:** free the Patience and leave. The Director's override code,
+  VESPER's core in the Underdeck, or a pilot mad enough to fire the drive
+  with the clamps still on.
+- **Solve:** find the evidence (the Director's Directive 9, the foreman's
+  Survey Log, the doctor's autopsy notes, the Magdalene's manifest) and
+  broadcast it to the public relay, where the Company can't bury it.
+- **Save:** the survivors will go aboard the Patience and wait in the hold,
+  if they trust you. Errands win their trust: dog tags, a wedding ring, a
+  child's cat, a box of insulin, a failing CO2 scrubber, a pilot hiding in
+  the flooded cistern.
+- **Stop it:** put back what was taken from the Reliquary, and bring the
+  Dig down on top of it.
+
+One of the survivors is not a survivor. Every night at two, the Second Skin
+goes walking and somebody doesn't come back. The people who've noticed
+things will tell you, and a medscanner, a bioscanner, infrared goggles or
+VESPER's head count will too. Take it aboard the Patience and it goes where
+you go. Only fire keeps it down.
+
+Each turn is a minute. You wake aboard the Patience at 08:00 on Day 1.
+
+### Every station is different
+
+A new game deals a new station: the survivors' names change, a different one
+of them is the Second Skin, the people who've noticed something change, and
+the things you need (the Blasting Store key, a scrubber filter, a
+flamethrower, a medscanner) lie on different bodies in different places
+below. The Ring stays where it is. Below it are the Dig, the Underdeck, the
+sealed dorms of Sector 7, the airless ore hauler Magdalene and the flooded
+Reclamation tanks.
+
+### Crew
+
+Roll your Stats (Strength, Speed, Intellect, Combat: 2d10+25 each) and Saves
+(Sanity, Fear, Body: 2d10+10 each), and roll again until you like them. Then
+choose a class and a speciality:
+
+- **Marine:** +10 Combat, +10 Body, +20 Fear and a Wound to spare. When you
+  Panic, whoever is with you may run. Rifleman, Breacher or Old hand.
+- **Android:** +20 Intellect, -10 Speed, +60 Fear and a Wound to spare.
+  People find you hard to trust, but you don't breathe, and the Psalm has
+  nothing in you to hollow out. Systems, Medical or Security.
+- **Scientist:** +10 Intellect, +5 more Intellect and +30 Sanity, and a
+  Master Skill. When you fail a Sanity Save, whoever is with you loses their
+  nerve. Physician, Xenobiologist, Cyberneticist or Archaeologist.
+- **Teamster:** +5 to every Stat and +10 to every Save. Once a day you take
+  Advantage on a Panic Check. Mechanic, Miner or Pilot.
+
+Your class and roll give you a loadout (armour, a weapon, some kit), a few
+credits, a trinket and a patch.
+
+### Rolls, Stress and Panic
+
+- **Checks and Saves:** roll d100 under a Stat or Save, plus your best
+  relevant Skill (+10 Trained, +15 Expert, +20 Master). 90-99 always fails.
+  Doubles are critical, either way. Advantage rolls twice and takes the
+  better, Disadvantage the worse. Every roll is shown in the log.
+- **Stress:** every failed roll is a point. A critical failure, the first
+  sight of a horror or a death means a Panic Check: a d20 that must beat
+  your Stress, or you roll on the Panic table (adrenaline, nightmares,
+  cowardice, a heart attack, or giving up altogether). Stress past 20 eats
+  into your worst Save.
+- **Rest:** a bunk sheds Stress with a Rest Save, and six hours' sleep can
+  put your Health back. The Patience and the chapel are safe. Nowhere else
+  is.
+
+### Wounds and dying
+
+Damage comes off Health, but armour ignores any hit smaller than its Armor
+Points, and is wrecked by any hit that isn't. At zero Health you take a
+Wound and roll on the Wounds table for its kind (blunt force, bleeding,
+gunshot, fire, gore). That might mean a broken leg, Bleeding every turn
+until you stop it, or a lethal injury with a few turns left to treat it.
+Run out of Wounds and you make a Death Save.
+
+When you die, the next of the Patience's crew comes out of cryo and carries
+on, from where things stand. Your body stays where it fell, with your kit.
+When all four are gone, it's over.
+
+Vacuum, cold, radiation, steam and bad air all hurt too. Fit a scrubber
+filter before Day 3, and wear a sealed suit with air in it on the Magdalene.
+
+### Talking and trust
+
+Walk into someone, or into a counter with someone behind it, then choose or
+type a word. Everyone knows NAME, JOB and BYE, and most know NEWS. Words in
+CAPITALS are worth asking about. The quartermaster, the bartender, the
+doctor, the cook and (once she trusts you) the deputy answer BUY.
+
+Do someone a favour and they'll trust you. Ask the people who trust you to
+go aboard the PATIENCE and they'll wait in its hold, or ask them to COME
+with you (STAY sends them back). Ask about HOLLOW when you're sure enough.
+
+### Keys
+
+| Key | Action |
+| --- | --- |
+| Arrows / WASD | Move (walk into people to talk, into things to fight them) |
+| Space | Wait a turn |
+| E | Search |
+| F | Fire your weapon, or throw a grenade |
+| R | Reload |
+| U | Use something (medicine, scanners, suits, weapons, charges) |
+| I | Your crew member |
+| J | Journal |
+| M | Map |
+| ? | Help |
+
+Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X fires,
+Y reloads, LB uses something, RB opens the journal, View shows the map and
+Start opens the menu.
+
+### Files
+
+- `lazarus`: the game
+- `~/.lazarus.json`: the saved game
+- `~/.cache/lazarus/`: cached music
 
 ---
 
