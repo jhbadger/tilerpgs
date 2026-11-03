@@ -11,6 +11,7 @@ and music, and tiles drawn in code, so there are no image or sound files.
 | [Hyperspace Homeroom](#hyperspace-homeroom) | Marigold Bay, California, prom week | Teenagers From Outer Space |
 | [Clover Vale](#clover-vale) | a valley of magic ponies, the week of the Lantern Festival | the pony roleplaying game (Renegade Game Studios) |
 | [Lazarus Deep](#lazarus-deep) | a dead ice-mining station on a frozen moon, four days before the Company arrives | Mothership (Tuesday Knight Games) |
+| [Larkspur Hall](#larkspur-hall) | an English country house, the week of the Master's birthday | Maid RPG (Ryo Kamiya) |
 
 ## Running a game
 
@@ -30,6 +31,10 @@ The games need only Python 3 with Tk; there is nothing to install.
 
 ```bash
 ./lazarus
+```
+
+```bash
+./larkspur
 ```
 
 If Python reports `No module named '_tkinter'`, install your Python's Tk
@@ -58,9 +63,10 @@ Every game has a few things in common:
   in `~/.cache/<game>`.
 - **Icon:** drawn in code like the tiles. Miskatonic has a tentacle rising
   from the sea, Hyperspace Homeroom a flying saucer, Clover Vale a
-  four-leaf clover with a horseshoe, and Lazarus Deep the Dig tower on
-  the ice under a gas giant. It is the window icon on every system,
-  and the app icon on macOS.
+  four-leaf clover with a horseshoe, Lazarus Deep the Dig tower on the
+  ice under a gas giant, and Larkspur Hall a teacup with its steam
+  rising in a heart. It is the window icon on every system, and the app
+  icon on macOS.
 - **Self-test:** `./<game> --selftest` builds every map, room, level and
   tune of several generated games without opening a window.
 
@@ -533,6 +539,141 @@ Start opens the menu.
 - `lazarus`: the game
 - `~/.lazarus.json`: the saved game
 - `~/.cache/lazarus/`: cached music
+
+---
+
+## Larkspur Hall
+
+A comedy of a week below stairs in a rambling English country house, on
+the rules of Maid RPG (Ryo Kamiya; English edition by Kuroneko Designs).
+
+You are the newest maid at Larkspur Hall. The Master's birthday is on
+Sunday, and the Master doesn't want a fuss. The Master's great-aunt, the
+Dowager, who holds the family purse, is coming that afternoon to decide
+whether Larkspur carries on as it is or is sold, and its household turned
+out. And on the morning you arrive, a calling card comes with the post:
+*Larkspur. Tonight: the KITCHEN. Yours, the Phantom.*
+
+The week has three threads, and the ending depends on all of them:
+
+- **The Favor race:** every maid in the house wants the Master's Favor, and
+  the other three maids are working the same rota you are. Wake the Master,
+  cook and serve the meals, do the laundry and the cleaning, take the
+  Master for a walk, draw the bath, read a bedtime story. Whoever gets
+  there first gets the credit. At the party, the maid with the most Favor
+  gets the ending scene.
+- **The birthday:** bake the cake (flour, sugar, butter, eggs, cream, and
+  the Master's favourite flavour; practise first; the other maids help if
+  they like you), and make the Master a present. Find out what the Master
+  wishes for and make that, and it's the best present of all.
+- **The Phantom:** every night at one o'clock the Phantom takes something
+  (the family recipe book, the silver teaspoons, the Master's slippers...),
+  and every morning a card says where it will strike next. Lie in wait
+  there, set a trap, or search the scene for what it left behind: a thread,
+  a scent, a sweet wrapper, a hair. Two clues that point at one person and
+  you can ACCUSE them and wear them down until they confess. What it took
+  is hidden below the house, or beyond it.
+
+On Sunday the Dowager arrives at two, takes tea and inspects the house at
+three (the dust, the tea, your uniform, the Phantom, whatever's running
+loose), and gives her verdict at the party at five.
+
+Each turn is a minute, or half of one walking about the house and grounds.
+You start in the maids' quarters at six on Monday morning.
+
+### Every household is different
+
+A new game rolls a new Master on the book's Master tables (type, age,
+Special Qualities, Power Source, favourite Maid Type) and three new maids
+on the maid tables, like you. It chooses a new Phantom among the maids, the
+Master's cousin, the secretary and the butler, each with a motive of their
+own, a new wish and a favourite flavour, a new hiding place, and five of
+the book's Random Events (escaped hens, a penguin from the zoo, a treasure
+map, a dinosaur egg, the ghost of an ancestor, a UFO, a cursed laughing
+doll, a fleeing princess, a cold, a smashed vase, a kitchen fire, ninjas, a
+television crew). Below and beyond the house are the cellar and the old
+servants' tunnels, the attic and the tower room, and the hedge maze.
+
+### Your maid
+
+Everything is rolled, as in the book; roll again until you like her, or
+just roll new Special Qualities:
+
+- **Attributes:** Athletics, Affection, Skill, Cunning, Luck and Will, each
+  2d6 divided by 3.
+- **Maid Types:** two, which raise one Attribute and lower another. The
+  book's Lolita and Sexy are called Cute and Glamorous here.
+- **Maid Colours** (your uniform, eyes and hair, which is how your sprite
+  is drawn), two **Special Qualities**, **Maid Roots**, a **Stress
+  Explosion** and a **Maid Weapon**, each from its table.
+- **Maid Power:** from the table for your highest Attribute, or two if
+  your Attributes add up to 9 or less. All 36 are in the game, from Super
+  Evasion and Instant Cleaning to Teleport, Lie Detector and Maiden's
+  Tears.
+- **Spirit** is Will x 10, and your starting **Favor** is Affection x 2.
+
+This is a lighter game than the book allows for: the book's Perversion,
+Tragic Love and Trauma tables, and the rougher entries on the others, are
+left out.
+
+### Rolls, contests, Stress and Favor
+
+- **Rolls:** a die times the Attribute you're using, against a difficulty
+  of 4 to 10. At 0 in an Attribute you can't succeed. Every roll is shown in
+  the log.
+- **Your uniform:** every piece that's dirty, torn or missing takes 1 off
+  the die (the headdress 2). Change into clean pieces from the laundry
+  wardrobe, and do the laundry, or there won't be any.
+- **Contests:** against a troublemaker (a dust bunny, a goose, a clockwork
+  knight) or a suspect, you both roll, each with the Attribute you choose
+  to use. The loser takes Stress: the winner's total divided by the loser's
+  Attribute. A troublemaker whose Stress goes over its Spirit is beaten:
+  swept up, caught, calmed down or sent packing.
+- **Stress Explosion:** when your Stress goes over your Spirit, you can only
+  do what your Explosion says (cry, sleep, binge, sulk in your room, drive
+  the ride-on mower round the lawns...) until it drains away, a point a
+  minute.
+- **Favor** comes from the Master: 1d6 for a chore well done, 2d6 for a
+  lovely moment together, 2d6 to 3d6 for troubles put right. Spend it (F)
+  to shed Stress, to try harder (+1 to your next die), to raise an
+  Attribute, or to make a Random Event happen. If your Favor goes below
+  zero you're dismissed, unless you give up a point of an Attribute to
+  stay.
+
+### Talking
+
+Walk into someone, then choose or type a word. Everyone knows NAME, JOB and
+BYE, and most know NEWS. Words in CAPITALS are worth asking about. The
+grocer's van at the lodge (ten till four) answers BUY. Ask the Master to
+COME for a walk at half past four, and ask everyone about the PHANTOM, the
+CAKE and the Master's WISH.
+
+### Keys
+
+| Key | Action |
+| --- | --- |
+| Arrows / WASD | Move (walk into people to talk, into troublemakers to take them on) |
+| Space | Wait a turn |
+| Z | Wait longer (a quarter of an hour, an hour, until the next chore) |
+| C | Do the chore here (cook, wash, serve, sweep...) |
+| E | Search |
+| F | Spend Favor |
+| U | Use something (make a present, set a trap, a Maid Power) |
+| I | Your maid |
+| J | Journal |
+| R | The rota |
+| M | Map |
+| ? | Help |
+
+Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X does
+a chore, Y spends Favor, LB uses something, RB opens the journal, View shows
+the map and Start opens the menu.
+
+### Files
+
+- `larkspur`: the game
+- `~/.larkspur.json`: the saved game
+- `~/.cache/larkspur/`: cached music
 
 ---
 
