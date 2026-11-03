@@ -577,7 +577,7 @@ TIPS = [
 SNORR_RUMOURS = [
     "There's men in grey suits around town at night. They don't blink.",
     "My mom says the Formal's a bad influence. Well, my mom and some "
-    "grey guy she met at the PTA.",
+    "grey guy she met at the P.T.A.",
     "Somebody painted over the mural at the beach. Grey. Just grey.",
     "Ever hear of SNORR? It's a planet. Fun's illegal there. Imagine.",
     "My dad saw a guy in a grey suit taking notes outside the gym.",
@@ -2681,6 +2681,46 @@ def fill(text, world):
     return text.format(**names)
 
 
+# What anyone in town can say about the words going round, when they
+# know nothing better: gossip, and who to ask.
+TOPICS = {
+    "boil": "The boiler room's under the school. The janitor's got the "
+            "only keys.",
+    "date": "Ask somebody to the Formal! One of the kids from school. "
+            "Bring a corsage.",
+    "drai": "The storm drain on the beach, south of the pier. It smells "
+            "awful, and lately it glows.",
+    "driv": "The Starlite Drive-In, on the east side of town. Monster "
+            "movies every night. The projectionist's a nice guy.",
+    "form": "The Formal's Saturday at eight, in the gym. Tux & Tiara at "
+            "the mall rents formalwear.",
+    "jetb": "Zeb sells jetbikes at his saucer lot, downtown.",
+    "love": "Lover's Point: up in the hills north-west of town, over the "
+            "ocean. Where kids go to, um, look at the view.",
+    "cras": "Something crashed up in the hills behind Lover's Point last "
+            "week. The Air Force says it was a weather balloon.",
+    "out": "The OUT OF ORDER machine at the Galaxy Arcade? The manager "
+           "hates that thing.",
+    "pier": "The pier's on the beach. The old fisherman's always out at "
+            "the end of it.",
+    "snor": "Snorr? Some grey planet. Look it up at the library.",
+    "sub": "The mall's sub-basement? Ask the mall cop. He guards the "
+           "door.",
+    "trua": "The truant officer catches kids cutting class. The mall and "
+            "the arcade first, every time.",
+    "blob": "A blob? Like in the old monster movies at the drive-in?",
+    "meat": "The cafeteria meat? Ask the lunch lady. On second thought, "
+            "don't.",
+    "keys": "Keys? The janitor at the school has keys to everything.",
+    "mall": "Seaview Mall, on the east side. They've got everything.",
+    "hype": "The Hyperdisco? Dr. Fizzwick, the science teacher, knows all "
+            "about it.",
+    "shar": "Shards? Dr. Fizzwick at the school is looking for some, I "
+            "heard.",
+    "rese": "The library's the place to look things up. The video store "
+            "has a shelf of movie books too.",
+}
+
 # Each role: greeting, then keyword: reply.  A reply may be a dict: "say"
 # the words, "learn" a clue, "topic" a research subject; "stat" names the
 # Stats (the best is used) and "knack" the kind of Knack to roll, against
@@ -2707,11 +2747,15 @@ ROLE_TALK = {
         "snor": "SNORR? The planet where fun is illegal. They'd love to "
                 "see us fail. If there's a Snorrian in town, it'll look "
                 "like a grown-up. They always do.",
-        "help": "Talk to people. Words in CAPITALS are worth asking "
+        "help": "Talk to people. Words in capitals are worth asking "
                 "about, and worth looking up at the library.",
         "news": "Everything's news this week. Weird news, mostly.",
         "teen": "Bring me shards and I'll give you something from my "
                 "lab. Teener Points, too, for being amazing.",
+        "drai": "The storm drain on the beach, south of the pier. Just a "
+                "drain. Smelly.",
+        "drai": "The storm drain on the beach, south of the pier. Just a "
+                "drain. Smelly.",
     }),
     "principal": ("Shouldn't you be in class? Oh, it's you.", {
         "job": "I'm the principal of Marigold Bay High. Some days I wish "
@@ -2735,6 +2779,8 @@ ROLE_TALK = {
         "news": "Somebody's been in my supply closet. Mopped the floor "
                 "for me. I don't like it.",
         "key": "My KEYS? Nobody touches my keys.",
+        "boil": "The boiler room? Under my closet. Nothing down there but "
+                "the boiler, and the mops.",
     }),
     "coach": ("Drop and give me twenty! Kidding. Unless you want to.", {
         "job": "I coach everything. Football, volleyball, dodgeball. "
@@ -2769,7 +2815,7 @@ ROLE_TALK = {
         "news": "Coach is freaking out about his gym floor.",
     }),
     "brainkid": ("Shh. I'm studying. Oh, it's fine. What?", {
-        "job": "I'm going to MIT. Or Caltech. Or the Vegan Science "
+        "job": "I'm going to M.I.T. Or Caltech. Or the Vegan Science "
                "Academy, it's in the Crab Nebula.",
         "news": "Did you know the Hyperdisco runs on pure boogie? It's in "
                 "the literature.",
@@ -2788,11 +2834,17 @@ ROLE_TALK = {
                 "LOVER'S Point. Not one of ours. A very old model.",
         "earth": "Is it true that on Earth you dance to make the stars "
                  "come out?",
+        "love": "Lover's Point is in the hills, north-west of town. My saucer "
+                "club goes there to look at the stars. Only the stars.",
+        "cras": "A very old saucer. It came down hard. My club did not go "
+                "and look. We are not that kind of club.",
     }),
     "rebelkid": ("What do you want?", {
         "job": "Nothing. I play pinball. I don't do clubs.",
         "news": "There's a machine at the arcade that's OUT of order. "
                 "Kids keep going in it. Not playing it. In it.",
+        "out": "The corner machine at the Galaxy Arcade. Don't feed it. "
+               "It's broken.",
     }),
     "librarian": ("Shhh! Library voice, please.", {
         "job": "I run the Marigold Bay Public Library. Every newspaper "
@@ -2823,6 +2875,7 @@ ROLE_TALK = {
         "job": "Mall security. I see everything. Mostly.",
         "news": "Strange noises from the SUB-basement at night. Shopping "
                 "carts. Rolling around by themselves.",
+        "sub": "The sub-basement's storage. Employees only. Sorry, kid.",
     }),
     "gizmo": ("Greetings, valued customer! Today only, everything!", {
         "job": "I sell gadgets, by appointment of the Intergalactic Trade "
@@ -2858,13 +2911,13 @@ ROLE_TALK = {
     }),
     "patron2": ("This is the best ice cream in the Galaxy.", {
         "job": "Eating ice cream. Ask me again in five minutes.",
-        "news": "My dad works at the drive-in. He says the monster "
-                "movies are coming out wrong. Like, OUT.",
+        "news": "My dad works at the DRIVE-in. He says the monster "
+                "movies are coming out wrong. Like, out of the screen.",
     }),
     "patron3": ("Oh! Sorry, these bags. Hello.", {
         "job": "I'm shopping for my daughter's Formal dress. She hates "
                "all of them.",
-        "news": "Did you hear? Men in grey suits at the PTA meeting. "
+        "news": "Did you hear? Men in grey suits at the P.T.A. meeting. "
                 "They didn't eat a single cookie.",
     }),
     "cook": ("Welcome to Burger Blaster! Can I take your order?", {
@@ -3015,7 +3068,7 @@ HOOKS = {
         "mallcop": {
             "news": "Noises from the SUB-basement at night. Carts, rolling "
                     "by themselves. And something giving orders.",
-            "sub": {"say": "Behind the EMPLOYEES ONLY door at the end of "
+            "sub": {"say": "Behind the EMPLOYEES-only door at the end of "
                     "the food court. I'm not allowed to let anybody "
                     "down there. Rules.", "learn": "mall_known"},
             "empl": {"say": "Employees only. Unless you've got a good "
@@ -7636,8 +7689,9 @@ class Game:
     def hear(self, text):
         """Words in CAPITALS: things to ask about, and to look up."""
         words = re.findall(r"\b[A-Z][A-Z']{2,}\b", text)
-        self.heard = [w for w in words if w not in ("BYE", "HI", "SNORR")
-                      or w == "SNORR"]
+        self.heard = [re.sub(r"'S?$", "", w) for w in words
+                      if w not in ("BYE", "HI") and
+                      not re.fullmatch(r"[IVXLC]+", w)]
         for w in words:
             if w in RESEARCH:
                 self.topics.add(w)
@@ -7686,7 +7740,7 @@ class Game:
             st = self.side.get(e["id"])
             if st and st["state"] == "active":
                 greet = "Oh! It's you. Any luck?"
-        if p.get("date") == mob.role:
+        if p.get("date") and p.get("date") == mob.role:
             greet = random.choice(("Hi, you! Saturday's going to be "
                                    "great.", "Hey, date!",
                                    "I bought shoes. For Saturday."))
@@ -7784,7 +7838,7 @@ class Game:
             self.npc_say(mob, random.choice(BYES))
             self.end_talk()
             return
-        word = w.split()[0]
+        word = re.sub(r"'s?$", "", w.split()[0])
         if word.startswith("name"):
             mob.known = True
             self.npc_say(mob, "I'm %s." % mob.name if not mob.role else
@@ -7823,9 +7877,21 @@ class Game:
                 "Keep going!"))
             return
         reply = next((v for k, v in mob.talk.items()
-                      if k[:4] == word[:4]), None)
+                      if k[:4] == word[:4] or (len(k) < 4 and
+                                               word.startswith(k))), None)
         if reply is None and word[:4] in ("heal", "how'", "how"):
             reply = random.choice(HEALTH)
+        if reply is None and mob.shop and len(word) >= 4 and \
+                not self.closed(mob) and any(
+                    word[:4] in label.lower()
+                    for label, _, _ in self.offers(mob)):
+            self.list_offers(mob)
+            return
+        if reply is None:
+            reply = next((v for k, v in TOPICS.items()
+                          if word.startswith(k)), None)
+        if reply is None and word.upper() in RESEARCH:
+            reply = "Like, I don't know much about that. Look it up at the library?"
         if reply is None:
             reply = random.choice((
                 "I don't know anything about that.",

@@ -2178,6 +2178,48 @@ def fill(text, world):
     return text.format(**names)
 
 
+# What anyone in town can say about the words going round, when they
+# know nothing better: gossip, and who to ask.
+TOPICS = {
+    "ashc": "Professor Ashcroft? The one who went missing. Dr. Armitage at "
+            "the University Library was his friend. Ask him.",
+    "armi": "Dr. Armitage keeps the University Library, south of the "
+            "river. A clever old man. Tired, lately.",
+    "bodi": "Bodies going missing from St. Mary's, they say. The nurses "
+            "there would know, if they'd talk.",
+    "grav": "The Old Arkham Graveyard, out on French Hill. The sexton's "
+            "the man to ask.",
+    "inns": "Innsmouth? Down the coast. Queer folk, and they smell of "
+            "fish. Some of them come up the river to Rivertown.",
+    "isla": "Nobody goes out to the island. There are old stones out "
+            "there. The boatman by the dock rents boats, if you're fool "
+            "enough.",
+    "lant": "The Pale Lantern? I shouldn't talk about that. Better "
+            "families, closed doors. Try the library.",
+    "mead": "Meadow Hill's out in the woods, south-west of town. Folk who "
+            "eat at the Silver Spoon talk about lights there.",
+    "morg": "The Advertiser keeps a morgue of old papers; the editor "
+            "might let you look. St. Mary's has the other kind.",
+    "rats": "Rats? The Witch House on Pickman Street is crawling with "
+            "them, the landlady says.",
+    "spec": "Ask at Nolan's barber shop for the special. That's all I'll "
+            "say about it.",
+    "tunn": "The steam tunnels under the University. The janitor at "
+            "Science Hall has the keys.",
+    "humm": "A humming, under Science Hall? The janitor would know, if "
+            "anyone does.",
+    "base": "The Sanitarium basement? Locked, and the orderlies keep it "
+            "that way.",
+    "rive": "Rivertown's by the river, in the east. A rough part of town. "
+            "The Marsh warehouse is there.",
+    "rese": "The University Library, the public library and the "
+            "Advertiser's morgue: walk into their shelves to research.",
+    "acco": "The teller will see to your account. Ask to BUY, and say how "
+            "much to WITHDRAW.",
+    "bed": "Your bed's upstairs on the left. Walk into it when you want to "
+           "sleep.",
+}
+
 # Each role: greeting, then keyword: reply.  A reply may be a dict: "say"
 # the words, "learn" a clue, "topic" a research subject; "skill" names the
 # skills (best used) to roll first, "ok"/"fail" the replies either way, and
@@ -6143,7 +6185,8 @@ class Game:
     def hear(self, text):
         """Words in CAPITALS: things to ask about, and to research."""
         words = re.findall(r"\b[A-Z][A-Z']{2,}\b", text)
-        self.heard = [w for w in words if w not in ("BYE",)]
+        self.heard = [re.sub(r"'S?$", "", w) for w in words
+                      if w not in ("BYE",)]
         for w in words:
             if w in RESEARCH:
                 self.topics.add(w)
@@ -6285,7 +6328,7 @@ class Game:
                          random.choice(BYES))
             self.end_talk()
             return
-        word = w.split()[0]
+        word = re.sub(r"'s?$", "", w.split()[0])
         if word.startswith("name"):
             mob.known = True
             self.npc_say(mob, "I'm %s." % mob.name if not mob.role else
@@ -6315,9 +6358,21 @@ class Game:
         if word[:4] == "spec" and mob.role == "bartender":
             self.flags.add("special")
         reply = next((v for k, v in mob.talk.items()
-                      if k[:4] == word[:4]), None)
+                      if k[:4] == word[:4] or (len(k) < 4 and
+                                               word.startswith(k))), None)
         if reply is None and word[:4] == "heal":
             reply = random.choice(HEALTH)
+        if reply is None and mob.shop and len(word) >= 4 and \
+                not self.closed(mob) and any(
+                    word[:4] in label.lower()
+                    for label, _, _ in self.offers(mob)):
+            self.list_offers(mob)
+            return
+        if reply is None:
+            reply = next((v for k, v in TOPICS.items()
+                          if word.startswith(k)), None)
+        if reply is None and word.upper() in RESEARCH:
+            reply = "I couldn't tell you much about that. You could look it up at a library, or in the Advertiser's morgue."
         if reply is None:
             reply = random.choice((
                 "I don't know anything about that.",
