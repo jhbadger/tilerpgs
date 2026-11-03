@@ -753,6 +753,8 @@ PEOPLE = {
                     shoes="#2a2a2a"),
     "bully": person("M", "#1a1a1a", "#4a3020", pants="#2a2a6a",
                     shoes="#1a1a1a"),
+    "sweetie": person("F", "#1a1a1a", "#ffa8d0", pants="#f070b0",
+                      shoes="#ffffff", collar="#ffffff"),
 }
 # What the Boy/Girl Gun makes of people: each look and its opposite.
 SWAP_TILES = {}
@@ -5982,6 +5984,7 @@ class Game:
         if "thief" in m.traits and p["cash"] > 0:
             n = min(p["cash"], random.randint(1, 6))
             p["cash"] -= n
+            p["stolen"] = p.get("stolen", 0) + n
             self.say("%s takes $%d of your lunch money!" % (name, n), "bad")
 
     def hurt(self, n, text):
@@ -6758,6 +6761,10 @@ class Game:
             self.say("ZORP! Your copy is the other you now. You both find "
                      "this very weird.", "mad")
             mob.tile = SWAP_TILES.get(mob.tile, mob.tile)
+        elif mob.kind == "bully" and mob.hostile:
+            self.reform_bully(mob)
+        elif getattr(mob, "reformed", False):
+            self.unreform_bully(mob)
         elif mob.hostile:
             mob.stuck = max(mob.stuck, 2)
             self.say("ZORP! %s is now a %s %s. It stops to think about "
@@ -6815,8 +6822,65 @@ class Game:
             if f.startswith("swapped:") and role in self.world["people"]:
                 swap_person(self.world["people"][role], role)
 
+    def reform_bully(self, mob):
+        """A bully, zapped: she turns out to be the sweetest kid in town."""
+        rng = random.Random()
+        mob.hostile = False
+        mob.reformed = True
+        mob.swapped = True
+        mob.aware = False
+        mob.stuck = mob.flee = 0
+        mob.tile = "sweetie"
+        mob.name = "%s %s" % (rng.choice(FEMALE), rng.choice(SURNAMES))
+        mob.title = "a former school bully"
+        mob.roam = {"street", "grass", "lawn", "boardwalk", "lot", "path",
+                    "floor", "tile", "carpet", "dfloor"}
+        mob.home = (mob.x, mob.y)
+        mob.greet = "Hiii! Oh my gosh. I'm SO sorry about the lunch money " \
+            "thing. I don't know what I was thinking."
+        mob.talk = {
+            "job": "I used to take lunch money. Now I bake cookies and "
+                   "volunteer at the animal shelter. It's a whole new me!",
+            "news": random.choice(TIPS + SNORR_RUMOURS),
+            "sorr": "I really am sorry. Being mean is SO much work. Being "
+                    "nice is way easier. Who knew?",
+            "lunc": "Your lunch money! I gave some back. The rest I spent "
+                    "on candy. I'm sorry! I'll make it up to you.",
+            "cook": "Chocolate chip. I'll bring you some on Saturday.",
+        }
+        self.flags.add("zapped:" + mob.name)
+        self.sound.play("level")
+        self.say("ZORP! The bully goes pink, and sparkly, and... cute? "
+                 "%s blinks big eyes at you, then bursts into happy "
+                 "tears." % mob.name, "mad")
+        if "reformed_bully" not in self.flags:
+            self.flags.add("reformed_bully")
+            back = min(10, max(3, self.p.get("stolen", 0)))
+            self.p["cash"] += back
+            self.p["items"]["cosmo cake"] = self.p["items"].get(
+                "cosmo cake", 0) + 1
+            self.say("She presses $%d and a Cosmo Cake into your hands. "
+                     "'For all the lunches. I'm so sorry!'" % back, "gold")
+            self.gain_tp(1, "for turning a bully into a sweetheart")
+
+    def unreform_bully(self, mob):
+        """Zapped back: and he remembers."""
+        mob.hostile = True
+        mob.reformed = False
+        mob.swapped = False
+        mob.aware = True
+        mob.tile = "bully"
+        mob.name = MONSTERS["bully"].name
+        mob.title = mob.name
+        mob.bonk = mob.maxbonk = MONSTERS["bully"].bonk + 2
+        self.sound.play("horror")
+        self.say("ZORP! Oh no. The bully's back, and he remembers "
+                 "EVERYTHING. Especially the pink.", "bad")
+
     def likes_change(self, mob):
         """Some people like what the gun did. Some really don't."""
+        if getattr(mob, "reformed", False):
+            return True
         return random.Random("%s:%s:likes" % (
             self.world["seed"], mob.role or mob.name)).random() < 0.5
 
@@ -7926,7 +7990,14 @@ class Game:
             st = self.side.get(e["id"])
             if st and st["state"] == "active":
                 greet = "Oh! It's you. Any luck?"
-        if getattr(mob, "swapped", False):
+        if getattr(mob, "reformed", False) and "met:" + mob.name in \
+                self.flags:
+            greet = random.choice(("Hi, friend!", "Want a cookie? I made "
+                                   "cookies!", "You're my favourite "
+                                   "person. Don't tell anyone."))
+        elif getattr(mob, "reformed", False):
+            self.flags.add("met:" + mob.name)
+        elif getattr(mob, "swapped", False):
             greet = "Hey! Check out the new me!" if self.likes_change(mob) \
                 else "You! You did this! Change me back!"
         elif p.get("date") and p.get("date") == mob.role:
@@ -9483,7 +9554,8 @@ def selftest():
 
 
 TILE_NEEDED = {"monster", "plant", "mouse", "car", "saucer", "jetbike",
-               "pet", "judge", "agent", "drone", "bully", "shard"} | \
+               "pet", "judge", "agent", "drone", "bully", "shard",
+               "sweetie"} | \
     {m.tile for m in MONSTERS.values()} | \
     {ROLES[r][0] for r in ROLES} | set(TOWNSFOLK_TILES)
 
