@@ -9,6 +9,7 @@ and music, and tiles drawn in code, so there are no image or sound files.
 | --- | --- | --- |
 | [Miskatonic](#miskatonic) | Arkham, Massachusetts, 1925 | Call of Cthulhu, 5th edition |
 | [Hyperspace Homeroom](#hyperspace-homeroom) | Marigold Bay, California, prom week | Teenagers From Outer Space |
+| [Clover Vale](#clover-vale) | a valley of magic ponies, the week of the Lantern Festival | the pony roleplaying game (Renegade Game Studios) |
 
 ## Running a game
 
@@ -20,6 +21,10 @@ The games need only Python 3 with Tk; there is nothing to install.
 
 ```bash
 ./homeroom
+```
+
+```bash
+./clovervale
 ```
 
 If Python reports `No module named '_tkinter'`, install your Python's Tk
@@ -255,6 +260,122 @@ Start opens the menu.
 - `homeroom`: the game
 - `~/.homeroom.json`: the saved game
 - `~/.cache/homeroom/`: cached music
+
+---
+
+## Clover Vale
+
+*A gentle adventure of magic ponies, friendship and the Lantern Festival.*
+
+Clover Vale, the week of the Lantern Festival. Every midsummer the ponies of
+the valley light the Great Lantern in the Lantern Hall, and its light keeps
+the Greymist, a fog that drains the colour and the cheer out of everything,
+back in the hills for another year. This year somepony has taken the
+Lantern's four Heartstones and hidden them around the valley. Find them,
+bring them to Grandmare Thistlewick at the Star Tower, and light the Great
+Lantern on Lantern Night, Saturday between sunset (8 pm) and midnight.
+
+Each turn is a minute. You start at home on Monday morning.
+
+### Every week is different
+
+A new game deals a new week. The Heartstones lie in four of six places: the
+old gem mine under Pebble Hill, the heart of the Hollow Wood, the Cloud
+Castle above the north-east hills, the grotto under Lily Lake, the Clockwork
+Attic over the toy shop, and the cellars of Thornwall Keep. The ponies of
+Clover Vale change, and one of the town's grown-ups is a Gloom in disguise.
+Find proof and ask them about the GREYMIST, or meet them on Lantern Night as
+the Greymist Wyrm.
+
+### Ponies
+
+Be a meadow pony, a pegasus or a unicorn, and choose a Calling (the talent
+your heartmark shows) and a Heart (the virtue you live by).
+
+- **Origins:** meadow ponies are tough and can buck things (a monster, a
+  stuck gate, an apple tree). Pegasi fly over water, hedges and holes, and
+  walk on clouds. Unicorns cast spells and fetch things with telekinesis.
+- **Callings:** Baker, Bookworm, Adventurer, Animal Friend, Performer,
+  Tinkerer, Athlete, Fashion Pony, Farmer or Party Planner. The Calling sets
+  your heartmark Skill (always an upshift, and specialized), what you've
+  practised and what you start with.
+- **Hearts:** Generosity, Honesty, Kindness, Laughter, Loyalty or Wonder.
+  Each adds to two Essences, gives a gift of its own, and earns Friendship
+  Points when you live by it.
+- **Essences and Skills:** twelve points go between Strength, Speed, Smarts
+  and Social (move them in the creation dialog), and your Origin and Heart
+  add four more. Each Essence's points become ranks in its Skills, from d2 to
+  d12, and each Essence plus ten is a Defense.
+- **Rolls:** a d20 plus the Skill's die against a Difficulty (10 routine, 15
+  challenging, 20 difficult). Upshifts and downshifts move the die up and
+  down the ladder. With no rank in a Skill you roll two d20s and keep the
+  worse. Rolling the die's highest number on a success is a Critical
+  Success; a natural 1 on a failure is a fumble, which earns a Friendship
+  Point. Every roll is shown in the log.
+- **Magic:** each spell costs downshifts to your Spellcasting, which come
+  back a rank a turn. Push past zero and it costs Health instead. Grandmare
+  Thistlewick teaches a spell for each Heartstone you bring home, to any
+  pony, horn or no horn.
+
+Each Heartstone brought home is also a level: raise a Skill (and its
+Essence) from the menu.
+
+### Health, friendship and befriending
+
+A hit costs Health. At zero you're Defeated for a few turns, and then you
+pick yourself up. Get Defeated three times in one place and somepony carries
+you to the Healer's Cottage, or home if it's late. Food, salve, sleep and
+Nurse put Health back.
+
+Most monsters would rather be friends. Befriend one (`T`) with the Skill
+that reaches it: Animal Handling for beasts, Persuasion for anything that
+talks, Technology for clockwork, Performance to make a spook laugh. Each
+Heartstone's guardian takes a few tries, and hands the stone over when you
+win it round. Looking the guardian up at the library first helps.
+
+Friendship Points buy a pep talk (full Health), a hint where a Heartstone
+is, or a run of luck (Edge on every roll), from the menu. Each morning brings
+you back up to three.
+
+### Talking and friends
+
+Walk into a pony, or into a counter with someone behind it, then choose or
+type a word. Everypony knows NAME, JOB and BYE, and most know NEWS. Words in
+CAPITALS are worth asking about, and worth looking up at the Inkwell Library
+or the Star Tower. Shopkeepers answer BUY.
+
+Help a pony with an errand, or GIVE them a gift, and they become your
+friend. Ask a friend to COME along and they'll follow you, lend a hoof on
+every roll, and join in the scuffles. Say STAY to send them home.
+
+You can't go to Lantern Night without a festival ribbon. Well, you can, but
+somepony will tut.
+
+### Keys
+
+| Key | Action |
+| --- | --- |
+| Arrows / WASD | Move (walk into ponies to talk, into monsters to scuffle) |
+| Space | Wait a turn |
+| E | Search |
+| F | Throw a pie or a buckball |
+| T | Befriend a creature |
+| C | A talent or a spell (fly, buck, telekinesis, magic) |
+| U | Use something |
+| I | Your pony |
+| J | Journal |
+| M | Map |
+| ? | Help |
+
+Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X
+throws, Y uses a talent or spell, LB uses something, RB opens the journal,
+View shows the map and Start opens the menu.
+
+### Files
+
+- `clovervale`: the game
+- `~/.clovervale.json`: the saved game
+- `~/.cache/clovervale/`: cached music
 
 ---
 
