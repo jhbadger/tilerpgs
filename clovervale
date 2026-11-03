@@ -4325,10 +4325,11 @@ class Game:
         side.pack(side="right", fill="y")
         side.pack_propagate(False)
         self.panel = tk.Label(side, bg=PANEL, fg=INK, font=MONO,
-                              justify="left", anchor="nw")
+                              justify="left", anchor="nw", wraplength=230)
         self.panel.pack(fill="x", padx=10, pady=(8, 0))
         self.condition = tk.Label(side, bg=PANEL, fg=BAD, justify="left",
-                                  anchor="nw", font=("Menlo", 12, "bold"))
+                                  anchor="nw", font=("Menlo", 12, "bold"),
+                                  wraplength=230)
         self.condition.pack(fill="x", padx=10)
 
         left = tk.Frame(body, bg=PANEL)
@@ -8799,7 +8800,7 @@ class Game:
         lines = [p["name"], "%s %s" % (p["origin"].split()[0].title()
                                        if p["origin"] != "Meadow pony"
                                        else "Meadow pony", p["calling"]),
-                 "Heart of %s, level %d" % (p["heart"], p["level"]), "",
+                 "Heart of %s" % p["heart"], "Level %d" % p["level"], "",
                  "Health %2d/%-2d FP %d" % (max(0, p["health"]),
                                            self.max_health(), p["fp"]),
                  "Coins  %-5d" % p["coins"]]
