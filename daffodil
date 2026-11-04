@@ -5185,7 +5185,8 @@ class Game:
             if mob.hostile:
                 self.attack(mob)
                 self.end_turn()
-            elif mob.ally:
+            elif mob.ally and (not mob.her or self.hostiles_in_view()):
+                # in a fight she just gets out of your way
                 mob.x, mob.y, self.pos = self.pos[0], self.pos[1], [x, y]
                 return "moved"
             else:
@@ -6723,6 +6724,8 @@ class Game:
         if "Masseuse" in d["mods"]:
             words.append("MASSAGE")
         words += ["DUTIES", "HELP"]
+        if d["with"]:
+            words.append("PAST")
         return words
 
     def her_converse(self, mob, word):
@@ -6759,6 +6762,14 @@ class Game:
             return
         if w4 in ("come", "foll", "join"):
             self.invite(mob)
+            return
+        if w4 in ("past", "move", "swap", "excu", "scoo"):
+            px, py = self.pos
+            mob.x, mob.y, self.pos = px, py, [mob.x, mob.y]
+            self.say("%s steps aside, and you squeeze past. Not that "
+                     "you mind." % d["name"], "her")
+            self.end_talk()
+            self.render()
             return
         if w4 in ("stay", "home", "wait"):
             self.dismiss()
@@ -8918,7 +8929,7 @@ class Game:
         if (x, y) == goal:
             return True
         m = a.mob_at(x, y)
-        if (m and not m.ally) or (x, y) in a.links:
+        if (m and not (m.ally and not m.her)) or (x, y) in a.links:
             return False
         return self.can_stand(x, y) and a.grid[y][x] not in (
             "stairs_up", "stairs_down", "exit")
