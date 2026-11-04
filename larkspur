@@ -8433,6 +8433,13 @@ class Game:
         self.render()
 
     def menu_pick(self, i=None):
+        if i in ("up", "down"):
+            m = self.menu
+            page = m.get("page", 1)
+            m["sel"] = max(0, min(len(m["items"]) - 2, m["sel"] + (
+                page if i == "down" else -page)))
+            self.render()
+            return
         m, self.menu = self.menu, None
         self.render()
         m["items"][m["sel"] if i is None else i][1]()
@@ -8462,8 +8469,19 @@ class Game:
                                               bold.measure(title))))
         th = (title.count("\n") + 1) * rh
         fit = max(1, (H - 2 * rh - th) // rh)
-        first = max(0, min(m["sel"] - fit // 2, len(labels) - fit))
-        shown = labels[first:first + fit]
+        n_items = len(labels)
+        if n_items <= fit:
+            shown = list(enumerate(labels))
+        else:
+            # Too long for the screen: a scrolling window, with arrows to
+            # tap, and the last item (Bye, Nothing, Quit) always in view.
+            page = max(1, fit - 3)
+            m["page"] = page
+            first = max(0, min(m["sel"] - page // 2, n_items - 1 - page))
+            shown = [("up", "\u25b2 more" if first else "")] + \
+                [(i, labels[i]) for i in range(first, first + page)] + \
+                [("down", "\u25bc more" if first + page < n_items - 1
+                  else ""), (n_items - 1, labels[-1])]
         bh = len(shown) * rh + th + 16
         x0, y0 = (W - bw) // 2, max(8, (H - bh) // 2)
         c.create_rectangle(x0, y0, x0 + bw, y0 + bh, fill=PANEL,
@@ -8471,13 +8489,18 @@ class Game:
         c.create_text(x0 + 20, y0 + 8 + th // 2, text=title, anchor="w",
                       fill=ACCENT, font=bold, tags="overlay")
         self.menu_rows = []
-        for n, label in enumerate(shown):
-            i = first + n
+        for n, (i, label) in enumerate(shown):
             ry = y0 + 8 + th + n * rh
             if i == m["sel"]:
                 c.create_rectangle(x0 + 6, ry, x0 + bw - 6, ry + rh,
                                    fill="#5a2a48", outline="",
                                    tags="overlay")
+            if isinstance(i, str):
+                if label:
+                    c.create_text(x0 + bw // 2, ry + rh // 2, text=label,
+                                  fill=ACCENT, font=f, tags="overlay")
+                    self.menu_rows.append((x0, ry, x0 + bw, ry + rh, i))
+                continue
             c.create_text(x0 + 20, ry + rh // 2, text=label, anchor="w",
                           fill=INK, font=f, tags="overlay")
             self.menu_rows.append((x0, ry, x0 + bw, ry + rh, i))
