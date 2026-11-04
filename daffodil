@@ -541,6 +541,9 @@ FACES = (("Cute", {"CHA": 1}, "big eyes, a button nose"),
          ("Sultry", {"CHA": 2, "WIS": -1}, "heavy-lidded eyes, full lips"),
          ("Next Door", {"CON": 1, "WIS": 1}, "freckles, an easy smile"))
 VOICES = ("Soft", "Husky", "Bright", "Posh")
+# The Kemonomimi package: animal ears, optional, and extra.
+EARS = ("None", "Cat", "Dog", "Fox")
+EARS_PRICE = 199
 TEMPERS = (("Sweet", "warm, kind, a little old-fashioned"),
            ("Sassy", "quick, teasing, never lets you win an argument"),
            ("Shy", "quiet, gentle, blushes (she can blush)"),
@@ -978,7 +981,8 @@ def daffodil_art(d):
            (skin if not wear or wear == "polka dot bikini" else "#2a2228"),
            "d": "#e04050", "n": "#2a3a7a", "r": "#e03030",
            "w": "#f8f8f8", "y": "#f0d040", "q": shade(bottom, 0.6),
-           "v": shade(top, 0.8)}
+           "v": shade(top, 0.8), "x": "#f0a0b0",
+           "g": shade(hair, 0.55), "t": "#f8f8f8"}
     rows = [list(r) for r in tuple(head) + tuple(body)]
 
     def paint(y, old, new, xs=None):
@@ -1020,6 +1024,38 @@ def daffodil_art(d):
     if tb == "pioneer skirt":
         paint(14, "k", "p")                     # down to the ankle
         paint(14, ".", "p", (6, 7, 8, 9))
+    ears = des.get("ears", "None")
+    if ears != "None":
+        t = next(y for y, r in enumerate(rows) if "h" in r)
+        a = rows[t].index("h")
+        b = len(rows[t]) - 1 - rows[t][::-1].index("h")
+
+        def put(y, x, ch):
+            if 0 <= y < 16 and 0 <= x < 16:
+                rows[y][x] = ch
+        if ears in ("Cat", "Fox"):
+            if t >= 1:
+                ta_, l, r = t - 1, a, b
+            else:
+                ta_, l, r = 0, a - 1, b + 1
+            tip = "t" if ears == "Fox" else "h"
+            if ears == "Fox" and ta_ >= 1:
+                put(ta_ - 1, l, "t")            # tall, with white tips
+                put(ta_ - 1, r, "t")
+                tip = "h"
+            put(ta_, l, tip)
+            put(ta_, r, tip)
+            if ears == "Fox":
+                put(ta_, l + 1, "h")
+                put(ta_, r - 1, "h")
+            put(t, l + 1, "x")                  # pink insides
+            put(t, r - 1, "x")
+        else:                                   # floppy dog ears
+            for y in (t, t + 1, t + 2, t + 3):
+                put(y, a - 1, "g")
+                put(y, b + 1, "g")
+            put(t + 3, a - 2, "g")
+            put(t + 3, b + 2, "g")
     if tb == "plaid skirt":
         for x in range(16):
             if rows[13][x] == "p" and x % 2:
@@ -2776,6 +2812,77 @@ STAGE_LINES = {
 }
 for _k, _v in STAGE_LINES.items():
     DLINES.setdefault(_k, {}).update(_v)
+
+# Her ears, if she has them: what they do, after the things she says.
+EAR_LINES = {
+    "greet": {
+        "Cat": ["({d}'s ears swivel toward you.)",
+                "({d}'s ears twitch, once, which is how you know she's "
+                "pleased.)"],
+        "Dog": ["({d}'s ears shoot straight up. If she had a tail, the "
+                "whole room would know.)",
+                "({d} bounces on her toes. Her ears flop.)"],
+        "Fox": ["({d}'s ears flick toward you. She looks like she knows "
+                "something you don't.)",
+                "({d}'s ears tilt. Sly.)"]},
+    "morning": {
+        "Cat": ["(She's been curled up in the sunbeam on your side of the "
+                "bed. It's warm when you get up.)"],
+        "Dog": ["(She's been sitting by the bedroom door since six, "
+                "waiting for you to wake up.)"],
+        "Fox": ["(One of your socks is missing. She has no idea where it "
+                "went. Her ears say otherwise.)"]},
+    "kiss": {
+        "Cat": ["(She makes a small sound that is suspiciously like a "
+                "purr.)"],
+        "Dog": ["(Her ears go flat with happiness, and she leans all her "
+                "weight against you.)"],
+        "Fox": ["(Her ears flick back, very pleased with herself.)"]},
+    "come": {
+        "Cat": ["(She takes her time about it, to make the point that it "
+                "was her idea.)"],
+        "Dog": ["'Walkies? Is it walkies? I'm joking. ...Is it, though?'"],
+        "Fox": ["(She's at the door before you are. You didn't see her "
+                "move.)"]},
+    "stay": {
+        "Cat": ["(She stretches, and settles in the window, and pretends "
+                "she doesn't mind.)"],
+        "Dog": ["(Her ears droop. She'll be at the window until you're "
+                "back. Every time.)"],
+        "Fox": ["(She salutes. You should probably hide the good "
+                "chocolate.)"]},
+    "fight": {
+        "Cat": ["(She HISSES. It's genuinely alarming.)"],
+        "Dog": ["(A growl comes out of her you didn't know she had.)"],
+        "Fox": ["(She yips, high and wild, and grins.)"]},
+    "bed": {
+        "Cat": ["(Afterwards she kneads the pillow for a while before "
+                "she settles.)"],
+        "Dog": ["(Afterwards she's asleep across your feet, which is "
+                "not how Daffodils sleep, and is exactly how she sleeps.)"],
+        "Fox": ["(Afterwards she curls up in a tight ball, nose to "
+                "knees, one ear still listening.)"]},
+    "gift_love": {
+        "Cat": ["(She bats it gently, twice, before she takes it.)"],
+        "Dog": ["(Her ears go up so fast they flap.)"],
+        "Fox": ["(She hides it somewhere. You'll find it in a month, "
+                "lovingly arranged.)"]},
+}
+# What she says when you ask about her EARS: at first, and later.
+EAR_TALK = {
+    "Cat": ("Cat ears. Kemonomimi package, $199. They rotate 180 degrees "
+            "and detect frequencies up to 64 kilohertz.",
+            "I hear everything. The fridge. The neighbor's TV. Your heart, "
+            "when you're near me. Don't tell anyone they're soft."),
+    "Dog": ("Dog ears. Kemonomimi package, $199. Expressive mode: "
+            "enabled.",
+            "I can't hide anything with these. When I'm happy, they go UP. "
+            "You make them go up a lot. It's embarrassing."),
+    "Fox": ("Fox ears. Kemonomimi package, $199. Directional hearing, "
+            "white tips.",
+            "Everyone thinks foxes are tricky. I'm a little tricky. Mostly "
+            "I just like it when you scratch behind them."),
+}
 
 # ── Errands ──────────────────────────────────────────────────────────────────
 
@@ -5086,6 +5193,11 @@ class Game:
         else:
             self.say("%s: %s" % (name, text), "her")
         self.hear(text)
+        ears = des.get("ears", "None")
+        quirk = EAR_LINES.get(key, {}).get(ears)
+        if quirk and d.get("name") and (key in ("fight", "kiss", "bed")
+                                        or random.random() < 0.5):
+            self.say(self.f(random.choice(quirk)), "her")
 
     def stage(self):
         d = self.d
@@ -5768,7 +5880,9 @@ class Game:
         if x0 <= px <= x1 and y0 <= py <= y1 and \
                 abs(px - a.pond[0]) + abs(py - a.pond[1]) <= 4 and \
                 not any(m.kind == "goose" for m in a.mobs) and \
-                not (self.wears("sundress") and self.her_here()) and \
+                not (self.her_here() and (self.wears("sundress") or
+                                          self.d["design"].get("ears") ==
+                                          "Fox")) and \
                 random.random() < 0.03:
             for _ in range(10):
                 x = a.pond[0] + random.randint(-2, 2)
@@ -6869,9 +6983,20 @@ class Game:
                   "cheerleader uniform": "Go team. What team? Never mind.",
                   "sailor uniform": "Is that some sort of navy outfit? My "
                   "Harold was in the navy. It didn't look like that."}
+        ear_greet = {"Cat": "Are those... EARS? Cat ears? Does she shed? I "
+                     "have allergies, you know.",
+                     "Dog": "Oh, look at her EARS. Like a spaniel! My Harold "
+                     "had a spaniel. Does she fetch?",
+                     "Fox": "Fox ears. Hm. You keep her away from my "
+                     "chickens. I don't have chickens. On principle."}
         if mob.role == "neighbor" and d and d["with"] and \
                 d.get("wearing") in outfit:
             greet = outfit[d["wearing"]]
+        elif mob.role == "neighbor" and d and d["with"] and \
+                d["design"].get("ears", "None") in ear_greet and \
+                "neighbor_ears" not in self.flags:
+            self.flags.add("neighbor_ears")
+            greet = ear_greet[d["design"]["ears"]]
         elif mob.role == "neighbor" and d and d["with"] and \
                 d.get("calls") == "Master":
             greet = "I heard what she calls you. The whole street heard. " \
@@ -7165,6 +7290,8 @@ class Game:
         if "Masseuse" in d["mods"]:
             words.append("MASSAGE")
         words += ["CHAT", "DUTIES", "HELP"]
+        if d["design"].get("ears", "None") != "None":
+            words.insert(4, "EARS")
         if d["with"]:
             words.append("PAST")
         return words
@@ -7272,6 +7399,18 @@ class Game:
                      "her")
             self.heal(roll("1d6"))
             self.pass_time(20, quiet=True)
+            return
+        if w4 in ("ears", "ear") and d["design"].get("ears", "None") != \
+                "None":
+            early, late = EAR_TALK[d["design"]["ears"]]
+            self.say("%s: %s" % (d["name"], late if self.stage() >= 2 else
+                                 early), "her")
+            key = "ears:%d" % self.day_no()
+            if self.stage() >= 2 and key not in self.flags:
+                self.flags.add(key)
+                self.say("You scratch behind %s's ears. Her eyes close." %
+                         d["name"], "her")
+                self.affection(1, "melted")
             return
         if w4 in ("chat", "talk", "news", "goss"):
             self.her_say("chat")
@@ -7633,8 +7772,9 @@ class Game:
         return {s: max(3, min(18, v)) for s, v in st.items()}
 
     @staticmethod
-    def design_price(mods):
-        return BASE_PRICE + sum(MODULES[m][0] for m in mods)
+    def design_price(mods, des=None):
+        return BASE_PRICE + sum(MODULES[m][0] for m in mods) + (
+            EARS_PRICE if des and des.get("ears", "None") != "None" else 0)
 
     @staticmethod
     def random_design(rng):
@@ -7646,7 +7786,7 @@ class Game:
                 "face": rng.choice(FACES)[0], "voice": rng.choice(VOICES),
                 "temper": rng.choice(TEMPERS)[0],
                 "mind": rng.choice(MINDS)[0],
-                "spice": rng.choice(SPICES)[0]}
+                "spice": rng.choice(SPICES)[0], "ears": "None"}
 
     def design_studio(self):
         """The Design Studio: every dial on the website, and a preview."""
@@ -7702,7 +7842,8 @@ class Game:
             ("voice", "Voice", list(VOICES)),
             ("temper", "Temper", [t[0] for t in TEMPERS]),
             ("mind", "Mind", [m[0] for m in MINDS]),
-            ("spice", "Spice", [s[0] for s in SPICES]))
+            ("spice", "Spice", [s[0] for s in SPICES]),
+            ("ears", "Kemonomimi ($%d)" % EARS_PRICE, list(EARS)))
 
         def value(key):
             v = des[key]
@@ -7792,11 +7933,13 @@ class Game:
                      "%s hair (%s), %s eyes, %s skin. A %s voice." % (
                          d["hair"], d["style"].lower(), d["eyes"].lower(),
                          SKIN_NAMES[d["skin"]], d["voice"].lower()), "",
-                     "%s's %s; %s; %s." % (she, temper, mind, spice), "",
+                     "%s's %s; %s; %s." % (she, temper, mind, spice)] + (
+                         ["%s ears, soft and twitchy." % d["ears"]]
+                         if d.get("ears", "None") != "None" else []) + ["",
                      "  ".join("%s %d" % (s, st[s]) for s in STATS[:3]),
                      "  ".join("%s %d" % (s, st[s]) for s in STATS[3:])]
             desc.config(text="\n".join(lines))
-            price = self.design_price(chosen())
+            price = self.design_price(chosen(), d)
             total.config(text="Total: $%d\n(You have $%d. Easy Pay "
                               "available!)" % (price, self.p["coins"]))
             modtext.config(text="\n".join("%s: %s" % (m, MODULES[m][1])
@@ -7838,7 +7981,7 @@ class Game:
     def checkout(self, des, mods):
         """Paying: cash, or Easy Pay."""
         p = self.p
-        price = self.design_price(mods)
+        price = self.design_price(mods, des)
         items = []
         if p["coins"] >= price:
             items.append(("Pay cash: $%d" % price,
@@ -7878,6 +8021,14 @@ class Game:
         line = "Congratulations! She'll be delivered to your door in three "\
             "hours. Three! Go home, tidy up. Maybe buy some CLOTHES? They "\
             "come... um. Without."
+        ears = des.get("ears", "None")
+        if ears != "None":
+            line = {"Cat": "Ooh, cat ears! Kemonomimi's our most popular "
+                           "option in Japan. And, weirdly, Portland. ",
+                    "Dog": "Dog ears! Floppy ones! I'm not supposed to "
+                           "have favorites. Those are my favorite. ",
+                    "Fox": "Fox ears. Bold. Very bold. People are going to "
+                           "assume she's up to something. "}[ears] + line
         if cons:
             self.npc_say(cons, line)
         else:
@@ -8584,9 +8735,31 @@ class Game:
         self.say("%s's husband %s opens the door, sees %s, and his mouth "
                  "falls open. %s, behind him, smacks him on the back of the "
                  "head." % (sis, inlaw, d["name"], sis), "info")
-        self.say("The dog sticks its nose somewhere personal. %s says "
-                 "'Oh, he does that to everybody,' which is not true." %
-                 sis, "info")
+        ears = d["design"].get("ears", "None")
+        if ears == "Dog":
+            self.say("The dog takes one look at %s's ears, lies down at her "
+                     "feet, and won't leave them all night. %s stares. "
+                     "'He doesn't like ANYBODY.'" % (d["name"], sis), "info")
+            st["sister"] += 1
+        elif ears == "Cat":
+            self.say("The dog takes one look at %s's ears and hides under "
+                     "the sofa. %s says 'Oh, he's just shy,' which is not "
+                     "true." % (d["name"], sis), "info")
+        elif ears == "Fox":
+            self.say("The dog circles %s, very suspicious, all through the "
+                     "soup. %s asks if those ears are 'a real fox thing or "
+                     "a California thing'." % (d["name"], sis), "info")
+        else:
+            self.say("The dog sticks its nose somewhere personal. %s says "
+                     "'Oh, he does that to everybody,' which is not true." %
+                     sis, "info")
+        if ears != "None":
+            inlaw_line = {"Cat": "Can she see in the dark?",
+                          "Dog": "Does she, uh. Does she fetch?",
+                          "Fox": "What noise does a fox even make? Can "
+                                 "she do it? Ask her to do it."}[ears]
+            self.say("%s, to you, very quietly: '%s'" % (inlaw, inlaw_line),
+                     "talk")
         if self.test("CHA", label="being charming", adv=self.stage() >= 2):
             st["sister"] += 1
             self.say("You're funny. You're actually funny, at dinner, out "
@@ -9243,8 +9416,10 @@ class Game:
                 des["height"], des["build"].lower(), des["face"].lower(),
                 des["hair"], des["style"].lower(), des["eyes"].lower(),
                 SKIN_NAMES[des["skin"]], des["voice"].lower()),
-            "%s, %s, %s." % (des["temper"], des["mind"].lower(),
-                             des["spice"].lower()), "",
+            "%s, %s, %s.%s" % (des["temper"], des["mind"].lower(),
+                               des["spice"].lower(), " %s ears." % des["ears"]
+                               if des.get("ears", "None") != "None" else ""),
+            "",
             "  ".join("%s %2d" % (s, d["stats"][s]) for s in STATS[:3]),
             "  ".join("%s %2d" % (s, d["stats"][s]) for s in STATS[3:]), "",
             "State: %s" % {"ordered": "on her way", "box": "in her box",
@@ -10208,7 +10383,9 @@ def selftest():
                 [e["thanks"] for e in w["errands"]] + \
                 list(CLUES.values()) + [t for _, t in EVENTS.values()] + \
                 [y for d in DLINES.values() for x in d.values()
-                 for y in (x if isinstance(x, list) else [x])]:
+                 for y in (x if isinstance(x, list) else [x])] + \
+                [y for d in EAR_LINES.values() for x in d.values()
+                 for y in x] + [y for x in EAR_TALK.values() for y in x]:
             fill(text, w)
         for e in w["errands"]:
             assert e["giver"] in ROLES and e["thing"] in ITEMS, e

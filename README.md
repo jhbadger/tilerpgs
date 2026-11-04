@@ -863,7 +863,9 @@ Galleria opens at ten.
   frame (she or he), build, height, skin, hair and hairstyle, eyes, face,
   voice, and a personality from three choices (Sweet, Sassy, Shy or Bold;
   Bookish, Bubbly, Practical or Dreamy; Prim, Playful or Naughty), with a
-  live preview. Then the modules: Gourmet Chef, Accountant, Personal
+  live preview, and the optional Kemonomimi package ($199): cat, dog or
+  fox ears, on her sprite, and in how she (and your neighbor, and your
+  sister's dog) behaves. Then the modules: Gourmet Chef, Accountant, Personal
   Trainer, Bodyguard, Tech Suite, Masseuse, Dance, Mathematics and Driver.
   Pay cash, or use Easy Pay (zero percent for a year!).
 - **Unbox her:** she's delivered in three hours, in a silver box with a
