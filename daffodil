@@ -4993,20 +4993,12 @@ class Game:
         t = self.now()
         day = self.day_no()
         mins = t.hour * 60 + t.minute
-        st = self.st
         d = self.d
         if mins >= 6 * 60 and "morning:%d" % day not in self.flags and \
                 day >= 1:
             self.flags.add("morning:%d" % day)
             self.morning()
-        if st.get("delivery_at") is not None and \
-                self.turn >= st["delivery_at"] and d and \
-                d["state"] == "ordered":
-            self.delivered()
-        if d and d["state"] == "setup" and self.turn >= d["ready_at"] and \
-                "setup_told" not in self.flags:
-            self.flags.add("setup_told")
-            self.setup_done()
+        self.timers()
         ev = self.world["events"].get(day)
         if ev and mins >= ev[1] * 60 and "event_day:%d" % day not in \
                 self.flags:
@@ -5063,6 +5055,21 @@ class Game:
                      "7.2.", "quest")
         if self.turn >= UPDATE:
             self.the_end()
+
+    def timers(self):
+        """The things that happen on the minute: her delivery, and the
+        end of her primary setup."""
+        d = self.d
+        if not d or self.overlay:
+            return
+        if d["state"] == "ordered" and self.st.get("delivery_at") is not \
+                None and self.turn >= self.st["delivery_at"]:
+            self.delivered()
+        if d["state"] == "setup" and d.get("ready_at") is not None and \
+                self.turn >= d["ready_at"] and \
+                "setup_told" not in self.flags:
+            self.flags.add("setup_told")
+            self.setup_done()
 
     # ── Turns ──
 
@@ -5241,6 +5248,8 @@ class Game:
                       "dusk": "The streetlights come on along Main Street.",
                       "night": "Night. Bellwether's quiet. Mostly."}[now],
                      "info")
+        if ticked:
+            self.timers()
         if ticked and self.turn % 30 == 0:
             self.hourly()
             if self.overlay:
@@ -6631,8 +6640,12 @@ class Game:
         if d["state"] == "box":
             self.unbox()
             return
+        if d["state"] == "setup" and d.get("ready_at") is not None and \
+                self.turn >= d["ready_at"]:
+            self.timers()
+            return
         if d["state"] == "setup":
-            left = d["ready_at"] - self.turn
+            left = max(0, d["ready_at"] - self.turn)
             self.say("%s stands perfectly still in the middle of the living "
                      "room. 'Primary setup in progress. %d hours %d minutes "
                      "remaining.'" % (d.get("name") or "Your Daffodil",
@@ -8614,7 +8627,7 @@ class Game:
                  ("Wait an hour", lambda: self.wait_for(60))]
         d = self.d
         if d and d["state"] == "setup":
-            left = d["ready_at"] - self.turn
+            left = max(0, d["ready_at"] - self.turn)
             items.append(("Wait for her setup (%dh %02dm)" % (
                 left // 60, left % 60), lambda: self.wait_for(left)))
         if d and d["state"] == "ordered":
