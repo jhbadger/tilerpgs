@@ -4130,7 +4130,7 @@ class Game:
 
         self.canvas.bind("<Configure>", lambda e: self.layout())
         root.bind("<Configure>", self.on_resize, add="+")
-        self.canvas.bind("<ButtonPress-1>", self.on_tap)
+        self.canvas.bind("<ButtonPress-1>", self.tapped)
         root.bind("<KeyPress>", self.on_key)
         for k in ("Control-q", "Command-q"):
             root.bind("<%s>" % k, lambda e: self.quit())
@@ -4220,6 +4220,13 @@ class Game:
         {"a": self.wait, "x": self.ability_menu, "y": self.luck_menu,
          "lb": self.use_menu, "rb": self.show_phone, "view": self.toggle_map,
          "start": self.action_menu}.get(name, lambda: None)()
+
+    def tapped(self, ev):
+        """A tap on the map, unless it's the tail of one on a dialog that
+        just closed (on Android it can land on the map behind)."""
+        if time.time() < getattr(self, "tap_guard", 0):
+            return
+        self.on_tap(ev)
 
     def aimed(self, dx, dy):
         self.aim = None
@@ -4535,6 +4542,7 @@ class Game:
                                             2))))
         dlg.grab_set()
         root.wait_window(dlg)
+        self.tap_guard = time.time() + 0.6
         return result.get("who")
 
     @staticmethod
@@ -7805,7 +7813,16 @@ class Game:
             return
         got = self.ask_design()
         if got:
-            self.checkout(*got)
+            des, mods, cash, credit = got
+            self.ordered(des, mods, cash, credit)
+
+    @staticmethod
+    def payment(price, how):
+        """(cash, credit): Easy Pay covers up to $3,000 of it."""
+        if how == "easy":
+            credit = min(3000, price)
+            return price - credit, credit
+        return price, 0
 
     def ask_design(self):
         root = self.root
@@ -7887,6 +7904,18 @@ class Game:
         total = tk.Label(right, bg=PANEL, fg=GOLD, justify="left",
                          font=F("Helvetica", 12, "bold"))
         total.pack(anchor="w", pady=(6, 0))
+        pay = tk.StringVar(value="cash" if self.p["coins"] >= self.design_price(
+            ["Housekeeping"], des) else "easy")
+        payrow = tk.Frame(right, bg=PANEL)
+        payrow.pack(anchor="w")
+        for k, label in (("cash", "Pay cash"), ("easy", "Easy Pay")):
+            tk.Radiobutton(payrow, text=label, variable=pay, value=k,
+                           bg=PANEL, fg=INK, selectcolor=LOG_BG,
+                           activebackground=PANEL, font=F("Helvetica", 11),
+                           command=lambda: show()).pack(side="left")
+        warn = tk.Label(right, bg=PANEL, fg=BAD, justify="left",
+                        font=F("Helvetica", 11), wraplength=S(240))
+        warn.pack(anchor="w")
         modtext = tk.Label(right, bg=PANEL, fg=INK_DIM, justify="left",
                            font=F("Helvetica", 10), wraplength=S(240))
         modtext.pack(anchor="w")
@@ -7940,8 +7969,15 @@ class Game:
                      "  ".join("%s %d" % (s, st[s]) for s in STATS[3:])]
             desc.config(text="\n".join(lines))
             price = self.design_price(chosen(), d)
-            total.config(text="Total: $%d\n(You have $%d. Easy Pay "
-                              "available!)" % (price, self.p["coins"]))
+            cash, credit = self.payment(price, pay.get())
+            total.config(text="Total: $%d   (you have $%d)" % (
+                price, self.p["coins"]))
+            warn.config(text=(
+                "Easy Pay: $%d down, $%d on credit, zero percent for a "
+                "year!" % (cash, credit) if pay.get() == "easy" else
+                "Cash, all of it.") if cash <= self.p["coins"] else
+                "That's more than you have. Easy Pay, or fewer modules?",
+                fg=INK_DIM if cash <= self.p["coins"] else BAD)
             modtext.config(text="\n".join("%s: %s" % (m, MODULES[m][1])
                                           for m in chosen() if
                                           MODULES[m][0]))
@@ -7955,7 +7991,13 @@ class Game:
             show()
 
         def buy(_=None):
-            result["design"] = (read(), chosen())
+            d = read()
+            price = self.design_price(chosen(), d)
+            cash, credit = self.payment(price, pay.get())
+            if cash > self.p["coins"]:
+                show()
+                return
+            result["design"] = (d, chosen(), cash, credit)
             dlg.destroy()
         show()
         bar = tk.Frame(dlg, bg=PANEL)
@@ -7976,6 +8018,7 @@ class Game:
                                             2))))
         dlg.grab_set()
         root.wait_window(dlg)
+        self.tap_guard = time.time() + 0.6
         return result.get("design")
 
     def checkout(self, des, mods):
@@ -8194,6 +8237,7 @@ class Game:
                                             2))))
         dlg.grab_set()
         root.wait_window(dlg)
+        self.tap_guard = time.time() + 0.6
         self.name_her(out.get("name") or random.choice(names))
 
     def name_her(self, name):
