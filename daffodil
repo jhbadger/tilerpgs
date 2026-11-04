@@ -395,6 +395,28 @@ def outfit_name(w):
     return "%s with %s" % (SEPARATES[a][0], SEPARATES[b][1])
 
 
+# What each outfit is good for (with her, wearing it).
+CLOTHES_PERKS = {
+    "sundress": "the park: the geese leave you alone (they think she's a "
+                "flower)",
+    "jeans": "fights: she hits with Advantage in something practical",
+    "workout gear": "the gym: Advantage on your workout; fights, too",
+    "crop top": "fights: practical enough to hit with Advantage",
+    "lingerie": "nights in: Affection past 6",
+    "silk robe": "nights in: Affection past 6",
+    "little black dress": "the casino and the bistro: Advantage at cards, "
+                          "and a better date",
+    "evening gown": "the casino and the bistro: Advantage at cards, and a "
+                    "better date",
+    "plaid skirt": "your sister's: Advantage when she charms your sister",
+    "polka dot bikini": "a heatwave: her charge doesn't drain faster",
+    "cheerleader uniform": "the dance-off: Advantage on her dancing",
+    "French maid uniform": "home: resting heals an extra 1d6",
+    "sailor uniform": "the dance-off: the DJ loves it, Advantage on your "
+                      "dancing",
+}
+
+
 # What happens when she first puts each on.
 CLOTHES_LINES = {
     "sundress": "She twirls, and the skirt flares out, and she laughs.",
@@ -558,7 +580,7 @@ MONSTERS = {
     "bouncer": Trouble("bouncer", "bouncer", 3, False, ("human",),
                        "a bouncer the size of a vending machine",
                        "The bouncer decides you're not worth it."),
-    "sentry": Trouble("security drone", "sentry", 3, True,
+    "sentry": Trouble("security drone", "sentry", 2, True,
                       ("robot", "flier"),
                       "a Dataplex security drone, red light blinking",
                       "The drone sparks and drops out of the air."),
@@ -2891,6 +2913,9 @@ def make_dungeon(world, lid, level, flags):
             area.terminals[(x, y)] = "lore"
             g[y][x] = "terminal" if lid == "dataplex" else "crate_open"
             area.note = lore
+    for x, y in free(1, 4, inner, must=True):       # a first-aid cabinet
+        g[y][x] = "locker"
+        area.terminals[(x, y)] = "aid"
     for e, place in world["evidence"].items():
         if place == [lid, level] and "evidence:" + e not in flags:
             for x, y in free(1, 8, inner if lid == "dataplex" else
@@ -2943,7 +2968,7 @@ def make_dungeon(world, lid, level, flags):
                                               rng=rng))
     for x, y in free(rng.randint(1, 2), 4):     # found by searching
         area.hidden[(x, y)] = rng.choice(("coins", "coins", "first aid kit"))
-    n = 2 + level
+    n = (1 if lid == "dataplex" else 2) + level
     for x, y in free(n, 7):
         if (x, y) in end_cells and last and info.boss:
             continue
@@ -2986,9 +3011,12 @@ CLUES = {
                 "gives them out, sometimes; a power cut helps), a red "
                 "badge for the server floor (somewhere in the offices), "
                 "the core badge in a safe on the server floor. The core "
-                "needs an override key, or a very good hacker.",
+                "needs an override key, or a very good hacker. Every floor "
+                "has a first-aid cabinet on the wall.",
     "override": "Gearhart's override key, from Rusty's chop shop, will "
-                "pull a flag out of an update at the core.",
+                "pull a flag out of an update at the core, and anything "
+                "Gearhart built will let whoever carries it pass. Like, "
+                "say, the Paragon.",
     "vane": "Preston Vane of Gearhart Robotics is behind it all: the "
             "thefts, and the reset. Two pieces of EVIDENCE to Detective "
             "{detective} and she'll get a warrant.",
@@ -4804,15 +4832,29 @@ class Game:
     def her_stat(self, s):
         return self.d["stats"][s]
 
-    def her_test(self, s, hd=0, label=None):
+    def her_test(self, s, hd=0, label=None, adv=False):
         r = random.randint(1, 20)
+        text = "d20 %d" % r
+        if adv:
+            r2 = random.randint(1, 20)
+            text = "d20 %d/%d, Advantage" % (r, r2)
+            r = min(r, r2)
         over = max(0, hd - self.her_level())
         ok = r + over < self.her_stat(s)
-        self.say("[%s, %s %d: d20 %d%s: %s]" % (
-            label or self.d["name"], s, self.her_stat(s), r,
+        self.say("[%s, %s %d: %s%s: %s]" % (
+            label or self.d["name"], s, self.her_stat(s), text,
             " +%d" % over if over else "", "success" if ok else "failure"),
             "roll")
         return ok
+
+    def wears(self, *names):
+        """Whether she's wearing any of these (as an outfit, or its top or
+        bottom), and here with you to show it off."""
+        d = self.d
+        if not d or not d.get("wearing"):
+            return False
+        ta, tb = outfit_parts(d["wearing"])
+        return any(n in (ta, tb) for n in names)
 
     def her_max_hp(self):
         return 6 + 4 * self.her_level()
@@ -5130,7 +5172,8 @@ class Game:
         if d and d["with"] and t.minute < 10 and t.hour % 2 == 0 and \
                 "hourcharge:%d" % (self.turn // 60) not in self.flags:
             self.flags.add("hourcharge:%d" % (self.turn // 60))
-            self.use_charge(2 if self.active_event("heatwave") else 1)
+            self.use_charge(2 if self.active_event("heatwave") and
+                            not self.wears("polka dot bikini") else 1)
         p = self.p
         if self.area.dark and p["items"].get("flashlight") and \
                 p["torch"] <= 0 and t.minute < 10 and \
@@ -5301,7 +5344,8 @@ class Game:
             if mob.hostile:
                 self.attack(mob)
                 self.end_turn()
-            elif mob.ally and (not mob.her or self.hostiles_in_view()):
+            elif mob.ally and (not mob.her or self.hostiles_in_view() or
+                               self.walking):
                 # in a fight she just gets out of your way
                 mob.x, mob.y, self.pos = self.pos[0], self.pos[1], [x, y]
                 return "moved"
@@ -5449,6 +5493,17 @@ class Game:
         px, py = self.pos
         dx, dy = px - mob.x, py - mob.y
         dist = abs(dx) + abs(dy)
+        if mob.kind == "paragon" and self.p["items"].get("override key") \
+                and dist <= 4 and not getattr(mob, "stood_down", False):
+            mob.stood_down = True
+            self.area.mobs.remove(mob)
+            self.flags.add("beat:dataplex")
+            self.flash(mob.x, mob.y, "sparkle")
+            self.say("The Paragon turns its blank chrome face toward you. A "
+                     "light scans the Gearhart override key in your pocket. "
+                     "'AUTHORIZED,' it says, and walks out of the room to "
+                     "wait for orders that aren't coming.", "good")
+            return True
         if not mob.aware:
             if self.noticed(mob, dist):
                 mob.aware = True
@@ -5472,8 +5527,13 @@ class Game:
                 random.random() < 0.35 and self.her_ok():
             self.attack_her(mob, her)
             return True
-        if dist == 1 or (m.ranged and dist <= 4 and (mob.x, mob.y) in
+        if dist == 1 or (m.ranged and dist <= 3 and (mob.x, mob.y) in
                          self.visible):
+            # a ranged one has to recharge between shots
+            if m.ranged and dist > 1:
+                mob.cool = not getattr(mob, "cool", False)
+                if mob.cool:
+                    return True
             self.attacked(mob)
             return True
         chase = dist <= 10
@@ -5514,6 +5574,7 @@ class Game:
         if x0 <= px <= x1 and y0 <= py <= y1 and \
                 abs(px - a.pond[0]) + abs(py - a.pond[1]) <= 4 and \
                 not any(m.kind == "goose" for m in a.mobs) and \
+                not (self.wears("sundress") and self.her_here()) and \
                 random.random() < 0.03:
             for _ in range(10):
                 x = a.pond[0] + random.randint(-2, 2)
@@ -5673,7 +5734,8 @@ class Game:
                 t = a.mob_at(mob.x + dx, mob.y + dy)
                 if t and t.hostile:
                     m = MONSTERS[t.kind]
-                    if self.her_test("STR", m.hd, d["name"]):
+                    if self.her_test("STR", m.hd, d["name"], adv=self.wears(
+                            "jeans", "workout gear", "crop top")):
                         dmg = roll("1d8+2" if "Bodyguard" in d["mods"]
                                    else "1d6")
                         t.hp -= dmg
@@ -5741,7 +5803,7 @@ class Game:
     def touch(self, t, x, y):
         a = self.area
         d = self.d
-        if t in ("terminal", "server", "safe", "desk") and \
+        if t in ("terminal", "server", "safe", "desk", "locker") and \
                 (x, y) in a.terminals:
             self.use_terminal(x, y)
         elif t == "terminal" and a.site == "galleria":
@@ -5862,6 +5924,11 @@ class Game:
         if key not in self.flags:
             self.flags.add(key)
             n = random.randint(1, CLASSES[p["cls"]].die)
+            if self.wears("French maid uniform") and \
+                    self.d["state"] == "awake":
+                n += random.randint(1, 6)
+                self.say("The house is spotless. So are the sheets. So, "
+                         "somehow, are you.", "info")
             if self.d and "Masseuse" in self.d["mods"] and \
                     self.d["state"] == "awake":
                 n += random.randint(1, 6)
@@ -5917,7 +5984,7 @@ class Game:
         key = "bed:%d" % self.day_no()
         if key not in self.flags:
             self.flags.add(key)
-            if d["affection"] < 6:
+            if d["affection"] < 6 or self.wears("lingerie", "silk robe"):
                 self.affection(1, "fell asleep in your arms")
             self.learns(5)
         self.say("...", "info")
@@ -6421,8 +6488,35 @@ class Game:
         if what == "safe":
             self.open_safe()
             return
+        if what == "aid":
+            self.first_aid_cabinet()
+            return
         if what == "core":
             self.core()
+
+    def first_aid_cabinet(self):
+        """A first-aid cabinet on the wall: once a day, a proper patch-up."""
+        a = self.area
+        key = "aid:%s:%d:%d" % (a.key[1], a.key[2], self.day_no())
+        if key in self.flags:
+            self.say("The first-aid cabinet: empty wrappers, and one sad "
+                     "plaster.", "info")
+            return
+        self.flags.add(key)
+        p = self.p
+        self.pass_time(5, quiet=True)
+        n = self.heal(roll("2d6+2"), quiet=True)
+        p["ap"] = p["maxap"]
+        self.say("A first-aid cabinet. You patch yourself up and tighten "
+                 "your straps. (+%d HP: %d/%d, Armor %d)" % (
+                     n, p["hp"], p["maxhp"], p["ap"]), "good")
+        d = self.d
+        if d and self.her_nearby(4) and d["state"] in ("awake", "down"):
+            d["hp"] = min(d["maxhp"], d["hp"] + roll("2d6"))
+            self.say("%s gets a dab of synthskin glue. (%d/%d)" % (
+                d["name"], d["hp"], d["maxhp"]), "good")
+            if d["state"] == "down":
+                self.wake_her()
 
     def her_helps_tech(self):
         d = self.d
@@ -6467,7 +6561,7 @@ class Game:
             return
         if self.turn >= UPDATE:
             return
-        if any(m.kind == "paragon" for m in self.area.mobs):
+        if any(m.kind == "paragon" and m.hostile for m in self.area.mobs):
             self.say("The Paragon stands between you and the console.",
                      "bad")
             return
@@ -6569,7 +6663,19 @@ class Game:
         if mob.role == "sister" and self.st.get("old_home") == "sister":
             greet = "{me}! Come see what {old} did with the kitchen!"
         d = self.d
+        outfit = {"polka dot bikini": "Is that a BIKINI? On MY street? I "
+                  "have a heart condition, you know.",
+                  "lingerie": "I'm calling the police. No, I'm calling my "
+                  "sister. Then the police.",
+                  "French maid uniform": "Oh, how lovely, a maid. Does she "
+                  "do windows? Mine are filthy.",
+                  "cheerleader uniform": "Go team. What team? Never mind.",
+                  "sailor uniform": "Is that some sort of navy outfit? My "
+                  "Harold was in the navy. It didn't look like that."}
         if mob.role == "neighbor" and d and d["with"] and \
+                d.get("wearing") in outfit:
+            greet = outfit[d["wearing"]]
+        elif mob.role == "neighbor" and d and d["with"] and \
                 d.get("calls") == "Master":
             greet = "I heard what she calls you. The whole street heard. " \
                 "I'm calling the homeowners' association."
@@ -7054,11 +7160,13 @@ class Game:
         items = []
         for c in CLOTHES:
             if p["items"].get(c):
-                items.append((self.mf("Give her the %s" % c),
+                items.append((self.mf("Give her the %s (%s)" % (
+                    c, CLOTHES_PERKS[c].split(":")[0])),
                               lambda c=c: self.dress_her(c, new=True)))
         for c in d["wardrobe"]:
             if c != d.get("wearing"):
-                items.append((self.mf("Ask her to wear the %s" % c),
+                items.append((self.mf("Ask her to wear the %s (%s)" % (
+                    c, CLOTHES_PERKS[c].split(":")[0])),
                               lambda c=c: self.dress_her(c)))
         if d.get("wearing") and self.area.site == "home":
             items.append((self.mf("Ask her to take everything off"),
@@ -8126,7 +8234,8 @@ class Game:
         p["coins"] -= 20
         self.flags.add(key)
         self.pass_time(60, quiet=True)
-        trainer = d and "Personal Trainer" in d["mods"] and self.her_here()
+        trainer = d and self.her_here() and (
+            "Personal Trainer" in d["mods"] or self.wears("workout gear"))
         self.npc_say(mob, "Again. AGAIN. Did I say stop? I did not say "
                      "stop.")
         if trainer:
@@ -8255,7 +8364,12 @@ class Game:
         else:
             self.say("You tell the story about the geese. Nobody laughs. "
                      "The roast is very loud.", "bad")
-        if self.her_test("CHA", label="%s, with %s" % (d["name"], sis)):
+        if self.wears("plaid skirt"):
+            self.say("%s looks %s up and down and says, 'Well. At least "
+                     "SOMEBODY in this family knows how to dress.'" % (
+                         sis, d["name"]), "info")
+        if self.her_test("CHA", label="%s, with %s" % (d["name"], sis),
+                         adv=self.wears("plaid skirt")):
             st["sister"] += 1
             self.say("%s helps in the kitchen, and asks %s about her "
                      "verbena, and listens to the answer. All of it." % (
@@ -8300,6 +8414,12 @@ class Game:
         self.flags.add(key)
         p["coins"] -= 100
         maths = d and "Mathematics" in d["mods"] and self.her_here()
+        dressed = self.her_here() and self.wears("little black dress",
+                                                  "evening gown")
+        if dressed:
+            self.say("The dealer keeps losing count, looking at %s." %
+                     d["name"], "info")
+        maths = maths or dressed
         wins = 0
         for hand in range(3):
             if self.test("INT", adv=maths, label="hand %d" % (hand + 1)):
@@ -8351,8 +8471,16 @@ class Game:
         self.say("The lights go down. The music comes up. %s takes your "
                  "hand%s." % (d["name"], " and LEADS" if lead else ""),
                  "info")
-        mine = self.test("DEX", adv=lead, label="your feet")
-        hers = self.her_test("DEX", label="%s dancing" % d["name"])
+        if self.wears("sailor uniform"):
+            self.say("The DJ takes one look at %s and puts on something "
+                     "from an anime. The crowd goes wild." % d["name"],
+                     "info")
+        if self.wears("cheerleader uniform"):
+            self.say("%s does the splits. On purpose." % d["name"], "info")
+        mine = self.test("DEX", adv=lead or self.wears("sailor uniform"),
+                         label="your feet")
+        hers = self.her_test("DEX", label="%s dancing" % d["name"],
+                             adv=self.wears("cheerleader uniform"))
         self.pass_time(15, quiet=True)
         if mine and hers:
             p["coins"] += 200
@@ -8391,7 +8519,13 @@ class Game:
         self.say("At some point you realize you haven't looked at your "
                  "phone in an hour. At some point you realize you're happy.",
                  "info")
-        self.affection(2, "loved the date")
+        if self.wears("little black dress", "evening gown"):
+            self.say("Every head in the room turns when %s walks in. The "
+                     "maître d' gives you the table by the window." %
+                     d["name"], "info")
+            self.affection(3, "loved the date")
+        else:
+            self.affection(2, "loved the date")
         self.learns(8)
         self.quest_done("date", "a perfect date")
 
@@ -8815,7 +8949,9 @@ class Game:
                 d["learning"], STAGE_NAMES[self.stage()], d["affection"]),
                 "HP %d/%d   Hit Dice %d   Charge d%d" % (
                     d["hp"], d["maxhp"], self.her_level(), d["charge"]),
-                "Wearing: %s" % outfit_name(d.get("wearing")),
+                "Wearing: %s" % outfit_name(d.get("wearing"))] + [
+                "  Good for %s" % CLOTHES_PERKS[x] for x in sorted(set(
+                    outfit_parts(d.get("wearing")))) if x in CLOTHES_PERKS] + [
                 "Wardrobe: %s" % (", ".join(d["wardrobe"]) or "empty")]
             if "knowlikes" in self.flags:
                 lines.append("Likes: %s" % " and ".join(d["likes"]))
@@ -9113,7 +9249,7 @@ class Game:
         if (x, y) == goal:
             return True
         m = a.mob_at(x, y)
-        if (m and not (m.ally and not m.her)) or (x, y) in a.links:
+        if (m and not m.ally) or (x, y) in a.links:
             return False
         return self.can_stand(x, y) and a.grid[y][x] not in (
             "stairs_up", "stairs_down", "exit")
@@ -9803,6 +9939,7 @@ def selftest():
         assert g in ITEMS, g
     for c in CLOTHES:
         assert c in CLOTHES_LOOK and c in CLOTHES_LINES, c
+        assert c in CLOTHES_PERKS, c
     for v in LIKES_OF.values():
         for g in (v if isinstance(v, tuple) else (v,)):
             assert g in GIFTS, g
