@@ -63,6 +63,11 @@ Every game has a few things in common:
   place and when you quit, and picks up from there the next time.
 - **Controls:** keyboard, mouse or touch (tap a square to walk there), and a
   gamepad on Linux and the Steam Deck. Press `?` in a game for its keys.
+- **Screen size:** the whole window scales to fit, on a desktop or a phone
+  (Pydroid 3 on Android): text, side panel, buttons and map tiles. Held
+  upright, a phone puts the side panel under the map and the buttons in
+  rows. The menu's Zoom in and Zoom out change the map tiles, and Bigger
+  text and Smaller text everything else.
 - **Sound:** played with `afplay` on macOS, `paplay` or `aplay` on Linux,
   or pygame's mixer; with none of these the game is silent. Music is cached
   in `~/.cache/<game>`.
