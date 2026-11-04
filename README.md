@@ -13,6 +13,7 @@ and music, and tiles drawn in code, so there are no image or sound files.
 | [Lazarus Deep](#lazarus-deep) | a dead ice-mining station on a frozen moon, four days before the Company arrives | Mothership (Tuesday Knight Games) |
 | [Larkspur Hall](#larkspur-hall) | an English country house, the week of the Master's birthday | Maid RPG (Ryo Kamiya) |
 | [Nine Lives](#nine-lives) | a Nevada company town, the week before Omnicorp's Firmware 9 | a light mix of Homeroom's, Larkspur's and Clover Vale's rules |
+| [Some Assembly Required](#some-assembly-required) | a sunny suburb in 2041, the week you buy a Daffodil | The Black Hack (David Black) |
 
 ## Running a game
 
@@ -40,6 +41,10 @@ The games need only Python 3 with Tk; there is nothing to install.
 
 ```bash
 ./ninelives
+```
+
+```bash
+./daffodil
 ```
 
 If Python reports `No module named '_tkinter'`, install your Python's Tk
@@ -75,9 +80,9 @@ Every game has a few things in common:
   from the sea, Hyperspace Homeroom a flying saucer, Clover Vale a
   four-leaf clover with a horseshoe, Lazarus Deep the Dig tower on the
   ice under a gas giant, Larkspur Hall a teacup with its steam rising
-  in a heart, and Nine Lives a catgirl's silhouette against a desert
-  sunset. It is the window icon on every system, and the app
-  icon on macOS.
+  in a heart, Nine Lives a catgirl's silhouette against a desert
+  sunset, and Some Assembly Required a daffodil and a power button. It
+  is the window icon on every system, and the app icon on macOS.
 - **Self-test:** `./<game> --selftest` builds every map, room, level and
   tune of several generated games without opening a window.
 
@@ -830,6 +835,148 @@ View shows the map and Start opens the menu.
 - `ninelives`: the game
 - `~/.ninelives.json`: the saved game
 - `~/.cache/ninelives/`: cached music
+
+---
+
+## Some Assembly Required
+
+A romantic comedy about a lonely human, a very expensive robot, and the
+week everything changes. The premise comes from Wesley Allison's Robot
+Girlfriend novels (Daffodil and its companion robots, the box, the button
+on the back of the neck, the six-hour setup, the update that goes wrong).
+The town, the story and every character are this game's own. The rules are
+The Black Hack's.
+
+Bellwether, a sunny suburb, 2041. Robots do most things now: they take your
+order at the drive-thru and deal the cards at the casino. But a Daffodil
+isn't a robot like that. A Daffodil is made to be someone: a companion, a
+friend, a lover, whatever you design. You've had a long, lonely couple of
+years, and you've saved up. On Saturday morning the Daffodil store at the
+Galleria opens at ten.
+
+- **Design her:** the Design Studio terminal in the store has every dial:
+  frame (she or he), build, height, skin, hair and hairstyle, eyes, face,
+  voice, and a personality from three choices (Sweet, Sassy, Shy or Bold;
+  Bookish, Bubbly, Practical or Dreamy; Prim, Playful or Naughty), with a
+  live preview. Then the modules: Gourmet Chef, Accountant, Personal
+  Trainer, Bodyguard, Tech Suite, Masseuse, Dance, Mathematics and Driver.
+  Pay cash, or use Easy Pay (zero percent for a year!).
+- **Unbox her:** she's delivered in three hours, in a silver box with a
+  yellow flower on it. Packing peanuts, a Quick Setup card, the button on
+  the back of her neck: one, two, three. She asks what duties she should
+  have, how she should dress, and what name she should answer to, and then
+  stands perfectly still for six hours of primary setup. She arrived with
+  nothing to wear. MegaMart and the Glamour Box sell clothes.
+- **Get to know her:** talk to her (walk into her). Her Learning goes from
+  reciting the dictionary to sounding entirely like herself, in four stages,
+  through everything you do together: talking, going out, the TV on the
+  sofa. Her Affection, from 0 to 10, is how she feels about you. Find out
+  what she LIKES and bring it; KISS her once she's ready; BED, at home, at
+  night, fades to black. She brings breakfast in the morning.
+- **The week:** the gym (she's decided you need it), dinner at your
+  sister's on Wednesday (your sister has Opinions about robots), the
+  dance-off at the Neon Rabbit, a date at Bistro Luna, blackjack at the
+  Lucky Star (with the Mathematics module she counts cards), and an old
+  Daffodil at the GoodWorks container who needs a home.
+- **The trouble:** Daffodils are being stolen all over town, and a red tow
+  truck keeps being seen. On Tuesday night a small service update crashes
+  her, and she comes back from her Dataplex backup. On Thursday Volt at
+  Volt's Robot Repair finds a CORE_RESET flag in Update 7.2, due on Sunday
+  week at midnight, which will wipe every companion Daffodil back to the
+  factory. A memory crystal from Volt saves her; pulling the flag at the
+  top of the Daffodil Dataplex saves them all; evidence to the detective
+  puts whoever did it in handcuffs.
+
+Each turn is a minute, or half of one walking the streets. You start at
+nine on Saturday morning. Update 7.2 goes out at midnight on the Sunday a
+week later.
+
+### Every week is different
+
+A new game deals new names about town, a new serial number on her box,
+different stolen Daffodils, the evidence in different places, and six
+Random Events (a heatwave, a flash sale, the geese escaping, a power cut
+at the Dataplex, a Daffodil owners' picnic, a protest at the Galleria).
+Below and above the town are the tunnels and the chop shop under Rusty's
+Salvage, and the three floors of the Dataplex.
+
+### You
+
+Roll STR, DEX, CON, INT, WIS and CHA on 3d6, in order (after a 15 or
+better the next one is rolled on 2d6+2), and swap two. Then choose what you
+do for a living, which is what you are in a fight:
+
+- **Bruiser:** HP from a d10, and a d8 with a bat. Second Wind once an
+  hour; an attack for every level; a trash can lid takes a hit for you.
+- **Hustler:** a d6. Advantage on sneaking, locks and safes, and a hit
+  from behind does 2d6 plus your level.
+- **Medic:** a d8. Talk Down sends human troublemakers packing, and
+  Remedies (Patch Up, Pep Talk, Calm Down, Second Opinion, Smelling Salts)
+  come from second level.
+- **Geek:** a d4, but Apps on your phone, cast like spells: Torchlight,
+  Taser Drone, Firewall, Shutdown, Spoof, Unlock, Ghost Mode and Blackout.
+
+### Rolls and fights
+
+- **Tests:** a d20 under the stat. Advantage rolls two and keeps the lower,
+  Disadvantage the higher. Something with more Hit Dice than your level
+  adds one to your roll for each. Every roll is shown in the log.
+- **Fights:** walk into a troublemaker to attack (under STR). Troublemakers
+  never roll to hit: when one attacks, you roll under STR (or DEX, from
+  range) to get out of the way, and if you fail it hits you for damage by
+  its Hit Dice. An attack roll of 1 doubles your damage; a 20 when dodging
+  doubles theirs.
+- **Armor Points:** a denim jacket 2, leather 4, kevlar 6. They soak up
+  hits until you rest an hour.
+- **Out of Action:** at 0 HP, roll a d6: knocked out, a Fat Head, cracked
+  ribs, a sprain, a viral video, or the hospital and a bill. If she's with
+  you, she carries you home.
+- **Usage dice:** flashlights, pepper spray, first aid kits, and her
+  charge, which runs down while she's out with you and recharges at home.
+- **Luck:** one point to start; spend it to reroll a failed test. A
+  natural 20, a glorious mess, earns one back.
+- **Levels:** one for every adventure you live through, The Black Hack's
+  way: more HP, and a d20 against every stat, higher and it goes up.
+
+She fights beside you, too, with her own stats from the design, Hit Dice
+equal to your level (more with the Bodyguard module) and her own HP. Badly
+hurt, she drops into safe mode until you get her out.
+
+### Talking
+
+Walk into someone, then choose or type a word. Everyone knows NAME, JOB and
+BYE, and most know NEWS. Words in CAPITALS are worth asking about.
+Shopkeepers answer BUY. Ask the consultant to DESIGN; Volt about a BACKUP,
+REPAIR, a MODULE or the UPDATE; the coach for a WORKOUT; the detective
+about EVIDENCE. Ask her about herself (YOU), what she LIKES, to COME or
+STAY, what to WEAR, for a GIFT, a KISS, or BED.
+
+### Keys
+
+| Key | Action |
+| --- | --- |
+| Arrows / WASD | Move (walk into people to talk, into troublemakers to fight) |
+| Space | Wait a turn |
+| Z | Wait longer |
+| C | An app, a remedy or a trick |
+| L | Spend Luck |
+| E | Search |
+| U | Use something |
+| I | You |
+| O | Her |
+| J | Journal |
+| M | Map |
+| ? | Help |
+
+Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X uses
+an app or a trick, Y spends Luck, LB uses something, RB opens the journal,
+View shows the map and Start opens the menu.
+
+### Files
+
+- `daffodil`: the game
+- `~/.daffodil.json`: the saved game
+- `~/.cache/daffodil/`: cached music
 
 ---
 
