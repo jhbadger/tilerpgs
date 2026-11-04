@@ -866,7 +866,11 @@ Galleria opens at ten.
   the back of her neck: one, two, three. She asks what duties she should
   have, how she should dress, and what name she should answer to, and then
   stands perfectly still for six hours of primary setup. She arrived with
-  nothing to wear. MegaMart and the Glamour Box sell clothes.
+  nothing to wear. MegaMart and the Glamour Box sell clothes: a sundress,
+  jeans, a plaid skirt, a crop top, workout gear, lingerie, a little black
+  dress, a silk robe, an evening gown, a polka dot bikini, and cheerleader,
+  French maid and sailor (JK) uniforms. Ask her to WEAR something; the
+  separates mix and match, top with bottom.
 - **Get to know her:** talk to her (walk into her). Her Learning goes from
   reciting the dictionary to sounding entirely like herself, in four stages,
   through everything you do together: talking, going out, the TV on the
