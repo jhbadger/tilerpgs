@@ -6437,6 +6437,14 @@ class Game:
                 d.get("calls") == "Master":
             greet = "I heard what she calls you. The whole street heard. " \
                 "I'm calling the homeowners' association."
+        elif mob.role == "neighbor" and "delivered" not in self.flags:
+            greet = random.choice((
+                "Oh! It's you. You look tired. You always look tired.",
+                "Morning. Your lawn needs mowing. I'm only saying.",
+                "Still on your own in that big house? Well. It's none of "
+                "my business.")) if not d else \
+                "You've got a parcel coming? I'll keep an eye out. I always " \
+                "keep an eye out."
         elif mob.role == "neighbor" and d and d["with"]:
             greet = "Oh! And this must be... the DELIVERY. Hello, dear. " \
                 "Aren't you pretty. Aren't you VERY pretty."
@@ -7765,6 +7773,13 @@ class Game:
         if r == "vane" and w4 in ("sund", "upda") and \
                 self.area.site == "casino":
             self.vane_brags(mob)
+            return True
+        if r == "neighbor" and w4 in ("deli", "daff", "box") and \
+                "delivered" not in self.flags:
+            self.npc_say(mob, "A delivery? For YOU? Well, I'll be watching "
+                         "for it." if self.d else "What delivery? Are you "
+                         "expecting something? You're never expecting "
+                         "anything.")
             return True
         if r == "owner" and w4 in ("juni",) and \
                 "juniper_rescued" in self.flags:
