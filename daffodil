@@ -105,7 +105,6 @@ import zlib
 import base64
 from collections import namedtuple, deque
 from tkinter import font as tkfont
-from tkinter import messagebox
 
 SAVE_FILE = os.path.expanduser("~/.daffodil.json")
 ANDROID = hasattr(sys, "getandroidapilevel") or "ANDROID_ROOT" in os.environ
@@ -4201,7 +4200,7 @@ class Game:
 
     def pad_button(self, name):
         self.walking = None
-        if self.busy:
+        if self.busy or not getattr(self, "area", None):
             return
         if self.menu:
             if name == "a":
@@ -4224,7 +4223,8 @@ class Game:
     def tapped(self, ev):
         """A tap on the map, unless it's the tail of one on a dialog that
         just closed (on Android it can land on the map behind)."""
-        if time.time() < getattr(self, "tap_guard", 0):
+        if time.time() < getattr(self, "tap_guard", 0) or \
+                not getattr(self, "area", None):
             return
         self.on_tap(ev)
 
@@ -4405,15 +4405,45 @@ class Game:
         p["ap"] = min(p.get("ap", 0), p["maxap"]) if p.get("ap") else \
             p["maxap"]
 
-    def ask_hero(self, title="Who are you?"):
-        """Making you: name, sex, what you do, and the dice; None if
-        cancelled."""
+    def open_dialog(self):
+        """Whether a dialog can open now (only one at a time)."""
+        dlg = getattr(self, "dialog", None)
+        try:
+            if dlg is not None and dlg.winfo_exists():
+                dlg.lift()
+                return False
+        except tk.TclError:
+            pass
+        return True
+
+    def close_dialog(self, dlg=None):
+        dlg = dlg or getattr(self, "dialog", None)
+        if dlg is not None:
+            try:
+                dlg.destroy()
+            except tk.TclError:
+                pass
+        if dlg is getattr(self, "dialog", None):
+            self.dialog = None
+        # a tap on a dialog button can land on the map behind it
+        self.tap_guard = time.time() + 0.6
+
+    def grab(self, dlg):
+        try:
+            dlg.grab_set()
+        except tk.TclError:
+            pass
+
+    def ask_hero(self, done, title="Who are you?"):
+        """Making you: name, sex, what you do, and the dice.  It doesn't
+        wait: Begin calls done(who), Cancel done(None)."""
         root = self.root
-        dlg = tk.Toplevel(root, bg=PANEL, padx=18, pady=14)
+        if not self.open_dialog():
+            return
+        dlg = self.dialog = tk.Toplevel(root, bg=PANEL, padx=18, pady=14)
         dlg.title(title)
         dlg.transient(root)
         dlg.resizable(False, False)
-        result = {}
         rng = random.Random()
         state = {"rolled": self.roll_hero(rng), "swap": None, "pick": None}
         tk.Label(dlg, text="Who are you?", bg=PANEL, fg=ACCENT,
@@ -4516,21 +4546,27 @@ class Game:
             show()
 
         def begin(_=None):
-            result["who"] = current()
-            dlg.destroy()
+            who = current()
+            self.close_dialog(dlg)
+            done(who)
+
+        def cancel(_=None):
+            self.close_dialog(dlg)
+            done(None)
         show()
         bar = tk.Frame(dlg, bg=PANEL)
         bar.pack(fill="x", pady=(12, 0))
         tk.Button(bar, text="Begin", command=begin, width=9,
                   highlightbackground=PANEL).pack(side="right")
-        tk.Button(bar, text="Cancel", command=dlg.destroy, width=8,
+        tk.Button(bar, text="Cancel", command=cancel, width=8,
                   highlightbackground=PANEL).pack(side="right", padx=6)
         tk.Button(bar, text="Roll again", command=reroll, width=10,
                   highlightbackground=PANEL).pack(side="left")
         tk.Button(bar, text="Another name", command=rename, width=12,
                   highlightbackground=PANEL).pack(side="left", padx=6)
         dlg.bind("<Return>", begin)
-        dlg.bind("<Escape>", lambda e: dlg.destroy())
+        dlg.bind("<Escape>", cancel)
+        dlg.protocol("WM_DELETE_WINDOW", cancel)
         name.focus_set()
         name.select_range(0, "end")
         self.fit_dialog(dlg)
@@ -4540,10 +4576,7 @@ class Game:
             root.winfo_rooty() + max(0, min(40, (root.winfo_height() -
                                                  dlg.winfo_reqheight()) //
                                             2))))
-        dlg.grab_set()
-        root.wait_window(dlg)
-        self.tap_guard = time.time() + 0.6
-        return result.get("who")
+        self.grab(dlg)
 
     @staticmethod
     def default_hero(name="Mike Ferris", cls="Bruiser"):
@@ -4559,14 +4592,16 @@ class Game:
 
     def new_game(self, who=None):
         if who is None:
-            if getattr(self, "headless", False):
-                who = self.default_hero()
-            else:
-                who = self.ask_hero()
-            if who is None:
-                if getattr(self, "p", None):
-                    return
-                who = self.default_hero()
+            if not getattr(self, "headless", False):
+                def chosen(w):
+                    if w is None:
+                        if getattr(self, "area", None):
+                            return
+                        w = self.default_hero()
+                    self.new_game(w)
+                self.ask_hero(chosen)
+                return
+            who = self.default_hero()
         self.setup_world(random.randrange(1 << 31))
         self.p = self.make_hero(who)
         self.d = None
@@ -5545,7 +5580,8 @@ class Game:
     # ── Turns ──
 
     def on_key(self, ev):
-        if self.talk or self.busy or ev.state & 0x0C:
+        if self.talk or self.busy or ev.state & 0x0C or \
+                not getattr(self, "area", None):
             return
         k = ev.keysym
         self.walking = None
@@ -5614,8 +5650,8 @@ class Game:
         self.render()
 
     def ready(self):
-        return not (self.busy or self.talk or self.overlay or self.menu)
-
+        return bool(getattr(self, "area", None)) and not (
+            self.busy or self.talk or self.overlay or self.menu)
 
     def can_stand(self, x, y):
         return self.area.grid[y][x] in WALKABLE
@@ -7811,10 +7847,7 @@ class Game:
             des = self.random_design(random.Random(1))
             self.checkout(des, ["Housekeeping", "Gourmet Chef"])
             return
-        got = self.ask_design()
-        if got:
-            des, mods, cash, credit = got
-            self.ordered(des, mods, cash, credit)
+        self.ask_design(lambda got: self.ordered(*got))
 
     @staticmethod
     def payment(price, how):
@@ -7824,15 +7857,20 @@ class Game:
             return price - credit, credit
         return price, 0
 
-    def ask_design(self):
+    def ask_design(self, done):
+        """The Design Studio dialog.  It doesn't wait: "Buy her" calls
+        done((design, modules, cash, credit)) itself.  (On Android,
+        wait_window doesn't block, so nothing can be left to come after
+        it.)"""
         root = self.root
-        dlg = tk.Toplevel(root, bg=PANEL, padx=14, pady=10)
+        if not self.open_dialog():
+            return
+        dlg = self.dialog = tk.Toplevel(root, bg=PANEL, padx=14, pady=10)
         dlg.title("Daffodil Design Studio")
         dlg.transient(root)
         dlg.resizable(False, False)
         rng = random.Random()
         des = self.random_design(rng)
-        result = {}
         vars_ = {}
         tk.Label(dlg, text="DAFFODIL DESIGN STUDIO", bg=PANEL, fg=ACCENT,
                  font=F("Helvetica", 15, "bold")).pack(anchor="w")
@@ -7997,18 +8035,21 @@ class Game:
             if cash > self.p["coins"]:
                 show()
                 return
-            result["design"] = (d, chosen(), cash, credit)
-            dlg.destroy()
+            got = (d, chosen(), cash, credit)
+            self.close_dialog(dlg)
+            done(got)
         show()
         bar = tk.Frame(dlg, bg=PANEL)
         bar.pack(fill="x", pady=(10, 0))
         tk.Button(bar, text="Buy her", command=buy, width=9,
                   highlightbackground=PANEL).pack(side="right")
-        tk.Button(bar, text="Cancel", command=dlg.destroy, width=8,
-                  highlightbackground=PANEL).pack(side="right", padx=6)
+        tk.Button(bar, text="Cancel", command=lambda: self.close_dialog(dlg),
+                  width=8, highlightbackground=PANEL).pack(side="right",
+                                                           padx=6)
         tk.Button(bar, text="Surprise me", command=randomize, width=11,
                   highlightbackground=PANEL).pack(side="left")
-        dlg.bind("<Escape>", lambda e: dlg.destroy())
+        dlg.bind("<Escape>", lambda e: self.close_dialog(dlg))
+        dlg.protocol("WM_DELETE_WINDOW", lambda: self.close_dialog(dlg))
         self.fit_dialog(dlg)
         dlg.geometry("+%d+%d" % (
             root.winfo_rootx() + max(0, (root.winfo_width() -
@@ -8016,10 +8057,7 @@ class Game:
             root.winfo_rooty() + max(0, min(30, (root.winfo_height() -
                                                  dlg.winfo_reqheight()) //
                                             2))))
-        dlg.grab_set()
-        root.wait_window(dlg)
-        self.tap_guard = time.time() + 0.6
-        return result.get("design")
+        self.grab(dlg)
 
     def checkout(self, des, mods):
         """Paying: cash, or Easy Pay."""
@@ -8197,7 +8235,8 @@ class Game:
         root = self.root
         names = DAFFODIL_NAMES if d["design"]["frame"] == "F" else \
             DAFFODIL_NAMES_M
-        dlg = tk.Toplevel(root, bg=PANEL, padx=16, pady=12)
+        self.close_dialog()
+        dlg = self.dialog = tk.Toplevel(root, bg=PANEL, padx=16, pady=12)
         dlg.title("Her name")
         dlg.transient(root)
         dlg.resizable(False, False)
@@ -8218,14 +8257,14 @@ class Game:
                       command=lambda nm=nm: (e.delete(0, "end"),
                                              e.insert(0, nm))).grid(
                 row=n // 4, column=n % 4, padx=1, pady=1)
-        out = {}
-
         def ok(_=None):
-            out["name"] = " ".join(e.get().split())[:16]
-            dlg.destroy()
+            name = " ".join(e.get().split())[:16]
+            self.close_dialog(dlg)
+            self.name_her(name or random.choice(names))
         tk.Button(dlg, text="That's her name", command=ok,
                   highlightbackground=PANEL).pack(anchor="e", pady=(8, 0))
         dlg.bind("<Return>", ok)
+        dlg.protocol("WM_DELETE_WINDOW", ok)
         e.focus_set()
         e.select_range(0, "end")
         self.fit_dialog(dlg)
@@ -8235,10 +8274,7 @@ class Game:
             root.winfo_rooty() + max(0, min(60, (root.winfo_height() -
                                                  dlg.winfo_reqheight()) //
                                             2))))
-        dlg.grab_set()
-        root.wait_window(dlg)
-        self.tap_guard = time.time() + 0.6
-        self.name_her(out.get("name") or random.choice(names))
+        self.grab(dlg)
 
     def name_her(self, name):
         d = self.d
@@ -10282,10 +10318,12 @@ class Game:
     def ask_new_game(self):
         if self.busy:
             return
-        if self.overlay in ("won", "doom") or messagebox.askyesno(
-                "New game", "Start a new week in Bellwether?",
-                parent=self.root):
+        if self.overlay in ("won", "doom"):
             self.new_game()
+            return
+        self.open_menu("Start a new week in Bellwether? This one's gone "
+                       "for good.", [("Yes, a new week", self.new_game),
+                                     ("No, keep playing", lambda: None)])
 
 
 OBJECT_NEXT = {"home", "out", "back", "up", "down", "in", "to", "and", "a",
