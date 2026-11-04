@@ -172,7 +172,8 @@ the library. Shopkeepers answer BUY.
 | C | Cast a spell |
 | U | Use or ready an item |
 | I | Investigator sheet |
-| J | Journal |
+| P | Your phone: the to-do list |
+| J | Journal: the clues and the evidence |
 | M | Map |
 | ? | Help |
 
@@ -290,7 +291,8 @@ everywhere.
 | U | Use a gadget or a snack |
 | G | Get in or out of your wheels |
 | I | Teener sheet |
-| J | Journal |
+| P | Your phone: the to-do list |
+| J | Journal: the clues and the evidence |
 | M | Map |
 | ? | Help |
 
@@ -406,7 +408,8 @@ somepony will tut.
 | C | A talent or a spell (fly, buck, telekinesis, magic) |
 | U | Use something |
 | I | Your pony |
-| J | Journal |
+| P | Your phone: the to-do list |
+| J | Journal: the clues and the evidence |
 | M | Map |
 | ? | Help |
 
@@ -542,7 +545,8 @@ with you (STAY sends them back). Ask about HOLLOW when you're sure enough.
 | R | Reload |
 | U | Use something (medicine, scanners, suits, weapons, charges) |
 | I | Your crew member |
-| J | Journal |
+| P | Your phone: the to-do list |
+| J | Journal: the clues and the evidence |
 | M | Map |
 | ? | Help |
 
@@ -822,7 +826,8 @@ her to COME along, or to make her HOME with you.
 | E | Search |
 | U | Use something |
 | I | Your hero |
-| J | Journal |
+| P | Your phone: the to-do list |
+| J | Journal: the clues and the evidence |
 | M | Map |
 | ? | Help |
 
@@ -879,7 +884,8 @@ Galleria opens at ten.
   workout gear at the gym, the sundress against the geese, daisy dukes
   for getting past Rusty, the microskirt for counting cards unnoticed.
 - **Get to know her:** talk to her (walk into her). Her Learning goes from
-  reciting the dictionary to sounding entirely like herself, in four stages,
+  reciting the dictionary to sounding entirely like herself, in four stages
+  (CHAT with her to hear the difference),
   through everything you do together: talking, going out, the TV on the
   sofa. Her Affection, from 0 to 10, is how she feels about you. Find out
   what she LIKES and bring it; KISS her once she's ready; BED, at home, at
@@ -920,7 +926,7 @@ better the next one is rolled on 2d6+2), and swap two. Then choose what you
 do for a living, which is what you are in a fight:
 
 - **Bruiser:** HP from a d10, and a d8 with a bat. Second Wind once an
-  hour; an attack for every level; a trash can lid takes a hit for you.
+  hour; an attack for every level; a trash can lid takes any big hit.
 - **Hustler:** a d6. Advantage on sneaking, locks and safes, and a hit
   from behind does 2d6 plus your level.
 - **Medic:** a d8. Talk Down sends human troublemakers packing, and
@@ -940,7 +946,9 @@ do for a living, which is what you are in a fight:
   its Hit Dice. An attack roll of 1 doubles your damage; a 20 when dodging
   doubles theirs.
 - **Armor Points:** a denim jacket 2, leather 4, kevlar 6. They soak up
-  hits until you rest an hour.
+  hits until you rest an hour. A trash can lid adds 2 and, once, takes
+  the hit that would have knocked you out (a Bruiser's takes any big
+  hit).
 - **Out of Action:** at 0 HP, roll a d6: knocked out, a Fat Head, cracked
   ribs, a sprain, a viral video, or the hospital and a bill. If she's with
   you, she carries you home.
@@ -977,12 +985,13 @@ STAY, what to WEAR, for a GIFT, a KISS, or BED.
 | U | Use something |
 | I | You |
 | O | Her |
-| J | Journal |
+| P | Your phone: the to-do list |
+| J | Journal: the clues and the evidence |
 | M | Map |
 | ? | Help |
 
 Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X uses
-an app or a trick, Y spends Luck, LB uses something, RB opens the journal,
+an app or a trick, Y spends Luck, LB uses something, RB opens your phone,
 View shows the map and Start opens the menu.
 
 ### Files

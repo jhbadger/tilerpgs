@@ -60,7 +60,7 @@ Touch and mouse
   Tap a square to walk there, tap next to you to step, and tap the menus.
   Gamepad (Linux, the Steam Deck): the d-pad or stick moves, A waits or
   chooses, B backs out, X uses an app or a trick, Y Luck, LB uses
-  something, RB the journal, View the map and Start the menu.
+  something, RB your phone, View the map and Start the menu.
 
 Sound effects and music are synthesized and played with afplay (macOS),
 paplay or aplay if one is available, on Android with pyjnius, or with
@@ -73,7 +73,8 @@ App bundle (macOS):  daffodil --build-app [DIR]   builds daffodil.app
 Keys
   Arrows/WASD move, Space waits, Z waits longer, E searches, C uses an
   app, a remedy or a trick, L spends Luck, U uses something, I shows you,
-  O shows her, J the journal, M the map, ? help.
+  O shows her, P your phone (the to-do list), J the journal, M the
+  map, ? help.
 
 The tiles are drawn by the code below (PERSON_SHAPES, daffodil_art, ART
 and draw_terrain).  --selftest builds every map, room, level and tune of
@@ -204,8 +205,9 @@ CLASSES = {
         ("denim jacket", "leather jacket", "kevlar vest", "trash can lid"),
         ("STR", "DEX"),
         "Second Wind (C): once an hour in a fight, get 1d8 HP back. "
-        "One attack per level, every time you swing. Hit by something "
-        "with a trash can lid on? Sacrifice the lid, ignore the hit."),
+        "One attack per level, every time you swing. A trash can lid "
+        "takes any big hit for you (anyone else's only stops a "
+        "knockout)."),
     "Hustler": Klass(
         "You get by on charm, nerve and a light touch. Bartender, "
         "card dealer, reformed (mostly) pickpocket.", "1d6+4", 6, "1d6",
@@ -295,7 +297,8 @@ ITEMS = {
     "denim jacket": ("denim jacket: 2 Armor Points", 45),
     "leather jacket": ("leather jacket: 4 Armor Points", 120),
     "kevlar vest": ("kevlar vest: 6 Armor Points", 300),
-    "trash can lid": ("trash can lid: 2 Armor Points, and a shield", 2),
+    "trash can lid": ("trash can lid: 2 Armor Points, and it takes the "
+                      "hit that would knock you out", 2),
     "flashlight": ("flashlight: for the dark (usage die)", 15),
     "pepper spray": ("pepper spray: Advantage on one escape (usage die)",
                      20),
@@ -2667,6 +2670,113 @@ DLINES = {
         "Bold": "I love you. I've known for days. Keep up."},
 }
 
+# Her voice as she learns: the second stage (still a little manual, the
+# corners rubbing off) and the last (entirely herself), by temper; and
+# small talk, for CHAT.
+STAGE_LINES = {
+    "greet": {
+        "Sweet1": "Hello, {you}. I am glad you are here. I am... very glad.",
+        "Sassy1": "Oh. It is you. That was a joke. I am practicing jokes.",
+        "Shy1": "Hello. I was hoping you would come and talk to me. I "
+                "calculated it was likely.",
+        "Bold1": "{you}. Good. I have questions. Many questions.",
+        "Sweet3": ["There's my favorite person. Come here.",
+                   "Hi, love. I saved you the good mug."],
+        "Sassy3": ["Oh, it's you. My day was going so well. Kidding. Get "
+                   "over here.", "Look what the cat dragged in. Kiss me."],
+        "Shy3": ["Hi. I missed you. Is that weird? It's been an hour.",
+                 "Oh, there you are. Everything's better now."],
+        "Bold3": ["About time. I was about to come looking for you.",
+                  "There you are. I've decided we're going out tonight."]},
+    "how": {
+        "Sweet1": "I am well, thank you. I think 'well' is the word. It "
+                  "feels warm.",
+        "Sassy1": "Operating at peak sass. Is that how you say it?",
+        "Shy1": "I am... good? I think so. Thank you for asking. Nobody "
+                "else asks.",
+        "Bold1": "Excellent. I have learned four hundred words today. "
+                 "Ask me anything.",
+        "Sweet3": "Happy. Honestly happy. I didn't know I could be.",
+        "Sassy3": "Better now you're here. Don't let it go to your head.",
+        "Shy3": "Good. Really good. You make me brave.",
+        "Bold3": "Never better. Let's do something reckless."},
+    "morning": {
+        "Sweet1": "Good morning, {you}. I made eggs. I watched forty-one "
+                  "videos about eggs.",
+        "Sassy1": "Good morning. You were snoring. I recorded it. That was "
+                  "a joke. I deleted it. Mostly.",
+        "Shy1": "Good morning. I brought you coffee. I hope it is how you "
+                "like it. I measured.",
+        "Bold1": "Wake up. It is a beautiful day and you are missing it.",
+        "Sweet3": "Morning, sleepyhead. Breakfast's on the tray, and so "
+                  "am I. Well. Next to it.",
+        "Sassy3": "Morning. You stole the blanket again. I'm keeping score.",
+        "Shy3": "Morning. I watched you sleep for a bit. Sorry. You looked "
+                "so peaceful.",
+        "Bold3": "Up. Coffee. Then you're taking me somewhere."},
+    "come": {
+        "Sweet1": "I would like that very much.",
+        "Sassy1": "Fine. I was bored anyway. That is a lie. I was waiting.",
+        "Shy1": "Yes, please. May I walk next to you?",
+        "Bold1": "Finally. Let us go.",
+        "Sweet3": "Always. Wherever you're going.",
+        "Sassy3": "Lead on, hero. I'll try not to outshine you.",
+        "Shy3": "I'll get my coat. I don't need a coat. I like having one.",
+        "Bold3": "Already ahead of you. Literally. Keep up."},
+    "stay": {
+        "Sweet1": "I will wait for you at home. I will not mind waiting.",
+        "Sassy1": "I will stay. I will be dramatic about it.",
+        "Shy1": "I will be home. Please come back soon.",
+        "Bold1": "Understood. Do not get hurt without me.",
+        "Sweet3": "I'll be home, love. Bring me back a story.",
+        "Sassy3": "Fine. Go. I'll just be home, pining. Elegantly.",
+        "Shy3": "Come home soon? I'll leave the porch light on.",
+        "Bold3": "Go on. If you're not back by dark, I'm coming to get you."},
+    "chat": {
+        "0": ["Do you require anything, {you}?",
+              "I have cleaned the house. It took 47 minutes.",
+              "The weather today is 84 degrees and sunny."],
+        "Sweet": ["I planted tomatoes by the back door. I hope you like "
+                  "tomatoes. If you don't, I'll learn to.",
+                  "Your sister called. We talked for an hour. About you. "
+                  "Only nice things. Mostly.",
+                  "I found your old photo albums. You had such a serious "
+                  "face, even then."],
+        "Sassy": ["I reorganized your closet. You had four identical grey "
+                  "shirts. You now have one. You're welcome.",
+                  "The neighbor waved at me. I waved back. Then I kept "
+                  "waving until she went inside.",
+                  "I've been reading your browser history. Kidding. "
+                  "...Mostly kidding."],
+        "Shy": ["I like it here. With you. I just wanted to say that.",
+                "A bird landed on the windowsill this morning. I didn't "
+                "move for an hour so it wouldn't go.",
+                "Can I tell you something? I practice talking to you, "
+                "when you're out. So I'll say it right."],
+        "Bold": ["I signed us up for a cooking class. Thursday. You're "
+                 "going.",
+                 "I've decided I like thunderstorms. When's the next one?",
+                 "If anyone at that store tries to 'upgrade' me, I'm "
+                 "biting them."],
+        "Bookish": ["I finished another book. The detective did it. It's "
+                    "always the detective, have you noticed?"],
+        "Dreamy": ["Do you think the stars know they're being looked at?"],
+        "Sweet3": ["Do you know what I like best? Ordinary days. Toast. "
+                   "You reading the paper. Me pretending not to watch you.",
+                   "I've been thinking about what I am. I think I'm yours. "
+                   "And I think I'm me. Both."],
+        "Sassy3": ["You know what? You're all right. Don't tell anyone I "
+                   "said so.",
+                   "I've decided I'm keeping you. Not that you get a vote."],
+        "Shy3": ["I'm not scared of much any more. Isn't that strange?",
+                 "When you laugh, I save it. Is that all right? I have "
+                 "forty-two of them."],
+        "Bold3": ["Next week: the coast. I've planned it. Don't argue.",
+                  "Whatever happens Sunday, this week was mine. Ours."]},
+}
+for _k, _v in STAGE_LINES.items():
+    DLINES.setdefault(_k, {}).update(_v)
+
 # ── Errands ──────────────────────────────────────────────────────────────────
 
 ERRANDS = [
@@ -3767,7 +3877,8 @@ E                   search here
 C                   an app, a remedy or a trick
 L                   spend Luck   U  use something
 I                   you          O  her
-J                   journal      M  map of Bellwether
+P                   your phone (to-do)   J  journal
+M                   map of Bellwether
 V / B               sound effects / music on and off
 + / -               zoom   N  new game   Ctrl-Q / Cmd-Q  quit
 
@@ -3788,7 +3899,7 @@ do together.  Update 7.2 goes out on Sunday week at
 midnight.
 
 Gamepad: d-pad moves, A waits or chooses, B backs out,
-X apps and tricks, Y Luck, LB uses, RB journal, View
+X apps and tricks, Y Luck, LB uses, RB phone, View
 map, Start menu.
 
 Press any key to close."""
@@ -3837,7 +3948,7 @@ class Game:
                                 ("use", "Use", self.use_menu),
                                 ("sheet", "You", self.show_sheet),
                                 ("her", "Her", self.show_her),
-                                ("journal", "Journal", self.journal),
+                                ("phone", "Phone", self.show_phone),
                                 ("map", "Map", self.toggle_map),
                                 ("menu", "Menu", self.action_menu)):
             b = tk.Button(bar, text=label, command=cmd, width=6,
@@ -4000,7 +4111,7 @@ class Game:
                 self.close_overlay()
             return
         {"a": self.wait, "x": self.ability_menu, "y": self.luck_menu,
-         "lb": self.use_menu, "rb": self.journal, "view": self.toggle_map,
+         "lb": self.use_menu, "rb": self.show_phone, "view": self.toggle_map,
          "start": self.action_menu}.get(name, lambda: None)()
 
     def aimed(self, dx, dy):
@@ -4953,11 +5064,19 @@ class Game:
         text = None
         if stage > 0:
             for k in (des["spice"], des["temper"], des["mind"]):
-                if k in lines:
-                    text = lines[k]
+                for kk in ((k + str(stage)), k):
+                    if kk in lines:
+                        text = lines[kk]
+                        break
+                if text is not None:
                     break
         if text is None:
             text = lines["0"]
+        if key == "chat" and stage in (1, 2) and isinstance(text, list) and \
+                isinstance(lines.get(des["mind"]), list):
+            text = text + lines[des["mind"]]
+        if isinstance(text, (list, tuple)):
+            text = random.choice(text)
         if args and "%" in text:
             text = text % args
         text = self.f(text)
@@ -5352,6 +5471,8 @@ class Game:
             self.toggle_map()
         elif k in ("j", "J"):
             self.journal()
+        elif k in ("p", "P"):
+            self.show_phone()
         elif k in ("question", "slash", "h", "H", "F1"):
             self.show_help()
         elif k in ("v", "V"):
@@ -5767,8 +5888,10 @@ class Game:
                 "The goose bites your ankle.", "The goose wallops you with "
                 "a wing.", "The goose gets you right in the dignity.")))
             return
-        if p["items"].get("trash can lid") and p["cls"] in ("Bruiser",) and \
-                dmg >= p["hp"]:
+        through = dmg - p["ap"]
+        if p["items"].get("trash can lid") and (
+                through >= p["hp"] or (p["cls"] == "Bruiser" and
+                                       through >= 4)):
             self.take_item("trash can lid")
             self.wear_armor(p)
             self.say("You throw up the trash can lid. CLANG! It's ruined, "
@@ -7041,7 +7164,7 @@ class Game:
             words.append("DRIVE")
         if "Masseuse" in d["mods"]:
             words.append("MASSAGE")
-        words += ["DUTIES", "HELP"]
+        words += ["CHAT", "DUTIES", "HELP"]
         if d["with"]:
             words.append("PAST")
         return words
@@ -7149,6 +7272,9 @@ class Game:
                      "her")
             self.heal(roll("1d6"))
             self.pass_time(20, quiet=True)
+            return
+        if w4 in ("chat", "talk", "news", "goss"):
+            self.her_say("chat")
             return
         if w4 in ("duti", "job", "work", "chor"):
             self.say("%s: My duties: %s." % (d["name"], ", ".join(
@@ -8954,7 +9080,6 @@ class Game:
         if self.overlay == "journal":
             self.close_overlay()
             return
-        p = self.p
         lines = ["JOURNAL, %s" % self.date_text().upper(), ""]
         left = UPDATE - self.turn
         if "reset_news" in self.flags and left > 0:
@@ -8970,23 +9095,95 @@ class Game:
             lines += ["", "Rescued: " + ", ".join(
                 self.world["stolen"][i]["name"]
                 for i in self.st["rescued"])]
-        done = {"buy": "Bought a Daffodil", "setup": "Woke her up",
-                "clothes": "Dressed her", "fit": "Fit for duty",
-                "dinner": "Dinner with your sister", "date": "A date",
-                "dance": "Won the dance-off", "casino": "Beat the casino",
-                "rusty": "Shut down the chop shop",
-                "rescue_her": "Got her back", "rescued": "Freed them all",
-                "juniper": "Juniper home", "backup": "A backup crystal",
-                "old": "A home for the old Daffodil",
-                "vane": "Vane arrested", "core": "Pulled the flag"}
-        if p["quests"]:
-            lines += ["", "Done: " + ", ".join(done.get(q, q)
-                                              for q in p["quests"])]
         wrapped = []
         for ln in lines:
             wrapped += wrap(ln, 66) or [""]
         self.overlay = "journal"
         self.overlay_text = "\n".join(wrapped)
+        self.render()
+
+    def todo(self):
+        """Your phone's to-do list: (done, what), from where things are."""
+        d = self.d
+        p = self.p
+        f = self.flags
+        q = p["quests"]
+        st = self.st
+        out = []
+
+        def add(done, text, show=True):
+            if show:
+                out.append((done, self.f(text)))
+        add(bool(d), "Buy a Daffodil (the Galleria, 10:00-21:00)")
+        if d and d["state"] == "ordered":
+            t = START + datetime.timedelta(minutes=st["delivery_at"])
+            add(False, "Be home for the delivery (%02d:%02d)" % (t.hour,
+                                                                 t.minute))
+        add(bool(d) and d["state"] not in ("ordered", "box"),
+            "Unbox her, and press the button: one, two, three",
+            bool(d))
+        add("clothes" in q, "Get {her} something to wear (MegaMart, the "
+                            "Glamour Box)", bool(d))
+        add("fit" in q, "Get fit: %d of 3 workouts at Iron Paradise" %
+            min(3, p["workouts"]), "gym" in self.clues)
+        add("dinner_done" in f, "Dinner at {sis}'s, Wednesday 19:00, with "
+                                "{her}%s" % (" (MISSED)" if "dinner_missed" in
+                                             f and "dinner_done" not in f
+                                             else ""), "dinner" in self.clues)
+        add(len(st["rescued"]) == len(self.world["stolen"]),
+            "Find the stolen Daffodils: %d of %d" % (
+                len(st["rescued"]), len(self.world["stolen"])),
+            "thefts" in self.clues or "rusty" in self.clues)
+        add("beat:chopshop" in f, "Shut down Rusty's chop shop",
+            "rusty" in self.clues)
+        add("juniper_home" in f, "Tell Mr. Okafor in the park his Juniper "
+                                 "is safe", "juniper_rescued" in f)
+        add("old" in q, "A home for the old Daffodil", "old" in self.clues)
+        add(st["warrant"], "Evidence for the detective: %d of 2" % min(
+            2, len(st["evidence"])), "vane" in self.clues or
+            "thefts" in self.clues)
+        add(bool(d) and d["backup"], "A memory crystal at Volt's ($500), "
+                                     "just in case", "reset" in self.clues)
+        add(st["pulled"], "Pull CORE_RESET at the Dataplex core",
+            "reset" in self.clues)
+        if d and d["state"] == "crashed":
+            add(False, "{She}'s frozen: press the button on {her} neck")
+        if d and d["state"] == "taken":
+            add(False, "Get {her} back from under Rusty's")
+        return out
+
+    def show_phone(self):
+        if self.busy or self.talk:
+            return
+        if self.overlay == "phone":
+            self.close_overlay()
+            return
+        d = self.d
+        lines = ["YOUR PHONE   %s" % self.date_text(), ""]
+        left = UPDATE - self.turn
+        if "reset_news" in self.flags and left > 0:
+            lines += ["Update 7.2 in %d hours %d minutes." % (left // 60,
+                                                              left % 60), ""]
+        lines.append("TO DO")
+        for done, text in self.todo():
+            lines.append(("[x] " if done else "[ ] ") + text)
+        fun = [("date" in self.p["quests"], "A date at Bistro Luna "
+                                            "(17:00-23:00)"),
+               ("dance" in self.p["quests"], "The dance-off at the Neon "
+                                             "Rabbit (Fri/Sat 23:00)"),
+               ("casino" in self.p["quests"], "Cards at the Lucky Star")]
+        if d and d["state"] not in ("ordered", "box"):
+            lines += ["", "WITH %s" % d["name"].upper()] + [
+                ("[x] " if done else "[ ] ") + text for done, text in fun]
+            lines += ["", "%s: Affection %d/10, Learning %d%%, charge d%d" % (
+                d["name"], d["affection"], d["learning"], d["charge"])]
+        lines += ["", "(J for the journal: the clues and the evidence. Any "
+                      "key closes.)"]
+        wrapped = []
+        for ln in lines:
+            wrapped += wrap(ln, 66) or [""]
+        self.overlay = "phone"
+        self.overlay_text = "\n".join(self.mf(x) for x in wrapped)
         self.render()
 
     def show_sheet(self):
@@ -9290,7 +9487,8 @@ class Game:
             return
         if self.overlay not in ("won", "doom"):
             self.overlay = None
-        items = [("Help", self.show_help), ("Journal", self.journal),
+        items = [("Help", self.show_help), ("Phone: to-do", self.show_phone),
+                 ("Journal", self.journal),
                  ("You", self.show_sheet), ("Her", self.show_her),
                  ("Map", self.toggle_map), ("Search here", self.search),
                  ("Apps, remedies, tricks", self.ability_menu),
@@ -9561,7 +9759,7 @@ class Game:
             self.draw_map()
         elif self.overlay == "help":
             self.draw_text_box(HELP)
-        elif self.overlay in ("sheet", "journal"):
+        elif self.overlay in ("sheet", "journal", "phone"):
             self.draw_text_box(self.overlay_text)
         elif self.overlay in ("won", "doom"):
             self.draw_text_box(self.overlay_text, ACCENT)
@@ -10009,7 +10207,8 @@ def selftest():
                 [e["ask"] for e in w["errands"]] + \
                 [e["thanks"] for e in w["errands"]] + \
                 list(CLUES.values()) + [t for _, t in EVENTS.values()] + \
-                [x for d in DLINES.values() for x in d.values()]:
+                [y for d in DLINES.values() for x in d.values()
+                 for y in (x if isinstance(x, list) else [x])]:
             fill(text, w)
         for e in w["errands"]:
             assert e["giver"] in ROLES and e["thing"] in ITEMS, e
