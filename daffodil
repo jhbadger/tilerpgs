@@ -2548,6 +2548,13 @@ DLINES = {
         "Shy": "She's pretty. Do you think she's prettier than me? Don't "
                "answer that.",
         "Bold": "She's cute. You're still mine."},
+    "undress": {
+        "0": "Removing clothing. ...Done. Is there anything else, {you}?",
+        "Prim": "{you}! ...Well. Draw the curtains first. And close your "
+                "eyes. No, open them. Oh, I don't know.",
+        "Playful": "Ha! Is that what you want? ...Catch. And catch. And "
+                   "CATCH.",
+        "Naughty": "I thought you'd never ask. Slowly, or all at once?"},
     "lounging": {
         "0": "I am wearing the %s, as instructed.",
         "Prim": "Don't look at me like that. ...No. Keep looking at me "
@@ -7053,12 +7060,22 @@ class Game:
             if c != d.get("wearing"):
                 items.append((self.mf("Ask her to wear the %s" % c),
                               lambda c=c: self.dress_her(c)))
+        if d.get("wearing") and self.area.site == "home":
+            items.append((self.mf("Ask her to take everything off"),
+                          self.undress))
         if len([c for c in d["wardrobe"] if c in SEPARATES]) >= 2:
             items.append(("Mix and match: a top with a bottom",
                           self.mix_menu))
         items.append(("Never mind", lambda: None))
         self.open_menu("What should %s wear? (Now: %s)" % (
             d["name"], outfit_name(d.get("wearing"))), items)
+
+    def undress(self):
+        d = self.d
+        d["wearing"] = None
+        self.her_say("undress")
+        self.paint_people()
+        self.render()
 
     def mix_menu(self):
         d = self.d
@@ -7115,6 +7132,10 @@ class Game:
         d = self.d
         if d["with"]:
             self.say("%s: I'm right here." % d["name"], "her")
+            return
+        if not d.get("wearing") and d["wardrobe"]:
+            self.say("%s: Like this? Let me put something on first. (Ask "
+                     "me to WEAR something.)" % d["name"], "her")
             return
         if not d.get("wearing"):
             self.her_say("naked")
