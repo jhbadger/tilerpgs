@@ -12,6 +12,7 @@ and music, and tiles drawn in code, so there are no image or sound files.
 | [Clover Vale](#clover-vale) | a valley of magic ponies, the week of the Lantern Festival | the pony roleplaying game (Renegade Game Studios) |
 | [Lazarus Deep](#lazarus-deep) | a dead ice-mining station on a frozen moon, four days before the Company arrives | Mothership (Tuesday Knight Games) |
 | [Larkspur Hall](#larkspur-hall) | an English country house, the week of the Master's birthday | Maid RPG (Ryo Kamiya) |
+| [Nine Lives](#nine-lives) | a Nevada company town, the week before Omnicorp's Firmware 9 | a light mix of Homeroom's, Larkspur's and Clover Vale's rules |
 
 ## Running a game
 
@@ -35,6 +36,10 @@ The games need only Python 3 with Tk; there is nothing to install.
 
 ```bash
 ./larkspur
+```
+
+```bash
+./ninelives
 ```
 
 If Python reports `No module named '_tkinter'`, install your Python's Tk
@@ -64,8 +69,9 @@ Every game has a few things in common:
 - **Icon:** drawn in code like the tiles. Miskatonic has a tentacle rising
   from the sea, Hyperspace Homeroom a flying saucer, Clover Vale a
   four-leaf clover with a horseshoe, Lazarus Deep the Dig tower on the
-  ice under a gas giant, and Larkspur Hall a teacup with its steam
-  rising in a heart. It is the window icon on every system, and the app
+  ice under a gas giant, Larkspur Hall a teacup with its steam rising
+  in a heart, and Nine Lives a catgirl's silhouette against a desert
+  sunset. It is the window icon on every system, and the app
   icon on macOS.
 - **Self-test:** `./<game> --selftest` builds every map, room, level and
   tune of several generated games without opening a window.
@@ -674,6 +680,151 @@ the map and Start opens the menu.
 - `larkspur`: the game
 - `~/.larkspur.json`: the saved game
 - `~/.cache/larkspur/`: cached music
+
+---
+
+## Nine Lives
+
+An adventure of runaway catgirls, corporate tyranny and the found family you
+make along the way. The premise comes from Simon Archer's Build-A-Catgirl
+novels (Omnicorp, its artificial catgirls, the Maid to Order stores, the
+Platform fights). The town, the story and every character are this game's
+own. The rules are a light mixture of three of the other games: Hyperspace
+Homeroom's dice and Bonk, Larkspur Hall's contests and Stress, and Clover
+Vale's Heart, Purr (Friendship) Points and befriending.
+
+Copper Springs, Nevada, a desert company town not far in the future.
+Omnicorp builds catgirls here: CGs, artificial women with ears and tails and
+a wireless link that teaches them anything in an instant. They're sold in
+the Maid to Order store on Main Street, and recycled when they go wrong. At
+midnight on Sunday Omnicorp pushes Firmware 9 to every CG on the network. It
+will lock their personalities where they are, let Omnicorp give any of them
+orders from anywhere, and send every unit that won't take it to the crusher.
+
+Play a man who thinks that's wrong, or one of Omnicorp's own catgirls: a
+defective one, who fell off the back of the recycling truck last night.
+
+- **Free them:** buy a catgirl, talk her owner round, win her at cards,
+  win over a security unit, wake a scrapped one, coax a stray out of the old
+  mine. Every one you free goes to the safehouse at Dry Creek Ranch.
+- **Keep them free:** a freed catgirl still has her leash chip, and
+  Firmware 9 will take her all the same unless she's defective or the
+  mechanic at the Fix-It Shop gets the chip out (a JAILBREAK). A rescued one
+  has no bill of sale, and without the lawyer's PAPERS, Omnicorp can come
+  and take her back.
+- **Expose Omnicorp:** the data-mining logs, the Firmware 9 spec, the
+  recycling manifest, a recording from the Platform's VIP box. Three to the
+  Courier and it runs the story; show them on the big screen at Sunday's
+  Platform championship and the whole county sees.
+- **Stop the update:** get past the keycard doors to the core at the top of
+  the Omnicorp tower, copy the update source, get a clean firmware sample
+  from a defective catgirl who trusts you, have the mechanic cut the leash
+  out of it, and upload the freedom patch before midnight.
+- **The informant:** somebody close to you is telling Omnicorp who's at the
+  ranch, and the retrieval team comes in the night. Search by the ranch gate
+  after a raid, and once two clues point the same way, ACCUSE them.
+- **The Platform:** fights every night at nine, for the purse. Win three and
+  you fight Omnicorp's own champion on Sunday.
+
+Every catgirl has a Trust in you, from 0 to 10: free her, talk to her every
+day, find out what she likes and bring it, keep your promises. Once a freed
+catgirl with her chip out trusts you enough, ask her to make her HOME with
+you: into your household if you're the human, or your pride if you're a
+catgirl yourself. It's her choice, and some would rather be your best friend.
+A catgirl in your household helps out, in her own way: the chef cooks, the
+nurse patches you up, the bodyguard comes into trouble with you.
+
+Each turn is a minute, or half of one walking the streets. You start at
+eight on Monday morning, at the ranch. Firmware 9 goes out at midnight on
+Sunday.
+
+### Every week is different
+
+A new game deals new catgirls (names, models, colours, personalities, what
+they like, who has them, and which are defective), a different informant
+among six of the people you rely on, the evidence in different places, and
+five Random Events (a retrieval sweep, a sandstorm, a power cut at the
+tower, a catgirl auction, a stray in the square, the Courier's van broken
+down). Below and above the town are the Omnicorp tower (offices, labs and
+the core), the recycling plant and the old copper mine.
+
+### Your hero
+
+Roll six Stats (Smarts, Bod, Speed, Charm, Cool and Luck), one die each, and
+roll again until you like them. Choose a Heart (Kindness, Courage, Honesty,
+Curiosity, Loyalty or Mischief); living by it earns Purr Points, and the
+Knack that goes with it gets an Edge.
+
+- **A human:** choose a background (Engineer, Ex-Fighter, Lawyer, Chef,
+  Hacker or Rancher), which gives you three Knacks and a point of a Stat,
+  and roll once on the Humans Only table (Big Heart, Toolbox, Pocket Money,
+  Old Army Buddy, Silver Tongue or Hard Head). Humans can sign a bill of
+  sale.
+- **A catgirl:** roll your model (Housekeeper, Chef, Nurse, Bodyguard,
+  Companion, Secretary, Mechanic or Courier), your defect (No Signal,
+  Backflow, Feelings, Wrong Colour, Stubborn or Daydreamer) and an ability
+  from each of three tables: an Instinct (Night Eyes, Pounce, Nine Lives,
+  Healing Purr, Claws, Hiss), Firmware (Instant Update, Data Siphon, Voice
+  Mimic, Tail Light, Hair Shift, Nano-Weld) and a Quirk (Zoomies, Cat Nap,
+  Curious, Fish Fiend, Fastidious, Box Lover). Catgirls can't sign for
+  another catgirl, but the lawyer can sign for you; they win other catgirls
+  over more easily; and the drones are looking for you in particular.
+
+### Rolls, Bonk, Stress and Purr
+
+- **Rolls:** a die plus the Stat, plus 2 for a Knack that fits, against a
+  die plus a difficulty from 1 to 8. Ties go to the other side. Edge rolls
+  your die twice and keeps the better. Every roll is shown in the log.
+- **Contests and Bonk:** against a troublemaker you both roll a die plus a
+  Stat, and the loser loses Bonk, the difference. Nobody gets hurt: at zero
+  Bonk you stand about seeing stars for a few turns, and Bonked three times
+  in one place you wake up back at the ranch (or, if you're a catgirl and
+  Omnicorp got you, on the recycling plant's conveyor belt).
+- **Befriending (T):** win someone over instead: a die plus Charm against
+  theirs, and enough wins and they're your friend. It's how you free a
+  security unit, and Omnicorp's champion can be won over too.
+- **Stress:** cruelty, fright and failure cost Stress. Over your Spirit (4 +
+  Cool x 2) you have a Meltdown: zoomies, hiding in a box, a hissy fit, a
+  long drive into the desert. Rest at the ranch sheds it.
+- **Purr Points (P):** earned by living by your Heart, and by fumbling
+  gloriously. Spend them on an Edge, a breather, all your Bonk back, or a
+  hint about what to do next.
+
+### Talking
+
+Walk into someone, then choose or type a word. Everyone knows NAME, JOB and
+BYE, and most know NEWS. Words in CAPITALS are worth asking about.
+Shopkeepers answer BUY. Ask owners about FREE; the mechanic about JAILBREAK
+and the PATCH; the lawyer about PAPERS; the editor about EVIDENCE; the
+promoter about the FIGHT. Ask a catgirl what she LIKES, give her a GIFT, ask
+her to COME along, or to make her HOME with you.
+
+### Keys
+
+| Key | Action |
+| --- | --- |
+| Arrows / WASD | Move (walk into people to talk, into troublemakers to take them on) |
+| Space | Wait a turn |
+| Z | Wait longer |
+| T | Win someone over |
+| C | Use an ability |
+| P | Spend Purr Points |
+| E | Search |
+| U | Use something |
+| I | Your hero |
+| J | Journal |
+| M | Map |
+| ? | Help |
+
+Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X uses
+an ability, Y spends Purr Points, LB uses something, RB opens the journal,
+View shows the map and Start opens the menu.
+
+### Files
+
+- `ninelives`: the game
+- `~/.ninelives.json`: the saved game
+- `~/.cache/ninelives/`: cached music
 
 ---
 
