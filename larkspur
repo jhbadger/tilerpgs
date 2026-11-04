@@ -103,7 +103,6 @@ import zlib
 import base64
 from collections import namedtuple, deque
 from tkinter import font as tkfont
-from tkinter import messagebox
 
 SAVE_FILE = os.path.expanduser("~/.larkspur.json")
 ANDROID = hasattr(sys, "getandroidapilevel") or "ANDROID_ROOT" in os.environ
@@ -4172,7 +4171,7 @@ class Game:
 
         self.canvas.bind("<Configure>", lambda e: self.layout())
         root.bind("<Configure>", self.on_resize, add="+")
-        self.canvas.bind("<ButtonPress-1>", self.on_tap)
+        self.canvas.bind("<ButtonPress-1>", self.tapped)
         root.bind("<KeyPress>", self.on_key)
         for k in ("Control-q", "Command-q"):
             root.bind("<%s>" % k, lambda e: self.quit())
@@ -4383,15 +4382,54 @@ class Game:
              "served": 0, "out": 0, "held": 0, "rel": None}
         return p
 
-    def ask_maid(self, title="The new maid"):
+    def tapped(self, ev):
+        """A tap on the map, unless it's the tail of one on a dialog that
+        just closed (on Android it can land on the map behind), or there's
+        no game yet."""
+        if time.time() < getattr(self, "tap_guard", 0) or \
+                not getattr(self, "area", None):
+            return
+        self.on_tap(ev)
+
+    def open_dialog(self):
+        """Whether a dialog can open now (only one at a time)."""
+        dlg = getattr(self, "dialog", None)
+        try:
+            if dlg is not None and dlg.winfo_exists():
+                dlg.lift()
+                return False
+        except tk.TclError:
+            pass
+        return True
+
+    def close_dialog(self, dlg=None):
+        dlg = dlg or getattr(self, "dialog", None)
+        if dlg is not None:
+            try:
+                dlg.destroy()
+            except tk.TclError:
+                pass
+        if dlg is getattr(self, "dialog", None):
+            self.dialog = None
+        # a tap on a dialog button can land on the map behind it
+        self.tap_guard = time.time() + 0.6
+
+    def grab(self, dlg):
+        try:
+            dlg.grab_set()
+        except tk.TclError:
+            pass
+
+    def ask_maid(self, done, title="The new maid"):
         """Maid creation: a name, and everything else rolled on the tables;
         None if cancelled."""
         root = self.root
-        dlg = tk.Toplevel(root, bg=PANEL, padx=18, pady=14)
+        if not self.open_dialog():
+            return
+        dlg = self.dialog = tk.Toplevel(root, bg=PANEL, padx=18, pady=14)
         dlg.title(title)
         dlg.transient(root)
         dlg.resizable(False, False)
-        result = {}
         rng = random.Random()
         state = {"rolled": roll_maid(rng)}
         state["rolled"]["devil"] = rng.random() < 0.5
@@ -4454,14 +4492,19 @@ class Game:
             name.insert(0, rng.choice(MAID_FIRST))
 
         def begin(_=None):
-            result["who"] = current()
-            dlg.destroy()
+            who = current()
+            self.close_dialog(dlg)
+            done(who)
+
+        def cancel(_=None):
+            self.close_dialog(dlg)
+            done(None)
         show()
         bar = tk.Frame(dlg, bg=PANEL)
         bar.pack(fill="x", pady=(12, 0))
         tk.Button(bar, text="Start work", command=begin, width=10,
                   highlightbackground=PANEL).pack(side="right")
-        tk.Button(bar, text="Cancel", command=dlg.destroy, width=8,
+        tk.Button(bar, text="Cancel", command=cancel, width=8,
                   highlightbackground=PANEL).pack(side="right", padx=6)
         tk.Button(bar, text="Roll again", command=reroll, width=10,
                   highlightbackground=PANEL).pack(side="left")
@@ -4470,7 +4513,8 @@ class Game:
         tk.Button(bar, text="Another name", command=rename, width=12,
                   highlightbackground=PANEL).pack(side="left")
         dlg.bind("<Return>", begin)
-        dlg.bind("<Escape>", lambda e: dlg.destroy())
+        dlg.bind("<Escape>", cancel)
+        dlg.protocol("WM_DELETE_WINDOW", cancel)
         name.focus_set()
         name.select_range(0, "end")
         self.fit_dialog(dlg)
@@ -4478,9 +4522,7 @@ class Game:
             root.winfo_rootx() + max(0, (root.winfo_width() -
                                          dlg.winfo_reqwidth()) // 2),
             root.winfo_rooty() + max(0, min(40, (root.winfo_height() - dlg.winfo_reqheight()) // 2))))
-        dlg.grab_set()
-        root.wait_window(dlg)
-        return result.get("who")
+        self.grab(dlg)
 
     @staticmethod
     def default_maid(name="Hana"):
@@ -4497,14 +4539,16 @@ class Game:
 
     def new_game(self, who=None):
         if who is None:
-            if getattr(self, "headless", False):
-                who = self.default_maid()
-            else:
-                who = self.ask_maid()
-            if who is None:
-                if getattr(self, "p", None):
-                    return
-                who = self.default_maid()
+            if not getattr(self, "headless", False):
+                def chosen(w):
+                    if w is None:
+                        if getattr(self, "area", None):
+                            return
+                        w = self.default_maid()
+                    self.new_game(w)
+                self.ask_maid(chosen)
+                return
+            who = self.default_maid()
         self.setup_world(random.randrange(1 << 31))
         self.p = self.make_maid(who)
         w = self.world
@@ -5420,7 +5464,8 @@ class Game:
         self.render()
 
     def ready(self):
-        return not (self.busy or self.talk or self.overlay or self.menu)
+        return bool(getattr(self, "area", None)) and not (
+            self.busy or self.talk or self.overlay or self.menu)
 
 
     def can_stand(self, x, y):
@@ -9129,10 +9174,11 @@ class Game:
     def ask_new_game(self):
         if self.busy:
             return
-        if self.overlay in ("won", "doom") or messagebox.askyesno(
-                "New game", "Leave Larkspur and start again?",
-                parent=self.root):
+        if self.overlay in ("won", "doom"):
             self.new_game()
+            return
+        self.open_menu("Leave Larkspur and start again?", [("Yes, start again", self.new_game),
+                              ("No, keep playing", lambda: None)])
 
 
 def cap(s):

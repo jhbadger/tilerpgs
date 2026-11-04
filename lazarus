@@ -102,7 +102,6 @@ import zlib
 import base64
 from collections import namedtuple, deque
 from tkinter import font as tkfont
-from tkinter import messagebox
 
 SAVE_FILE = os.path.expanduser("~/.lazarus.json")
 ANDROID = hasattr(sys, "getandroidapilevel") or "ANDROID_ROOT" in os.environ
@@ -3977,7 +3976,7 @@ class Game:
 
         self.canvas.bind("<Configure>", lambda e: self.layout())
         root.bind("<Configure>", self.on_resize, add="+")
-        self.canvas.bind("<ButtonPress-1>", self.on_tap)
+        self.canvas.bind("<ButtonPress-1>", self.tapped)
         root.bind("<KeyPress>", self.on_key)
         for k in ("Control-q", "Command-q"):
             root.bind("<%s>" % k, lambda e: self.quit())
@@ -4199,15 +4198,54 @@ class Game:
              "patch": r["patch"], "kills": 0}
         return p
 
-    def ask_crew(self, title="Out of cryo"):
+    def tapped(self, ev):
+        """A tap on the map, unless it's the tail of one on a dialog that
+        just closed (on Android it can land on the map behind), or there's
+        no game yet."""
+        if time.time() < getattr(self, "tap_guard", 0) or \
+                not getattr(self, "area", None):
+            return
+        self.on_tap(ev)
+
+    def open_dialog(self):
+        """Whether a dialog can open now (only one at a time)."""
+        dlg = getattr(self, "dialog", None)
+        try:
+            if dlg is not None and dlg.winfo_exists():
+                dlg.lift()
+                return False
+        except tk.TclError:
+            pass
+        return True
+
+    def close_dialog(self, dlg=None):
+        dlg = dlg or getattr(self, "dialog", None)
+        if dlg is not None:
+            try:
+                dlg.destroy()
+            except tk.TclError:
+                pass
+        if dlg is getattr(self, "dialog", None):
+            self.dialog = None
+        # a tap on a dialog button can land on the map behind it
+        self.tap_guard = time.time() + 0.6
+
+    def grab(self, dlg):
+        try:
+            dlg.grab_set()
+        except tk.TclError:
+            pass
+
+    def ask_crew(self, done, title="Out of cryo"):
         """Crew creation: name, class, speciality, rolled Stats; None if
         cancelled."""
         root = self.root
-        dlg = tk.Toplevel(root, bg=PANEL, padx=18, pady=14)
+        if not self.open_dialog():
+            return
+        dlg = self.dialog = tk.Toplevel(root, bg=PANEL, padx=18, pady=14)
         dlg.title(title)
         dlg.transient(root)
         dlg.resizable(False, False)
-        result = {}
         rng = random.Random()
         state = {"rolled": self.roll_crew(rng)}
         tk.Label(dlg, text="Who's in the pod?", bg=PANEL, fg=ACCENT,
@@ -4302,21 +4340,27 @@ class Game:
             name.insert(0, person_name(rng, sex.get()))
 
         def begin(_=None):
-            result["who"] = current()
-            dlg.destroy()
+            who = current()
+            self.close_dialog(dlg)
+            done(who)
+
+        def cancel(_=None):
+            self.close_dialog(dlg)
+            done(None)
         pick_class()
         bar = tk.Frame(dlg, bg=PANEL)
         bar.pack(fill="x", pady=(12, 0))
         tk.Button(bar, text="Wake up", command=begin, width=9,
                   highlightbackground=PANEL).pack(side="right")
-        tk.Button(bar, text="Cancel", command=dlg.destroy, width=9,
+        tk.Button(bar, text="Cancel", command=cancel, width=9,
                   highlightbackground=PANEL).pack(side="right", padx=6)
         tk.Button(bar, text="Roll again", command=reroll, width=10,
                   highlightbackground=PANEL).pack(side="left")
         tk.Button(bar, text="Another name", command=rename, width=12,
                   highlightbackground=PANEL).pack(side="left", padx=6)
         dlg.bind("<Return>", begin)
-        dlg.bind("<Escape>", lambda e: dlg.destroy())
+        dlg.bind("<Escape>", cancel)
+        dlg.protocol("WM_DELETE_WINDOW", cancel)
         name.focus_set()
         name.select_range(0, "end")
         self.fit_dialog(dlg)
@@ -4324,9 +4368,7 @@ class Game:
             root.winfo_rootx() + max(0, (root.winfo_width() -
                                          dlg.winfo_reqwidth()) // 2),
             root.winfo_rooty() + max(0, min(40, (root.winfo_height() - dlg.winfo_reqheight()) // 2))))
-        dlg.grab_set()
-        root.wait_window(dlg)
-        return result.get("who")
+        self.grab(dlg)
 
     @staticmethod
     def default_crew(name="Dagny Voss", sex="F"):
@@ -4342,11 +4384,16 @@ class Game:
 
     def new_game(self, who=None):
         if who is None:
-            who = self.ask_crew()
-            if who is None:
-                if getattr(self, "p", None):
-                    return
-                who = self.default_crew()
+            if not getattr(self, "headless", False):
+                def chosen(w):
+                    if w is None:
+                        if getattr(self, "area", None):
+                            return
+                        w = self.default_crew()
+                    self.new_game(w)
+                self.ask_crew(chosen)
+                return
+            who = self.default_crew()
         self.setup_world(random.randrange(1 << 31))
         self.p = self.make_crew(who)
         self.flags = set()
@@ -5193,7 +5240,8 @@ class Game:
         self.render()
 
     def ready(self):
-        return not (self.busy or self.talk or self.overlay or self.menu)
+        return bool(getattr(self, "area", None)) and not (
+            self.busy or self.talk or self.overlay or self.menu)
 
 
     def can_stand(self, x, y):
@@ -6024,9 +6072,13 @@ class Game:
 
     def next_crew(self, name):
         sex = "F" if name.split()[0] in FIRST_F else "M"
-        who = None
         if not getattr(self, "headless", False):
-            who = self.ask_crew("The next pod opens")
+            self.ask_crew(lambda w: self.next_crew_go(name, sex, w),
+                          "The next pod opens")
+            return
+        self.next_crew_go(name, sex, None)
+
+    def next_crew_go(self, name, sex, who):
         if who is None:
             who = self.default_crew(name, sex)
         who["name"] = name
@@ -6168,10 +6220,16 @@ class Game:
                 return mob, path
         return None, path
 
-    def shoot(self, w, dx, dy):
+    def shoot(self, w, dx, dy, sure=False):
         p = self.p
         info = WEAPONS[w]
         mob, path = self.target_in_line(dx, dy, info.reach)
+        if mob is not None and not mob.hostile and not mob.down and \
+                not sure and not getattr(self, "headless", False):
+            self.open_menu("%s is a person. Shoot anyway?" % mob.name, [
+                ("Shoot", lambda: self.shoot(w, dx, dy, sure=True)),
+                ("Don't", lambda: None)])
+            return
         p["guns"][w] -= 1
         if "slow" in info.special:
             p["on"]["cutter"] = 2
@@ -6185,9 +6243,7 @@ class Game:
             self.end_turn()
             return
         if not mob.hostile and not mob.down:
-            if not self.shoot_person(mob):
-                p["guns"][w] += 1
-                return
+            self.shoot_person(mob)
         dist = abs(mob.x - self.pos[0]) + abs(mob.y - self.pos[1])
         adv = -1 if "close-" in info.special and dist <= CLOSE else 0
         skills = ("Firearms", "Military Training") if info.ammo not in (
@@ -6209,16 +6265,12 @@ class Game:
 
     def shoot_person(self, mob):
         """At someone who hasn't done anything.  Yet."""
-        if getattr(self, "headless", False) or messagebox.askyesno(
-                "Shoot?", "%s is a person. Shoot anyway?" % mob.name,
-                parent=self.root):
-            self.say("You open fire on %s." % mob.name, "bad")
-            if mob.mimic:
-                self.unmask(mob)
-            else:
-                self.turn_on(mob)
-            return True
-        return False
+        self.say("You open fire on %s." % mob.name, "bad")
+        if mob.mimic:
+            self.unmask(mob)
+        else:
+            self.turn_on(mob)
+        return True
 
     def turn_on(self, mob):
         """A survivor you've attacked: they run, and everyone hears."""
@@ -9135,10 +9187,11 @@ class Game:
     def ask_new_game(self):
         if self.busy:
             return
-        if self.overlay in ("won", "doom") or messagebox.askyesno(
-                "New game", "Abandon this station and start again?",
-                parent=self.root):
+        if self.overlay in ("won", "doom"):
             self.new_game()
+            return
+        self.open_menu("Abandon this station and start again?", [("Yes, start again", self.new_game),
+                              ("No, keep playing", lambda: None)])
 
 
 def cap(s):
