@@ -868,13 +868,16 @@ Galleria opens at ten.
   stands perfectly still for six hours of primary setup. She arrived with
   nothing to wear. MegaMart and the Glamour Box sell clothes: a sundress,
   jeans, a plaid skirt, a crop top, workout gear, lingerie, a little black
-  dress, a silk robe, an evening gown, a polka dot bikini, and cheerleader,
-  French maid and sailor (JK) uniforms. Ask her to WEAR something; the
+  dress, a silk robe, an evening gown, a polka dot bikini, cheerleader,
+  French maid and sailor (JK) uniforms, and tops and bottoms on their own:
+  a tight knit sweater, a logo T-shirt, a skater skirt, a microskirt,
+  daisy dukes and a long pioneer skirt. Ask her to WEAR something; the
   separates mix and match, top with bottom. Each outfit is good for
   something when she's with you: practical clothes in a fight, the gown
   or the little black dress at the casino and the bistro, the plaid skirt
   at your sister's, the cheerleader or sailor uniform at the dance-off,
-  workout gear at the gym, the sundress against the geese.
+  workout gear at the gym, the sundress against the geese, daisy dukes
+  for getting past Rusty, the microskirt for counting cards unnoticed.
 - **Get to know her:** talk to her (walk into her). Her Learning goes from
   reciting the dictionary to sounding entirely like herself, in four stages,
   through everything you do together: talking, going out, the TV on the

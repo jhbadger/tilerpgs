@@ -322,6 +322,15 @@ ITEMS = {
                             "apron, a feather duster", 110),
     "sailor uniform": ("sailor uniform: a Japanese JK uniform, navy collar "
                        "and a red bow", 95),
+    "knit sweater": ("knit sweater: tight, soft, lilac (a top)", 70),
+    "logo T-shirt": ("logo T-shirt: DAFFODIL, with the little flower (a "
+                     "top)", 20),
+    "skater skirt": ("skater skirt: short and flared, black (a bottom)", 35),
+    "microskirt": ("microskirt: very micro (a bottom)", 45),
+    "daisy dukes": ("daisy dukes: cut-off jean shorts, frayed (a bottom)",
+                    30),
+    "pioneer skirt": ("pioneer skirt: long, calico, to the ankle (a "
+                      "bottom)", 40),
     # for her: gifts
     "roses": ("roses: a dozen, red", 25),
     "a book": ("a book: a fat paperback romance", 15),
@@ -351,7 +360,9 @@ USAGE = {"flashlight": 8, "pepper spray": 6, "first aid kit": 6}
 CLOTHES = ("sundress", "jeans", "workout gear", "lingerie",
            "little black dress", "silk robe", "evening gown", "plaid skirt",
            "crop top", "polka dot bikini", "cheerleader uniform",
-           "French maid uniform", "sailor uniform")
+           "French maid uniform", "sailor uniform", "knit sweater",
+           "logo T-shirt", "skater skirt", "microskirt", "daisy dukes",
+           "pioneer skirt")
 CLOTHES_LOOK = {"sundress": ("#f0d040", "#f8f0a0"),
                 "jeans": ("#f4f4f4", "#3a5a9a"),
                 "workout gear": ("#e04a8a", "#2a2a3a"),
@@ -364,7 +375,13 @@ CLOTHES_LOOK = {"sundress": ("#f0d040", "#f8f0a0"),
                 "polka dot bikini": ("#f8f0f0", "#e04050"),
                 "cheerleader uniform": ("#e0402a", "#f4f4f4"),
                 "French maid uniform": ("#1a1a22", "#f4f4f4"),
-                "sailor uniform": ("#f4f4f4", "#2a3a7a")}
+                "sailor uniform": ("#f4f4f4", "#2a3a7a"),
+                "knit sweater": ("#c8a8d8", None),
+                "logo T-shirt": ("#f4f4f4", None),
+                "skater skirt": (None, "#2a2a30"),
+                "microskirt": (None, "#e0407a"),
+                "daisy dukes": (None, "#5a80c0"),
+                "pioneer skirt": (None, "#c89a6a")}
 # The outfits that come apart: their top, and their bottom, to wear with
 # anything else that comes apart.  What she's wearing is an outfit's name,
 # or "top+bottom" for one outfit's top with another's bottom.
@@ -373,7 +390,15 @@ SEPARATES = {"jeans": ("the BELLWETHER T-shirt", "the jeans"),
              "plaid skirt": ("the white blouse", "the plaid skirt"),
              "crop top": ("the crop top", "the jeans"),
              "cheerleader uniform": ("the cheer top", "the cheer skirt"),
-             "sailor uniform": ("the sailor top", "the pleated navy skirt")}
+             "sailor uniform": ("the sailor top", "the pleated navy skirt"),
+             "knit sweater": ("the tight knit sweater", None),
+             "logo T-shirt": ("the logo T-shirt", None),
+             "skater skirt": (None, "the skater skirt"),
+             "microskirt": (None, "the microskirt"),
+             "daisy dukes": (None, "the daisy dukes"),
+             "pioneer skirt": (None, "the long pioneer skirt")}
+# The pieces that are only a top, or only a bottom.
+PIECES = {c for c, (t, b) in SEPARATES.items() if not (t and b)}
 
 
 def outfit_parts(w):
@@ -414,6 +439,15 @@ CLOTHES_PERKS = {
     "French maid uniform": "home: resting heals an extra 1d6",
     "sailor uniform": "the dance-off: the DJ loves it, Advantage on your "
                       "dancing",
+    "knit sweater": "TV nights: a cuddle on the sofa counts double",
+    "logo T-shirt": "the Daffodil store: Advantage talking the consultant "
+                    "round",
+    "skater skirt": "the dance-off: Advantage on her dancing",
+    "microskirt": "the casino: nobody notices you counting cards",
+    "daisy dukes": "Rusty's: Advantage sneaking past him (he's looking "
+                   "elsewhere)",
+    "pioneer skirt": "your sister's: Advantage when she charms your "
+                     "sister",
 }
 
 
@@ -443,6 +477,20 @@ CLOTHES_LINES = {
                            "with the pom-poms. It takes a while.",
     "French maid uniform": "She curtsies. 'Housekeeping,' she says, very "
                            "seriously, and dusts you.",
+    "knit sweater": "She pulls the sleeves down over her hands and looks at "
+                    "you over the collar. It is, frankly, an ambush.",
+    "logo T-shirt": "It says DAFFODIL across the front, with the little "
+                    "flower. 'Is this merchandise of MYSELF?' she asks. 'I "
+                    "love it. It's so weird.'",
+    "skater skirt": "She spins until the skirt flares out, and keeps "
+                    "spinning, and falls over on the sofa, laughing.",
+    "microskirt": "'Is this a skirt,' she asks, 'or a belt with "
+                  "ambition?' She keeps it on.",
+    "daisy dukes": "She looks over her shoulder in the mirror. Then she "
+                   "looks again. 'Oh,' she says. 'OH.'",
+    "pioneer skirt": "She sweeps through the house in it, very prim, and "
+                     "announces that the butter needs churning. You don't "
+                     "have a churn.",
     "sailor uniform": "She strikes a pose from an anime she watched last "
                       "night, for research, and announces something very "
                       "dramatic about justice and the moon. She has no idea "
@@ -915,16 +963,19 @@ def daffodil_art(d):
     body = DAFFODIL_BODY[des["frame"]]
     wear = d.get("wearing")
     ta, tb = outfit_parts(wear)
-    top = CLOTHES_LOOK.get(ta, (skin, skin))[0]
-    bottom = CLOTHES_LOOK.get(tb, (skin, skin))[1] or \
-        CLOTHES_LOOK.get(tb, (skin, skin))[0]
+    tl, bl = CLOTHES_LOOK.get(ta, (skin, skin)), CLOTHES_LOOK.get(
+        tb, (skin, skin))
+    top = tl[0] or tl[1] or skin
+    bottom = bl[1] or bl[0] or skin
     pal = {"h": hair, "k": skin, "e": EYE_COLORS[des["eyes"]],
            "o": "#c05060", "c": top, "p": bottom,
            "s": "#f4f4f4" if tb in ("jeans", "crop top", "workout gear",
-                                    "cheerleader uniform") else
+                                    "cheerleader uniform", "daisy dukes",
+                                    "skater skirt") else
            (skin if not wear or wear == "polka dot bikini" else "#2a2228"),
            "d": "#e04050", "n": "#2a3a7a", "r": "#e03030",
-           "w": "#f8f8f8", "y": "#f0d040", "q": shade(bottom, 0.6)}
+           "w": "#f8f8f8", "y": "#f0d040", "q": shade(bottom, 0.6),
+           "v": shade(top, 0.8)}
     rows = [list(r) for r in tuple(head) + tuple(body)]
 
     def paint(y, old, new, xs=None):
@@ -948,6 +999,24 @@ def daffodil_art(d):
     if ta == "cheerleader uniform":
         paint(10, "k", "y")                     # pom-poms
         paint(11, "k", "y")
+    if ta == "knit sweater":                    # the knit
+        for y in (9, 10, 11, 12):
+            for x in range(16):
+                if rows[y][x] == "c" and (x + y) % 2:
+                    rows[y][x] = "v"
+    if ta == "logo T-shirt":
+        paint(10, "c", "y", (7, 8))             # the little daffodil
+    if tb == "skater skirt":
+        for x in (3, 12):
+            if rows[13][x] == ".":
+                rows[13][x] = "p"               # the flare
+    if tb == "microskirt":
+        paint(13, "p", "k", (4, 5, 10, 11))     # not much of it
+    if tb == "daisy dukes":
+        paint(13, "p", "w", (4, 11))            # frayed hems
+    if tb == "pioneer skirt":
+        paint(14, "k", "p")                     # down to the ankle
+        paint(14, ".", "p", (6, 7, 8, 9))
     if tb == "plaid skirt":
         for x in range(16):
             if rows[13][x] == "p" and x % 2:
@@ -4661,8 +4730,12 @@ class Game:
             return
         if lid == "chopshop" and self.where("rusty_npc") == "scrapyard" and \
                 any(m.role == "rusty_npc" for m in self.area.mobs):
+            dukes = self.her_here() and self.wears("daisy dukes")
+            if dukes:
+                self.say("Rusty is looking at %s. Rusty is not looking at "
+                         "the stairs." % self.d["name"], "info")
             if not self.test("DEX", label="sneaking past Rusty",
-                             adv=self.p["cls"] == "Hustler"):
+                             adv=self.p["cls"] == "Hustler" or dukes):
                 self.say("'HEY! Where d'you think you're going?' Rusty "
                          "blocks the stairs. Come back when he's not "
                          "looking. (He goes home at six.)", "bad")
@@ -6051,7 +6124,8 @@ class Game:
             key = "tv:%d" % self.day_no()
             if key not in self.flags:
                 self.flags.add(key)
-                self.affection(1, "liked the cuddle")
+                self.affection(2 if self.wears("knit sweater") else 1,
+                               "liked the cuddle")
 
     # ── Things ──
 
@@ -6869,7 +6943,10 @@ class Game:
                 return
             s, mod = r["check"]
             if self.test(s, mod=mod, label="persuading",
-                         adv=self.her_here() and self.d["stats"]["CHA"] >= 13):
+                         adv=self.her_here() and (
+                             self.d["stats"]["CHA"] >= 13 or (
+                                 mob.role == "consultant" and
+                                 self.wears("logo T-shirt")))):
                 self.npc_say(mob, r["ok"])
                 if flag:
                     self.flags.add(flag)
@@ -7164,7 +7241,8 @@ class Game:
                     c, CLOTHES_PERKS[c].split(":")[0])),
                               lambda c=c: self.dress_her(c, new=True)))
         for c in d["wardrobe"]:
-            if c != d.get("wearing"):
+            if c != d.get("wearing") and c not in outfit_parts(
+                    d.get("wearing")):
                 items.append((self.mf("Ask her to wear the %s (%s)" % (
                     c, CLOTHES_PERKS[c].split(":")[0])),
                               lambda c=c: self.dress_her(c)))
@@ -7193,15 +7271,30 @@ class Game:
             seen, items = set(), []
             for b in [a] + seps:
                 name = SEPARATES[b][1]
-                if name not in seen:
+                if name and name not in seen:
                     seen.add(name)
                     items.append((cap(name), lambda b=b: self.dress_her(
                         a if a == b else a + "+" + b)))
             self.open_menu("And with %s?" % SEPARATES[a][0], items +
                            [("Never mind", lambda: None)])
         self.open_menu("Which top?", [
-            (cap(SEPARATES[a][0]), lambda a=a: bottoms(a)) for a in seps] +
-            [("Never mind", lambda: None)])
+            (cap(SEPARATES[a][0]), lambda a=a: bottoms(a)) for a in seps
+            if SEPARATES[a][0]] + [("Never mind", lambda: None)])
+
+    def with_piece(self, c):
+        """A top on its own goes with what she has on below (or a bottom
+        from her wardrobe), and a bottom with what she has on top."""
+        d = self.d
+        ta, tb = outfit_parts(d.get("wearing"))
+        if SEPARATES[c][0]:
+            other = tb if tb in SEPARATES and SEPARATES[tb][1] else next(
+                (x for x in d["wardrobe"] if x in SEPARATES and
+                 SEPARATES[x][1]), None)
+            return c + "+" + other if other else None
+        other = ta if ta in SEPARATES and SEPARATES[ta][0] else next(
+            (x for x in d["wardrobe"] if x in SEPARATES and SEPARATES[x][0]),
+            None)
+        return other + "+" + c if other else None
 
     def dress_her(self, c, new=False):
         d = self.d
@@ -7213,13 +7306,23 @@ class Game:
             self.affection(1, "loves it" if c in ("evening gown",
                                                   "little black dress")
                            else "likes it")
+        piece = c
+        if c in PIECES:
+            c = self.with_piece(c)
+            if not c:
+                self.say("%s holds up the %s. 'Lovely. What do I wear with "
+                         "it?' (%s)" % (d["name"], piece, "a skirt, shorts or "
+                                        "jeans" if SEPARATES[piece][0] else
+                                        "a top, a T-shirt, a sweater"),
+                         "her")
+                return
         d["wearing"] = c
         self.say("%s goes off to change, and comes back in %s." % (
             d["name"], outfit_name(c)), "her")
         worn = d.setdefault("worn", [])
-        if c not in worn:
-            worn.append(c)
-            line = CLOTHES_LINES.get(c) or random.choice((
+        if piece not in worn:
+            worn.append(piece)
+            line = CLOTHES_LINES.get(piece) or random.choice((
                 "She checks herself in the mirror from three angles. 'I'm a "
                 "genius,' she says.",
                 "She does a little catwalk turn down the hall. 'Fashion,' "
@@ -7326,14 +7429,16 @@ class Game:
             return (cap(ITEMS[name][0]), price, give(name))
         stock = {
             "megamart": ("sundress", "jeans", "workout gear", "plaid skirt",
-                         "crop top", "flashlight",
+                         "crop top", "logo T-shirt", "skater skirt",
+                         "daisy dukes", "pioneer skirt", "flashlight",
                          "pepper spray", "first aid kit", "denim jacket",
                          "bat", "a book", "a puzzle", "chocolates",
                          "energy drink", "burrito", "trash can lid"),
             "boutique": ("lingerie", "little black dress", "silk robe",
                          "evening gown", "polka dot bikini",
                          "cheerleader uniform", "French maid uniform",
-                         "sailor uniform", "perfume", "a necklace",
+                         "sailor uniform", "knit sweater", "microskirt",
+                         "perfume", "a necklace",
                          "sunglasses", "roses", "leather jacket"),
             "cafe": ("coffee", "burrito", "music"),
             "repair": ("charge pack", "stun baton", "kevlar vest",
@@ -8364,12 +8469,12 @@ class Game:
         else:
             self.say("You tell the story about the geese. Nobody laughs. "
                      "The roast is very loud.", "bad")
-        if self.wears("plaid skirt"):
+        if self.wears("plaid skirt", "pioneer skirt"):
             self.say("%s looks %s up and down and says, 'Well. At least "
                      "SOMEBODY in this family knows how to dress.'" % (
                          sis, d["name"]), "info")
         if self.her_test("CHA", label="%s, with %s" % (d["name"], sis),
-                         adv=self.wears("plaid skirt")):
+                         adv=self.wears("plaid skirt", "pioneer skirt")):
             st["sister"] += 1
             self.say("%s helps in the kitchen, and asks %s about her "
                      "verbena, and listens to the answer. All of it." % (
@@ -8427,7 +8532,12 @@ class Game:
         if maths:
             self.say("%s, in your ear: 'Statistically, you should hit.'" %
                      d["name"], "her")
-        if wins == 3:
+        if wins == 3 and self.her_here() and self.wears("microskirt"):
+            p["coins"] += 600
+            self.say("Three hands, three wins. $600. Nobody at the table is "
+                     "looking at the cards. Nobody at the table is looking "
+                     "at anything but %s." % d["name"], "gold")
+        elif wins == 3:
             p["coins"] += 600
             self.say("Three hands, three wins. $600. The pit boss starts "
                      "walking over. A bouncer starts walking over.", "gold")
@@ -8480,7 +8590,8 @@ class Game:
         mine = self.test("DEX", adv=lead or self.wears("sailor uniform"),
                          label="your feet")
         hers = self.her_test("DEX", label="%s dancing" % d["name"],
-                             adv=self.wears("cheerleader uniform"))
+                             adv=self.wears("cheerleader uniform",
+                                            "skater skirt"))
         self.pass_time(15, quiet=True)
         if mine and hers:
             p["coins"] += 200
@@ -9918,7 +10029,8 @@ def selftest():
         des = Game.random_design(rng)
         des["frame"] = "MF"[n % 2]
         for c in (None,) + CLOTHES + tuple(
-                a + "+" + b for a in SEPARATES for b in SEPARATES if a != b):
+                a + "+" + b for a in SEPARATES for b in SEPARATES
+                if a != b and SEPARATES[a][0] and SEPARATES[b][1]):
             art_pixels(*daffodil_art({"design": des, "wearing": c}))
             outfit_name(c)
     for k in DLINES:
