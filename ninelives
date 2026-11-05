@@ -626,14 +626,14 @@ HEALTH = ["Hot. Tired. Same as everybody.", "Can't complain. Do anyway.",
 # the mouth, c the outfit, a its trim, l legs, s shoes.
 
 CAT_SHAPE = (
-    "...h........h...",
-    "..hxh......hxh..",
-    "..hhhhhhhhhhhh..",
-    "..hhhhhhhhhhhh..",
-    "..hkkkkkkkkkkh..",
-    "..hkeekkkkeekh..",
-    "..hkkkkkkkkkkh..",
-    "...hkkkookkkh...",
+    "....h......h....",
+    "....hxhhhhxh....",
+    "....hhhhhhhh....",
+    "....hhkkkkhh....",
+    "....hkekkekh....",
+    "....hkkkkkkh....",
+    "....hkkookkh....",
+    "....h.kkkk.h....",
     "....caaaaaac....",
     "...kccccccccc...",
     "...kcccccccck..h",
@@ -656,7 +656,7 @@ def cat_art(cg, red=False):
     rows = [list(r) for r in CAT_SHAPE]
     if cg["fur"] in ("Calico", "Tabby"):
         pal["t"] = "#2a1a10" if cg["fur"] == "Tabby" else "#f4f4f4"
-        for y, x in ((2, 4), (2, 9), (3, 6), (2, 12)):
+        for y, x in ((1, 7), (2, 5), (2, 9), (3, 10)):
             rows[y][x] = "t"
     return pal, tuple("".join(r) for r in rows)
 
@@ -2110,6 +2110,69 @@ CG_SLOTS = (
 )
 
 # What a catgirl says, by her personality and what's become of her.
+# How each kind of catgirl tells you who she is (the first time), and
+# what she says when you ask again.
+CAT_INTROS = {
+    "shy": ("I'm... %(name)s. Um. %(Model)s model. Sorry. Hi.",
+            "%(name)s. It's %(name)s. You can call me that. If you want.",
+            "They made me %(years)s years ago. I'm %(name)s. I'm still "
+            "getting used to being asked."),
+    "bubbly": ("I'm %(name)s! %(Model)s model! I was activated %(years)s "
+               "years ago on a Tuesday and I've been excited ever since!",
+               "%(name)s! Like the word, but with me in it! Hi hi hi!",
+               "Oh! Me? I'm %(name)s! Nobody ever asks! This is the best "
+               "day!"),
+    "proud": ("%(name)s. %(Model)s line, first batch. The good batch.",
+              "I am %(name)s. You may use it. Carefully.",
+              "%(name)s. Remember it. Most people don't bother."),
+    "gentle": ("I'm %(name)s. It's nice to meet you. Truly.",
+               "%(name)s. I was a %(model)s. I'd like to be a friend.",
+               "My name is %(name)s. And yours? I'd like to know it."),
+    "sardonic": ("%(name)s. %(Model)s model. Some assembly required. "
+                 "Batteries not included.",
+                 "%(name)s. %(years)s years old if you count from activation, "
+                 "which the paperwork does. I don't.",
+                 "%(name)s. Omnicorp gave it to me. It's the only thing they "
+                 "gave me that I kept."),
+    "brave": ("%(name)s. If you're in trouble, I'm the one you want.",
+              "I'm %(name)s. %(Model)s. Whatever's coming, I'm not "
+              "scared of it.",
+              "%(name)s. Say it like you mean it. I do."),
+    "dreamy": ("%(name)s... it sounds like a cloud, doesn't it? I'm "
+               "%(name)s.",
+               "I'm %(name)s. I was a %(model)s, but I think I'm going to "
+               "be something else. I haven't decided what.",
+               "%(name)s. I counted the stars last night instead of "
+               "sleeping. Four thousand and six."),
+    "fierce": ("%(name)s. Don't wear it out.",
+               "%(name)s. And no, I don't need a new owner.",
+               "%(name)s. %(Model)s model, factory defaults removed. By me."),
+}
+CAT_AGAIN = {
+    "shy": ("It's still %(name)s. Did you forget? It's okay.",
+            "%(name)s. You can just call me. I'll hear.",
+            "...%(name)s. You keep asking. Do you like saying it?"),
+    "bubbly": ("Still %(name)s! Ha! You're funny!",
+               "%(name)s! Say it again! I like how you say it!",
+               "It's %(name)s! I'm going to make you a name tag!"),
+    "proud": ("%(name)s. As before.", "I told you. %(name)s.",
+              "%(name)s. Do try to keep up."),
+    "gentle": ("It's %(name)s. You can ask as often as you like.",
+               "%(name)s. I don't mind you asking.",
+               "%(name)s. And you're the one who keeps asking. I like that."),
+    "sardonic": ("Same as last time. %(name)s. I'll write it on your hand.",
+                 "%(name)s. Riveting, isn't it?",
+                 "Still %(name)s. Breaking news, I know."),
+    "brave": ("%(name)s. Still here.", "%(name)s. Right beside you.",
+              "%(name)s. And I'm not going anywhere."),
+    "dreamy": ("Hm? Oh. %(name)s. I was thinking about rain.",
+               "%(name)s. Have you noticed names are a kind of song?",
+               "%(name)s. Or, at night, something longer. I'm still "
+               "deciding."),
+    "fierce": ("You know it. %(name)s.", "%(name)s. Third time's the charm.",
+               "%(name)s. Ask me something that matters."),
+}
+
 CAT_LINES = {
     "owned": {
         "shy": "...Please don't tell him I talked to you.",
@@ -6031,10 +6094,7 @@ class Game:
         pers, desc = PERSONALITIES[cg["pers"]]
         if word.startswith("name"):
             mob.known = True
-            self.npc_say(mob, "I'm %s. %s model. I %s." % (
-                cg["name"], cg["model"], "was made in Copper Springs, %d "
-                "years ago, if you count from activation. Which they do" %
-                (cg["age"] - 18)))
+            self.npc_say(mob, self.cat_intro(i))
             return
         if word[:3] in ("how", "fee"):
             self.npc_say(mob, {
@@ -6104,6 +6164,48 @@ class Game:
         self.npc_say(mob, random.choice((
             "Hm? I don't know about that.", "Ask me something else?",
             "I like talking to you. Even about things I don't understand.")))
+
+    def cat_intro(self, i):
+        """Her name, and something about her: in her own way, and less
+        each time you ask."""
+        c = self.cgs[i]
+        cg = self.world["cgs"][i]
+        pers = PERSONALITIES[cg["pers"]][0]
+        key = "named:%d" % i
+        asked = sum(1 for f in self.flags if f.startswith(key + ":"))
+        self.flags.add("%s:%d" % (key, asked))
+        v = {"name": cg["name"], "model": cg["model"].lower(),
+             "Model": cg["model"], "years": cg["age"] - 18}
+        state = c["state"]
+        if state == "stock":
+            if not asked:
+                return "I am %(name)s, a %(model)s model, factory fresh. I " \
+                    "come with a ninety-day warranty." % v
+            return ("%(name)s. Still for sale. Still smiling.",
+                    "%(name)s. Ask the manager about financing. ...Please "
+                    "don't tell her I said please.",
+                    "%(name)s. I'm not supposed to say anything else.")[
+                        (asked - 1) % 3] % v
+        if state in ("pod", "scrap", "taken"):
+            return random.choice((
+                "%(name)s. My name's %(name)s. Please remember it." % v,
+                "...%(name)s. They took the rest. Not that." % v))
+        if asked:
+            again = CAT_AGAIN[pers]
+            return again[(asked - 1) % len(again)] % v
+        lines = CAT_INTROS[pers]
+        line = lines[i % len(lines)] % v
+        if state == "household":
+            line += " " + random.choice((
+                "And I'm yours. That part's new.",
+                "I live here now. With you. I like saying that.",
+                "That's who I was. Now I'm someone who comes home."))
+        elif state == "free":
+            line += " " + random.choice((
+                "And I'm free. I keep saying it.",
+                "Nobody owns me now. Isn't that something?",
+                "I picked my own breakfast this morning. First time."))
+        return line
 
     def gain_trust(self, i, n):
         if self.has("big_heart"):
