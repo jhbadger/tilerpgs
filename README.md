@@ -748,6 +748,18 @@ catgirl yourself. It's her choice, and some would rather be your best friend.
 A catgirl in your household helps out, in her own way: the chef cooks, the
 nurse patches you up, the bodyguard comes into trouble with you.
 
+Each catgirl talks in her own voice (shy, bubbly, proud, gentle, sardonic,
+brave, dreamy or fierce). CHAT with her for small talk, and for what she
+remembers of your week together: the day you got her out, the night of a
+raid, a sister you freed, the fight at the Platform, the tower. She opens up
+as her Trust passes 3, 5, 7 and 10, and has something to say the first time
+you bring her somewhere new. Of a morning at the ranch the ones who've
+moved in greet you each in their own way and get on with their model's
+job where you can see it (the chef's breakfast, the nurse fussing over a
+bruise, the courier back from town with trail mix), and the catgirls at
+the ranch get on with each other: cards, the sunbeam on the porch, each
+other's tails.
+
 Each turn is a minute, or half of one walking the streets. You start at
 eight on Monday morning, at the ranch. Firmware 9 goes out at midnight on
 Sunday.
@@ -774,8 +786,11 @@ Knack that goes with it gets an Edge.
   and roll once on the Humans Only table (Big Heart, Toolbox, Pocket Money,
   Old Army Buddy, Silver Tongue or Hard Head). Humans can sign a bill of
   sale.
-- **A catgirl:** roll your model (Housekeeper, Chef, Nurse, Bodyguard,
-  Companion, Secretary, Mechanic or Courier), your defect (No Signal,
+- **A catgirl:** design how you look, with a preview: fur colour (hair,
+  ears and tail), eyes, skin, hairstyle (bob, long, short, twintails,
+  ponytail or hime cut) and your model (Housekeeper, Chef, Nurse,
+  Bodyguard, Companion, Secretary, Mechanic or Courier), or take a random
+  look; rolling again keeps it. Roll your defect (No Signal,
   Backflow, Feelings, Wrong Colour, Stubborn or Daydreamer) and an ability
   from each of three tables: an Instinct (Night Eyes, Pounce, Nine Lives,
   Healing Purr, Claws, Hiss), Firmware (Instant Update, Data Siphon, Voice
@@ -811,7 +826,12 @@ BYE, and most know NEWS. Words in CAPITALS are worth asking about.
 Shopkeepers answer BUY. Ask owners about FREE; the mechanic about JAILBREAK
 and the PATCH; the lawyer about PAPERS; the editor about EVIDENCE; the
 promoter about the FIGHT. Ask a catgirl what she LIKES, give her a GIFT, ask
-her to COME along, or to make her HOME with you.
+her to COME along, or to make her HOME with you. Walk into the catgirl
+who's following you to talk to her; ask her to STAY, or to let you PAST.
+
+Your phone (L) keeps a to-do list from what you've learned: each freed
+catgirl's leash chip and papers, the keycards, the freedom patch, the
+evidence, the Platform and the informant, ticking things off as you go.
 
 ### Keys
 
@@ -826,13 +846,13 @@ her to COME along, or to make her HOME with you.
 | E | Search |
 | U | Use something |
 | I | Your hero |
-| P | Your phone: the to-do list |
+| L | Your phone: the to-do list (also the Phone button) |
 | J | Journal: the clues and the evidence |
 | M | Map |
 | ? | Help |
 
 Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X uses
-an ability, Y spends Purr Points, LB uses something, RB opens the journal,
+an ability, Y spends Purr Points, LB uses something, RB opens your phone,
 View shows the map and Start opens the menu.
 
 ### Files

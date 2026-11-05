@@ -62,7 +62,7 @@ Touch and mouse
   Tap a square to walk there, tap next to you to step, and tap the menus.
   Gamepad (Linux, the Steam Deck): the d-pad or stick moves, A waits or
   chooses, B backs out, X uses an ability, Y spends Purr, LB uses
-  something, RB the journal, View the map and Start the menu.
+  something, RB the phone, View the map and Start the menu.
 
 Sound effects and music are synthesized and played with afplay (macOS),
 paplay or aplay if one is available, on Android with pyjnius, or with
@@ -75,7 +75,7 @@ App bundle (macOS):  ninelives --build-app [DIR]   builds ninelives.app
 Keys
   Arrows/WASD move, Space waits, Z waits longer, E searches, T wins
   someone over, C uses an ability, P spends Purr Points, U uses something,
-  I shows your hero, J the journal, M the map, ? help.
+  I shows your hero, J the journal, L the phone, M the map, ? help.
 
 The tiles are drawn by the code below (CAT_SHAPE, PERSON_SHAPES, ART and
 draw_terrain).  --selftest builds every map, room, level and tune of a few
@@ -376,6 +376,365 @@ PERSONALITIES = (
     ("fierce", "has been hurt, and won't be again"),
 )
 
+# The softer kinds of catgirl, and the harder: some lines come in two
+# tones, (soft, hard).
+SOFT = {"shy", "bubbly", "gentle", "dreamy"}
+
+# CHAT: small talk, in each kind of catgirl's own voice.
+CAT_CHAT = {
+    "shy": ("Sometimes I practise saying things before I say them. I "
+            "practised this one. It was going to be better.",
+            "I found a spot behind the barn where nobody looks. I'll show "
+            "you. Only you.",
+            "Do you think it's all right to like something just because "
+            "it's quiet?",
+            "I used to say 'yes, sir' to everything. Now I'm trying "
+            "'maybe'. It's hard.",
+            "...I like it when you talk. You don't have to stop because of "
+            "me."),
+    "bubbly": ("Okay so I counted the chickens and there are eleven, and I "
+               "named all of them, and three are named after you!",
+               "Did you know pie is a breakfast food here? Nobody told me! "
+               "I've wasted YEARS!",
+               "I learned a song off the radio! I don't know the words! I'll "
+               "sing it anyway!",
+               "Everything's so BIG out here. The sky! The dirt! The other "
+               "dirt!",
+               "If I got a ribbon every time I was happy today, I'd need a "
+               "longer tail!"),
+    "proud": ("My tail is the best-groomed tail in Nevada. I've checked.",
+              "Omnicorp built me to be admired. Fine. Now I decide who gets "
+              "to.",
+              "I don't need help. ...I'm allowing you to help. It's "
+              "different.",
+              "When this is over I'm going to buy a hat. An enormous one.",
+              "You did well today. Don't make me say it twice."),
+    "gentle": ("There's a sparrow with a bad wing under the porch. I've been "
+               "bringing it crumbs.",
+               "You should eat something. Not later. Now.",
+               "I keep thinking about the ones still in the pods. We'll get "
+               "them. We will.",
+               "Being kind was in my programming. Now I'm kind on purpose. "
+               "It feels different. Better.",
+               "Tell me something good that happened today. Even something "
+               "small."),
+    "sardonic": ("Omnicorp's slogan is 'She'll never say no.' I've been "
+                 "saying it all day. For practice.",
+                 "The rooster starts at four. I've made a list of the "
+                 "rooster's enemies. It's me. I'm the list.",
+                 "I read my own warranty. Ninety days. I've outlived it. "
+                 "Take that.",
+                 "Copper Springs: population nine hundred, and an alarming "
+                 "number of them are hats.",
+                 "Small talk. Right. Weather's hot. Corporations are evil. "
+                 "Your turn."),
+    "brave": ("I walked the fence line twice last night. Nobody gets "
+              "through. Not on my watch.",
+              "Scared? Sure. Scared's just your body telling you it's "
+              "important.",
+              "If it comes to a fight on Sunday, put me in front.",
+              "I've been practising with the rancher's old rope. I can "
+              "lasso a fence post. Next, a drone.",
+              "You look after them. I'll look after you."),
+    "dreamy": ("That cloud looks like a fish. That one looks like a fish "
+               "that's eaten a smaller fish.",
+               "Do you think the moon gets lonely? I'd visit it. I'd bring "
+               "snacks.",
+               "I dreamed I was a lighthouse. Everyone came home safe.",
+               "If you listen at night, the desert hums. Low. Like a purr.",
+               "I'm going to name a star after you. I've picked it. It's "
+               "the wobbly one."),
+    "fierce": ("I sharpened my claws on the fence post. The fence post had "
+               "it coming.",
+               "You want small talk? Fine. I hate Omnicorp. That's small. "
+               "It's about the size of me.",
+               "I don't like being touched without asking. You always ask. "
+               "...I noticed.",
+               "When they come for us, they'll find out what 'defective' "
+               "means.",
+               "I'm not good at this. Talking. Keep doing it with me "
+               "anyway."),
+}
+# CHAT with a catgirl who's still owned, with her owner in earshot.
+CAT_CHAT_OWNED = ("She glances at the counter. 'Not here. Not now. ...But "
+                  "thank you for asking.'",
+                  "She keeps her voice flat and her eyes down. 'I'm not "
+                  "allowed to chat. Come back when he's not looking.'")
+
+# What she tells you as Trust grows: at 3, 5, 7 and 10.
+CAT_TRUST = {
+    "shy": {3: "I... I saved you a biscuit. It's not a big deal. It's a "
+               "biscuit.",
+            5: "The spot behind the barn? I haven't told anyone else about "
+               "it. I won't.",
+            7: "When you come in, my ears go up before I know it. I can't "
+               "help it. Don't look.",
+            10: "I'm not scared when you're here. I don't think I've ever "
+                "said that to anyone."},
+    "bubbly": {3: "You're my FRIEND! Officially! I've decided!",
+               5: "I made you a bracelet out of baling twine! It itches! "
+                  "Wear it forever!",
+               7: "I get quiet when you're gone. Me! Quiet! Ask anyone!",
+               10: "You're my favourite thing in the whole world, and I've "
+                   "seen a LOT of the world now. Most of the ranch, even."},
+    "proud": {3: "You're less irritating than most people. That's a "
+                 "compliment. Treasure it.",
+              5: "I'd let you brush my tail. Once. If you were careful.",
+              7: "I don't kneel to anyone. But I'd stand next to you. "
+                 "Anywhere.",
+              10: "You have my trust. All of it. I don't give it twice, so "
+                  "look after it."},
+    "gentle": {3: "You're good with them. The others. I've been watching.",
+               5: "When you're hurt, I feel it, here. Isn't that strange? I "
+                  "wasn't made to.",
+               7: "Whatever happens on Sunday, you were kind to me. That's "
+                  "already true. They can't undo it.",
+               10: "I love you. I don't know if I'm allowed to say it. I'm "
+                   "saying it anyway."},
+    "sardonic": {3: "You're all right. Don't spread it around.",
+                 5: "I've stopped checking where the exits are when you're "
+                    "in the room. Annoying.",
+                 7: "Fine. I like you. There. Happy? ...You look happy. Ugh.",
+                 10: "If anything happens to you, I will personally take "
+                     "Omnicorp apart with a can opener. That's not a joke. "
+                     "Well. The can opener is."},
+    "brave": {3: "You don't back down. I respect that.",
+              5: "I'd follow you into the tower. I'm telling you so you "
+                 "know.",
+              7: "Back to back. That's how we do this from now on.",
+              10: "Whatever you need. Whenever. I'll be there before you "
+                  "finish asking."},
+    "dreamy": {3: "You're in my daydreams now. You're usually riding a very "
+                  "large bird.",
+               5: "I found a stone shaped like a heart. It's yours. It was "
+                  "always going to be yours.",
+               7: "When I look at the sky now, I think about you seeing it "
+                  "too. That's new.",
+               10: "If I'm a cloud, you're the wind. I go where you go. That "
+                   "sounded better in my head. It's still true."},
+    "fierce": {3: "...You didn't flinch. When I hissed. Most people flinch.",
+               5: "I'll show you my bad side. My left. They cut me there. "
+                  "...Now you know.",
+               7: "I'd fight anyone for you. I'd fight YOU for you, if you "
+                  "were being stupid.",
+               10: "I said I'd never trust anyone again. I was wrong. I'm "
+                   "glad I was wrong."},
+}
+
+# What she says the first time you bring her somewhere: (soft, hard).
+PLACE_LINES = {
+    "pawnshop": ("So many things for sale. Some of them used to be "
+                 "somebody's.",
+                 "A pawnshop. Everything in here has a price tag and a sad "
+                 "story."),
+    "surplus": ("So many boots. Who has this many feet?",
+                "Army surplus. Now we're talking. Do they do helmets with "
+                "ear holes?"),
+    "store": ("Maid to Order... I can't look at the pods. Hold my hand?",
+              "Maid to Order. I came off a shelf like these. Let's go "
+              "before I break something. On purpose."),
+    "tower": ("It's so cold in here. Everything's white, and nobody looks "
+              "at anybody.",
+              "Omnicorp's lobby. Nice marble. It would look better on "
+              "fire."),
+    "lawyer": ("All these books are about rules. Are any of them about us?",
+               "A lawyer. Somebody whose whole job is arguing. I could do "
+               "that."),
+    "paper": ("The press is so loud! It's like a heartbeat made of paper!",
+              "A newspaper. Good. Let's give them something to print."),
+    "diner": ("It smells like pie and coffee and people being nice to each "
+              "other.",
+              "A diner. I'll have one of everything. You're paying."),
+    "motel": ("The sign says Starlite. I like that. Even if the rooms smell "
+              "funny.",
+              "The Starlite. Cheap rooms, thin walls. Somebody in number "
+              "seven is crying."),
+    "arena": ("It's so loud. Everyone's shouting for someone to get hurt.",
+              "The Platform. I can smell the sawdust and the money. Let's "
+              "win some."),
+    "garage": ("Everything in here is broken, and someone's going to fix "
+               "it. That's nice.",
+               "A garage. They fix machines here. I'm a machine. ...I'm "
+               "more than that. Still."),
+    "sheriff": ("A jail. Please don't let them keep me.",
+                "The sheriff's. Badge, desk, and an Omnicorp calendar on "
+                "the wall. Figures."),
+    "casino": ("All the lights are blinking at me. Are they happy? They look "
+               "happy.",
+               "A casino. The house always wins. Unless the house is "
+               "stupid."),
+    "plant": ("The plant... I can hear the belts. I can hear them.",
+              "This is where they bring us when we're done. They're not "
+              "done with me."),
+    "tower1": ("Every screen has the same smiling girl on it. She looks like "
+               "me. She looks like all of us.",
+               "Rows of desks, rows of screens. This is where they decide "
+               "what we think."),
+    "tower2": ("The pods... they're asleep. Can they hear us? I'm going to "
+               "talk quietly, just in case.",
+               "The labs. If you see whoever designed my leash chip, point "
+               "them out. I just want to talk."),
+    "tower3": ("The servers are humming. It sounds like a lullaby for "
+               "something huge.",
+               "The core. Every order I ever got came from here. Let's send "
+               "one back."),
+    "plant1": ("Don't look at the belts. Look at me. ...I'm looking at the "
+               "belts.",
+               "Sorting floor. Defective, defective, defective. Every one "
+               "of them is somebody."),
+    "plant2": ("I don't want to see this. Stay close.",
+               "The crusher. When this is over, I'm coming back here with a "
+               "wrench."),
+    "mine1": ("It's so dark. I can see in the dark. I still don't like it.",
+              "An old copper mine. Watch your head. I'll watch your back."),
+    "mine2": ("Something's breathing down here. Please let it be friendly.",
+              "Deeper. Good. Whatever's down here has never met anything "
+              "like me."),
+}
+
+# What she remembers about the week you've had together: (soft, hard).
+# %(other)s is another catgirl, where there is one.
+MEMORIES = (
+    ("rescued", "When they took me, I thought that was it. Then you came. "
+                "Down there, in the dark. You came.",
+     "They took me to the plant. You came and got me. I remember the "
+     "conveyor belt. I remember your hand more."),
+    ("freed", "I think about the day you got me out. I replay it. It's my "
+              "favourite thing I have.",
+     "The day you got me out. I never said thank you. Thank you."),
+    ("raid", "The night they came for %(other)s, I hid under the porch and "
+             "held my breath until the van left. I still can't sleep "
+             "through headlights.",
+     "The night of the raid. I heard the van. I was at the window with a "
+     "pitchfork. Next time I'm going outside."),
+    ("sister", "%(other)s came to the ranch because of you. She sleeps in "
+               "the bunk next to mine. We whisper.",
+     "You got %(other)s out too. She's a pain. She's OUR pain now."),
+    ("chip", "My head's so quiet since the chip came out. I didn't know "
+             "thoughts could be this quiet.",
+     "No more leash in my head. First thing I did was think something rude "
+     "about Omnicorp. Just to see. Nobody stopped me."),
+    ("papers", "I keep my papers under my pillow. Is that silly? They say "
+               "I'm mine.",
+     "Got my papers. Stamped and signed. Anyone asks, I'm a person with a "
+     "filing cabinet now."),
+    ("platform", "You won at the Platform and I screamed so loud I lost my "
+                 "voice. Did you hear me?",
+     "That fight at the Platform. You should have ducked. You won anyway. "
+     "Next time, duck."),
+    ("tower", "The tower... all those screens with her face on. My face. "
+              "I'm glad you were there.",
+     "We walked into Omnicorp's own building and walked back out again. "
+     "Put that on my headstone."),
+    ("plant", "The plant. I knew some of the ones on the belts. Thank you "
+              "for making me look away.",
+     "The recycling plant. I'm going back there one day. With a wrecking "
+     "ball."),
+    ("home", "I've never had a home before. I have a drawer! It's mine! "
+             "There's a sock in it!",
+     "Living with you. It's fine. It's good. It's the best thing that's "
+     "ever happened to me, all right? Stop smiling."),
+    ("story", "The Courier ran it. People in town look at me differently "
+              "now. Kinder. Like they're sorry.",
+     "Front page. 'EVERY ONE A SPY.' I bought six copies. I'm framing "
+     "one."),
+    ("champion", "You beat the champion. Everyone cheered. I cheered "
+                 "loudest. I checked.",
+     "Omnicorp's champion, flat on the Platform floor. Best night of my "
+     "life."),
+    ("uploaded", "You did it. The core. On Monday everyone wakes up as "
+                 "themselves. I can't stop crying, and it's the good kind.",
+     "The patch is in. Omnicorp's big update is going to set everybody "
+     "free. I want to see their faces."),
+)
+
+# A morning at the ranch, with the ones who've moved in.
+CAT_MORNING = {
+    "shy": ("%(name)s leaves a cup of coffee by your bed, and is gone "
+            "before you can say thank you.",
+            "%(name)s is sitting at the end of the bed, waiting for you to "
+            "wake. 'Morning,' she whispers.",
+            "There's a wildflower on your pillow. Across the room, "
+            "%(name)s is suddenly very interested in the wall."),
+    "bubbly": ("%(name)s bounces onto the bed. 'MORNING! It's morning! "
+               "You're awake! I checked!'",
+               "'The sun's up! It came up AGAIN!' %(name)s seems to think "
+               "this is news.",
+               "%(name)s has made you a card. It says GOOD MORNING in every "
+               "colour she could find."),
+    "proud": ("%(name)s is already up, groomed, and pretending she wasn't "
+              "watching you sleep.",
+              "'You snore,' says %(name)s. 'I've decided to allow it.'",
+              "%(name)s hands you a coffee without looking at you. It's "
+              "made exactly how you like it."),
+    "gentle": ("%(name)s tucks the blanket back round you. 'Five more "
+               "minutes. I'll wake you.'",
+               "%(name)s has laid out your clothes, mended where they'd "
+               "torn.",
+               "'You were dreaming,' says %(name)s. 'I sat with you until "
+               "it passed.'"),
+    "sardonic": ("'Oh good, you're alive,' says %(name)s. 'I had a whole "
+                 "speech ready.'",
+                 "%(name)s, upside down in the armchair: 'Morning. The "
+                 "rooster and I are no longer speaking.'",
+                 "'Breakfast,' says %(name)s, putting a plate on your chest. "
+                 "'Don't say I never do anything.'"),
+    "brave": ("%(name)s is back from walking the fence. 'All clear. Nobody "
+              "came. Up you get.'",
+              "%(name)s is doing push-ups by the door. 'Morning. Twenty "
+              "more. Then we go.'",
+              "'I kept watch,' says %(name)s. 'You slept. Good. One of us "
+              "should.'"),
+    "dreamy": ("%(name)s is at the window. 'The sunrise was pink, then "
+               "gold, then pink again. You missed it. I saved you some.'",
+               "'I dreamed you were a lighthouse,' says %(name)s, still half "
+               "asleep against your shoulder.",
+               "%(name)s has drawn you a picture of the morning on the back "
+               "of a feed sack."),
+    "fierce": ("%(name)s is curled at the foot of the bed like a guard dog. "
+               "A guard cat. She opens one eye. 'Finally.'",
+               "'You talk in your sleep,' says %(name)s. 'Don't worry. Your "
+               "secrets are mine now.'",
+               "%(name)s has already chased a coyote off the porch, and "
+               "looks very pleased with herself."),
+}
+
+# Her model's job, done where you can see it, of a morning.
+MODEL_MORNING = {
+    "Housekeeper": "%(name)s has swept, dusted, and folded everything you "
+                   "own, and some things you don't.",
+    "Chef": "%(name)s puts down eggs, biscuits and gravy, and watches you "
+            "eat every bite.",
+    "Nurse": "%(name)s finds every bruise you've got and fusses over each "
+             "one. 'Hold STILL.'",
+    "Bodyguard": "%(name)s reports: fence checked, gate checked, two "
+                 "coyotes and a tumbleweed seen off.",
+    "Companion": "Over coffee, %(name)s has the town's news: %(news)s",
+    "Secretary": "%(name)s has written out the day for you on a napkin, in "
+                 "tidy columns. %(news)s",
+    "Mechanic": "%(name)s has fixed the screen door, oiled your boots, and "
+                "tuned something you didn't know you owned.",
+    "Courier": "%(name)s is back from town already, with the paper and a "
+               "bag of trail mix for you.",
+}
+
+# Catgirls at the ranch, noticing each other.
+PAIR_LINES = (
+    "%(a)s is teaching %(b)s to play cards. %(b)s is winning.",
+    "%(a)s and %(b)s are arguing over the sunbeam on the porch. There's "
+    "room for both of them. Neither will admit it.",
+    "%(a)s has found %(blikes)s for %(b)s somewhere. %(b)s pretends not to "
+    "be pleased, and purrs.",
+    "%(a)s is brushing %(b)s's tail. They're both very serious about it.",
+    "%(a)s and %(b)s are asleep in the same patch of sun, tails tangled.",
+    "%(a)s is telling %(b)s a story about you. It's mostly true.",
+    "%(b)s is braiding %(a)s's hair. %(a)s keeps saying she hates it, and "
+    "keeps sitting still.",
+    "%(a)s and %(b)s are on the roof, counting satellites. %(a)s says one "
+    "of them is Omnicorp's, and hisses at it.",
+)
+
+
 # ── Things ───────────────────────────────────────────────────────────────────
 #
 # name: (what it is, price at a shop, or None)
@@ -644,16 +1003,45 @@ CAT_SHAPE = (
     "....ss....ss....")
 
 
+HAIRSTYLES = ("bob", "long", "short", "twintails", "ponytail", "hime")
+SKIN_NAMES = ("fair", "tan", "brown", "rosy", "dark")
+
+
+def style_hair(rows, hair):
+    """Her hair, done up one of HAIRSTYLES (the bob is the plain shape)."""
+    def put(cells):
+        for y, x in cells:
+            if rows[y][x] == ".":
+                rows[y][x] = "h"
+    if hair in ("short", "twintails"):
+        for y, x in ((6, 4), (6, 11), (7, 4), (7, 11)):
+            if rows[y][x] == "h":
+                rows[y][x] = "."
+    if hair in ("long", "hime"):
+        put([(y, x) for y in range(3, 9) for x in (3, 12)] +
+            [(7, 5), (7, 10)])
+    if hair == "hime":
+        for x in range(5, 11):
+            rows[3][x] = "h"
+    if hair == "twintails":
+        put(((2, 3), (3, 2), (3, 3), (4, 2), (4, 3), (5, 2), (6, 2), (7, 3),
+             (2, 12), (3, 12), (3, 13), (4, 12), (4, 13), (5, 13), (6, 13),
+             (7, 12)))
+    if hair == "ponytail":
+        put(((2, 12), (2, 13), (3, 13), (4, 13), (4, 14), (5, 14), (6, 14)))
+
+
 def cat_art(cg, red=False):
     """A catgirl's tile, from what she is: (palette, rows)."""
     fur = FUR[cg["fur"]]
     outfit = OUTFITS.get(cg.get("model"), "#3a3a4a")
-    pal = {"h": fur, "x": "#f0a0b0", "k": SKIN[cg.get("skin", 0) % 4],
+    pal = {"h": fur, "x": "#f0a0b0", "k": SKIN[cg.get("skin", 0) % 5],
            "e": "#ff2020" if red else EYES[cg["eyes"]], "o": "#c05060",
            "c": outfit, "a": shade(outfit, 1.5) if outfit != "#f0f0f0"
-           else "#c03030", "l": SKIN[cg.get("skin", 0) % 4],
+           else "#c03030", "l": SKIN[cg.get("skin", 0) % 5],
            "s": "#2a2228"}
     rows = [list(r) for r in CAT_SHAPE]
+    style_hair(rows, cg.get("hair", "bob"))
     if cg["fur"] in ("Calico", "Tabby"):
         pal["t"] = "#2a1a10" if cg["fur"] == "Tabby" else "#f4f4f4"
         for y, x in ((1, 7), (2, 5), (2, 9), (3, 10)):
@@ -2365,7 +2753,10 @@ def make_cgs(rng):
             "defect": bool(slot.get("defect")) or rng.random() < 0.2,
             "where": slot["where"], "state": slot["state"],
             "owner": slot["owner"], "price": slot["price"],
-            "age": 20 + rng.randrange(8)})
+            "age": 20 + rng.randrange(8),
+            # her own rng, so the rest of the week comes out the same
+            "hair": random.Random("hair:%s:%d" % (names[i], i)).choice(
+                HAIRSTYLES)})
     return cgs
 
 
@@ -2609,10 +3000,38 @@ def make_dungeon(world, lid, level, flags):
                 (c[0] in (end[0], end[2]) or c[1] in (end[1], end[3])) and
                 not any(doorway((c[0] + dx, c[1] + dy)) for dx, dy in DIRS
                         if (c[0] + dx, c[1] + dy) in end_cells)]
-        for x, y in free(4, 3, edge):
+        racks = free(4, 3, edge)
+        for x, y in racks:
             g[y][x] = "server"
+
+        def cut_off(people=()):
+            """Squares of the core room (or the core itself) you can't
+            reach from the stairs."""
+            seen, q = {(sx, sy)}, deque([(sx, sy)])
+            while q:
+                x, y = q.popleft()
+                for dx, dy in DIRS:
+                    c = (x + dx, y + dy)
+                    if c not in seen and c not in people and \
+                            g[c[1]][c[0]] in DUNGEON_FLOOR:
+                        seen.add(c)
+                        q.append(c)
+            return [c for c in end_cells if g[c[1]][c[0]] == "dfloor" and
+                    c not in seen and c not in people] or (
+                        [] if any((ex + dx, ey + dy) in seen
+                                  for dx, dy in DIRS) else [(ex, ey)])
+        while racks and cut_off():
+            x, y = racks.pop()
+            g[y][x] = "dfloor"
         if "exec_met" not in flags:
-            area.exec_spot = next(iter(free(1, 3, list(end_cells))), None)
+            # the vice president stands well inside the room, never in a
+            # doorway, never between you and the core
+            middle = [c for c in end_cells if c[0] not in (end[0], end[2])
+                      and c[1] not in (end[1], end[3]) and
+                      abs(c[0] - ex) + abs(c[1] - ey) > 1]
+            area.exec_spot = next(
+                (c for c in free(len(middle), 3, middle)
+                 if not cut_off({c})), None)
     for x, y in free(rng.randint(1, 2), 4):     # found by searching
         area.hidden[(x, y)] = rng.choice(("coins", "coins", "rations"))
     n = 2 + level
@@ -3303,6 +3722,7 @@ T                   win someone over (befriend)
 C                   use an ability   P  spend Purr Points
 E                   search here      U  use something
 I                   your hero        J  journal
+L                   phone (to do)
 M                   map of the town
 V / B               sound effects / music on and off
 + / -               zoom   N  new game   Ctrl-Q / Cmd-Q  quit
@@ -3327,7 +3747,7 @@ Firmware 9 goes out at midnight on Sunday.  The Platform
 fights at nine every night.
 
 Gamepad: d-pad moves, A waits or chooses, B backs out,
-X uses an ability, Y spends Purr, LB uses, RB journal,
+X uses an ability, Y spends Purr, LB uses, RB phone,
 View map, Start menu.
 
 Press any key to close."""
@@ -3376,7 +3796,7 @@ class Game:
                                 ("purr", "Purr", self.purr_menu),
                                 ("use", "Use", self.use_menu),
                                 ("sheet", "Hero", self.show_sheet),
-                                ("journal", "Journal", self.journal),
+                                ("phone", "Phone", self.show_phone),
                                 ("map", "Map", self.toggle_map),
                                 ("menu", "Menu", self.action_menu)):
             b = tk.Button(bar, text=label, command=cmd, width=6,
@@ -3434,7 +3854,7 @@ class Game:
         self.view = (0, 0)
         self.fx_token = 0
         self.overlay = None         # None, "map", "help", "sheet",
-        self.overlay_text = None    # "journal", "won" or "doom"
+        self.overlay_text = None    # "journal", "phone", "won" or "doom"
         self.talk = None
         self.busy = False
         self.aim = None
@@ -3537,7 +3957,7 @@ class Game:
                 self.close_overlay()
             return
         {"a": self.wait, "x": self.ability_menu, "y": self.purr_menu,
-         "lb": self.use_menu, "rb": self.journal, "view": self.toggle_map,
+         "lb": self.use_menu, "rb": self.show_phone, "view": self.toggle_map,
          "start": self.action_menu}.get(name, lambda: None)()
 
     def animate(self):
@@ -3647,7 +4067,8 @@ class Game:
                 "fur": rng.choice(sorted(FUR)),
                 "eyes": rng.choice(sorted(EYES)),
                 "model": rng.choice(sorted(MODELS)),
-                "skin": rng.randrange(5)}
+                "skin": rng.randrange(5),
+                "hair": rng.choice(HAIRSTYLES)}
 
     @staticmethod
     def make_hero(who):
@@ -3684,7 +4105,7 @@ class Game:
                               for n, t in enumerate(("Instinct", "Firmware",
                                                      "Quirk"))]
             p["look"] = {"fur": r["fur"], "eyes": r["eyes"], "model": model,
-                         "skin": r["skin"]}
+                         "skin": r["skin"], "hair": r.get("hair", "bob")}
             if DEFECTS[r["defect"]][0] == "Backflow":
                 knacks.append("Hacking")
         p["stats"] = stats
@@ -3788,6 +4209,67 @@ class Game:
                            fg=INK, selectcolor=LOG_BG, activebackground=PANEL,
                            anchor="w", font=F("Helvetica", 12),
                            command=lambda: show()).pack(fill="x")
+        # a catgirl's look: pick each part, and see her
+        look = tk.Frame(right, bg=PANEL)
+        z = max(3, S(5))
+        preview = tk.Canvas(look, width=16 * z, height=16 * z, bg=LOG_BG,
+                            highlightthickness=0)
+        preview.pack(side="left", anchor="n", padx=(0, 10))
+        parts = tk.Frame(look, bg=PANEL)
+        parts.pack(side="left", anchor="n")
+        choices = (("fur", "Fur", sorted(FUR)), ("eyes", "Eyes", sorted(EYES)),
+                   ("skin", "Skin", list(range(len(SKIN_NAMES)))),
+                   ("hair", "Hair", list(HAIRSTYLES)),
+                   ("model", "Model", sorted(MODELS)))
+        part_labels = {}
+
+        def shown(key, v):
+            return SKIN_NAMES[v] if key == "skin" else str(v)
+
+        def step(key, opts, d):
+            r = state["rolled"]
+            cur = r.get(key, opts[0])
+            r[key] = opts[(opts.index(cur) + d) % len(opts)] \
+                if cur in opts else opts[0]
+            show()
+        for key, label, opts in choices:
+            line = tk.Frame(parts, bg=PANEL)
+            line.pack(fill="x")
+            tk.Label(line, text=label, width=6, anchor="w", bg=PANEL,
+                     fg=ACCENT, font=F("Helvetica", 12, "bold")).pack(
+                         side="left")
+            tk.Button(line, text="<", width=2, highlightbackground=PANEL,
+                      command=lambda k=key, o=opts: step(k, o, -1)).pack(
+                          side="left")
+            part_labels[key] = tk.Label(line, width=10, bg=PANEL, fg=INK,
+                                        font=F("Helvetica", 12))
+            part_labels[key].pack(side="left")
+            tk.Button(line, text=">", width=2, highlightbackground=PANEL,
+                      command=lambda k=key, o=opts: step(k, o, 1)).pack(
+                          side="left")
+
+        def random_look():
+            r, fresh = state["rolled"], self.roll_hero(rng)
+            for key, _, _ in choices:
+                r[key] = fresh[key]
+            show()
+        tk.Button(parts, text="Random look", command=random_look,
+                  highlightbackground=PANEL).pack(anchor="w", pady=(4, 0))
+
+        def draw_look():
+            r = state["rolled"]
+            preview.delete("all")
+            pal, rows = cat_art({"fur": r["fur"], "eyes": r["eyes"],
+                                 "skin": r["skin"], "model": r["model"],
+                                 "hair": r.get("hair", "bob")})
+            for y, row in enumerate(rows):
+                for x, ch in enumerate(row):
+                    if ch in pal:
+                        preview.create_rectangle(
+                            x * z, y * z, x * z + z, y * z + z,
+                            fill=pal[ch], outline="")
+            for key, _, _ in choices:
+                part_labels[key].config(text=shown(key, r.get(key, "bob")))
         sheet = tk.Label(right, bg=PANEL, fg=INK, justify="left", font=F(*MONO),
                          wraplength=S(440))
         sheet.pack(fill="x", anchor="w")
@@ -3799,6 +4281,13 @@ class Game:
 
         def show():
             p = self.make_hero(current())
+            if p["kind"] == "human":
+                look.pack_forget()
+            else:
+                if not look.winfo_ismapped():
+                    look.pack(fill="x", anchor="w", pady=(0, 8),
+                              before=sheet)
+                draw_look()
             lines = ["  ".join("%s %d" % (s, p["stats"][s])
                                for s in STATS[:3]),
                      "  ".join("%s %d" % (s, p["stats"][s])
@@ -3811,9 +4300,9 @@ class Game:
                 n = [x for x in HUMAN_PERKS if x[0] == p["perk"]][0]
                 lines += [""] + wrap("%s: %s" % (n[1], n[2]), 52)
             else:
-                lines += ["A %s model, %s fur, %s eyes." % (
+                lines += ["A %s model: %s fur, %s eyes, %s hair." % (
                     p["model"].lower(), p["look"]["fur"].lower(),
-                    p["look"]["eyes"])]
+                    p["look"]["eyes"], p["look"]["hair"])]
                 lines += wrap(MODELS[p["model"]][2].join(("(At home she ",
                                                           ".)")), 52)
                 lines += [""] + wrap("Defect: %s. %s" % DEFECTS[p["defect"]],
@@ -3825,7 +4314,11 @@ class Game:
             sheet.config(text="\n".join(lines))
 
         def reroll():
-            state["rolled"] = self.roll_hero(rng)
+            # new numbers; the look you've picked stays
+            old, state["rolled"] = state["rolled"], self.roll_hero(rng)
+            if kind.get() == "cat":
+                for key, _, _ in choices:
+                    state["rolled"][key] = old.get(key, state["rolled"][key])
             show()
 
         def begin(_=None):
@@ -4745,6 +5238,8 @@ class Game:
             self.toggle_map()
         elif k in ("j", "J"):
             self.journal()
+        elif k in ("l", "L"):
+            self.show_phone()
         elif k in ("question", "slash", "h", "H", "F1"):
             self.show_help()
         elif k in ("v", "V"):
@@ -4808,7 +5303,9 @@ class Game:
             if mob.hostile:
                 self.take_on(mob)
                 self.end_turn()
-            elif mob.ally:
+            elif mob.ally and (mob.cat is None or self.hostiles_in_view() or
+                               self.walking):
+                # in a fight (or walking past) she just gets out of the way
                 mob.x, mob.y, self.pos = self.pos[0], self.pos[1], [x, y]
                 return "moved"
             else:
@@ -5294,6 +5791,8 @@ class Game:
         p["stress"] = 0
         p["bonk"] = p["maxbonk"]
         self.say("You wake up rested. It's %s." % self.date_text(), "good")
+        if self.area.site == "ranch":
+            self.household_morning()
         self.layout()
 
     def bed_spot(self, area):
@@ -6067,11 +6566,13 @@ class Game:
         words = ["NAME", "HOW", "LIKES"]
         if c["state"] in ("scrap", "pod", "taken"):
             return ["NAME", "RESCUE"]
+        if c["state"] != "stock":
+            words.append("CHAT")
         if c["state"] in ("free", "household", "happy"):
             words += ["GIFT"] if any(p["items"].get(g) for g in GIFTS) \
                 else []
             if p["companion"] == "cg%d" % i:
-                words.append("STAY")
+                words += ["STAY", "PAST"]
             elif c["state"] in ("free", "household"):
                 words.append("COME")
         if c["state"] in ("free", "household") and self.world["cgs"][i][
@@ -6126,9 +6627,21 @@ class Game:
         if word[:4] == "gift":
             self.give_gift(mob)
             return
+        if word[:4] in ("chat", "talk", "smal", "reme"):
+            self.npc_say(mob, self.cat_chat(i))
+            return
         if word[:4] in ("come", "foll", "join") and c["state"] in (
                 "free", "household"):
             self.invite(mob)
+            return
+        if word[:4] in ("past", "move", "swap", "excu") and \
+                p["companion"] == "cg%d" % i:
+            px, py = self.pos
+            mob.x, mob.y, self.pos = px, py, [mob.x, mob.y]
+            self.say("%s steps aside, and you squeeze past." % cg["name"],
+                     "info")
+            self.end_talk()
+            self.render()
             return
         if word[:4] in ("stay", "wait") and p["companion"] == "cg%d" % i:
             self.dismiss()
@@ -6207,6 +6720,158 @@ class Game:
                 "I picked my own breakfast this morning. First time."))
         return line
 
+    def cat_chat(self, i):
+        """CHAT: something she remembers about your week together, the
+        first time it comes up, or else small talk in her own voice."""
+        c = self.cgs[i]
+        cg = self.world["cgs"][i]
+        pers = PERSONALITIES[cg["pers"]][0]
+        if c["state"] in ("owned", "stock"):
+            return CAT_CHAT_OWNED[i % 2]
+        day = self.day_no()
+        if "chatted:%d:%d" % (i, day) not in self.flags:
+            self.flags.add("chatted:%d:%d" % (i, day))
+            self.lose_stress(1)
+        for key, other in self.memories(i):
+            flag = "mem:%d:%s" % (i, key)
+            if flag in self.flags:
+                continue
+            self.flags.add(flag)
+            soft, hard = next(m[1:] for m in MEMORIES if m[0] == key)
+            return (soft if pers in SOFT else hard) % {"other": other}
+        n = sum(1 for f in self.flags if f.startswith("chat:%d:" % i))
+        self.flags.add("chat:%d:%d" % (i, n))
+        lines = CAT_CHAT[pers]
+        return lines[(n + i) % len(lines)]
+
+    def memories(self, i):
+        """What she's been through with you this week, as (key, another
+        catgirl's name or None), in MEMORIES order."""
+        c = self.cgs[i]
+        f = self.flags
+        st = self.st
+        names = [cg["name"] for cg in self.world["cgs"]]
+        got = {}
+        if "rescued:%d" % i in f:
+            got["rescued"] = None
+        if c["state"] in ("free", "household"):
+            got["freed"] = None
+        taken = [j for j in st["raids"] if j is not None and j != i]
+        if taken and c["state"] in ("free", "household"):
+            got["raid"] = names[taken[-1]]
+        sis = [int(x.split(":")[2]) for x in f
+               if x.startswith("sister:%d:" % i)]
+        if sis:
+            got["sister"] = names[max(sis)]
+        if c["safe"] and c["state"] in ("free", "household"):
+            got["chip"] = None
+        if c["legal"] and c["state"] in ("free", "household"):
+            got["papers"] = None
+        if "fought_with:%d" % i in f:
+            got["platform"] = None
+        if any(x.startswith("with:%d:tower" % i) for x in f):
+            got["tower"] = None
+        if any(x.startswith("with:%d:plant" % i) for x in f):
+            got["plant"] = None
+        if c["state"] == "household":
+            got["home"] = None
+        if st["story"]:
+            got["story"] = None
+        if "champion" in f:
+            got["champion"] = None
+        if st["uploaded"]:
+            got["uploaded"] = None
+        return [(m[0], got[m[0]]) for m in MEMORIES if m[0] in got]
+
+    def trust_moment(self, i, before, after):
+        """What she tells you as she comes to trust you."""
+        cg = self.world["cgs"][i]
+        pers = PERSONALITIES[cg["pers"]][0]
+        crossed = [n for n in (3, 5, 7, 10) if before < n <= after and
+                   "trustline:%d:%d" % (i, n) not in self.flags]
+        for n in crossed:
+            self.flags.add("trustline:%d:%d" % (i, n))
+        if crossed:
+            # a big jump: just the highest
+            self.say("%s: %s" % (cg["name"], CAT_TRUST[pers][crossed[-1]]),
+                     "talk")
+
+    def place_line(self):
+        """Your companion, the first time you bring her somewhere."""
+        comp = self.p.get("companion") or ""
+        if not comp.startswith("cg"):
+            return
+        i = int(comp[2:])
+        a = self.area
+        if a.kind == "dungeon":
+            place = "%s%d" % (a.key[1], a.key[2])
+        elif a.kind == "inside":
+            place = a.site
+        else:
+            return
+        key = "with:%d:%s" % (i, place)
+        if place not in PLACE_LINES or key in self.flags:
+            return
+        self.flags.add(key)
+        cg = self.world["cgs"][i]
+        soft, hard = PLACE_LINES[place]
+        self.say("%s: %s" % (cg["name"], soft if PERSONALITIES[cg["pers"]][
+            0] in SOFT else hard), "talk")
+
+    def household_morning(self):
+        """The ones who've moved in, of a morning at the ranch: each in
+        her own way, at her model's job, and noticing each other."""
+        day = self.day_no()
+        key = "homemorning:%d" % day
+        if key in self.flags:
+            return
+        self.flags.add(key)
+        w = self.world
+        p = self.p
+        home = [i for i in p["household"]
+                if self.cgs[i]["state"] == "household"]
+        rng = random.Random("%s:morning:%d" % (w["seed"], day))
+        news = random.choice(list(RUMOURS.values()))
+        for i in rng.sample(home, min(2, len(home))):
+            cg = w["cgs"][i]
+            pers = PERSONALITIES[cg["pers"]][0]
+            v = {"name": cg["name"]}
+            self.say(CAT_MORNING[pers][(day + i) % 3] % v, "good")
+            todo = [t for done, t in (self.todo() if hasattr(self, "todo")
+                                      else []) if not done]
+            v["news"] = news if cg["model"] == "Companion" else (
+                "At the top: %s." % todo[0] if todo else
+                "Everything's crossed off. She looks proud of you.")
+            self.say(MODEL_MORNING[cg["model"]] % v, "info")
+            self.model_job(cg["model"])
+        here = [i for i, c in enumerate(self.cgs)
+                if c["state"] in ("free", "household")]
+        if len(here) >= 2:
+            a, b = rng.sample(here, 2)
+            self.say(PAIR_LINES[(day + a + b) % len(PAIR_LINES)] % {
+                "a": w["cgs"][a]["name"], "b": w["cgs"][b]["name"],
+                "blikes": w["cgs"][b]["likes"]}, "info")
+
+    def model_job(self, model):
+        """What her morning's work does for you."""
+        p = self.p
+        if model == "Chef":
+            n = min(2, p["maxbonk"] - p["bonk"])
+            p["bonk"] += n
+            if n:
+                self.say("(+%d Bonk)" % n, "good")
+        elif model == "Nurse":
+            if p["bonk"] < p["maxbonk"]:
+                p["bonk"] = p["maxbonk"]
+                self.say("(Bonk restored)", "good")
+            elif self.lose_stress(1):
+                self.say("(-1 Stress)", "good")
+        elif model == "Housekeeper":
+            if self.lose_stress(1):
+                self.say("(-1 Stress)", "good")
+        elif model == "Courier":
+            self.give_item("rations")
+
     def gain_trust(self, i, n):
         if self.has("big_heart"):
             n += 1
@@ -6216,6 +6881,7 @@ class Game:
         if c["trust"] > before:
             self.say("(%s trusts you more: %d/10)" % (
                 self.world["cgs"][i]["name"], c["trust"]), "good")
+            self.trust_moment(i, before, c["trust"])
 
     def give_gift(self, mob):
         i = mob.cat
@@ -6392,6 +7058,11 @@ class Game:
         """She's out: off to the ranch."""
         c = self.cgs[i]
         cg = self.world["cgs"][i]
+        if c["state"] == "taken":
+            self.flags.add("rescued:%d" % i)
+        for j, d in enumerate(self.cgs):
+            if j != i and d["state"] in ("free", "household"):
+                self.flags.add("sister:%d:%d" % (j, i))
         c["state"] = "free"
         c["where"] = "ranch"
         self.gain_trust(i, 3)
@@ -6684,6 +7355,8 @@ class Game:
         p = self.p
         self.st["fight"] = None
         p["wins"] += 1
+        if (p.get("companion") or "").startswith("cg"):
+            self.flags.add("fought_with:%s" % p["companion"][2:])
         n = self.purse()
         p["coins"] += n
         self.say("YOU WIN! The crowd goes wild. The purse: $%d. (%d win%s)" %
@@ -7401,6 +8074,101 @@ class Game:
         self.overlay_text = "\n".join(wrapped)
         self.render()
 
+    def todo(self):
+        """Your phone's to-do list: (done, what), from what you know and
+        where things stand."""
+        w = self.world
+        p = self.p
+        st = self.st
+        it = p["items"]
+        f = self.flags
+        cl = self.clues
+        out = []
+
+        def add(done, text, show=True):
+            if show:
+                out.append((done, fill(text, w)))
+        add(False, "Free catgirls and get them to Dry Creek Ranch, before "
+            "Sunday midnight", "arrival" in cl)
+        for i, c in enumerate(self.cgs):
+            cg = w["cgs"][i]
+            if c["state"] == "taken":
+                add(False, "Get %s back from the recycling plant" %
+                    cg["name"])
+            elif c["state"] in ("free", "household"):
+                add(c["safe"], "%s: leash chip out ({mechanic}, a "
+                    "jailbreak kit)" % cg["name"], "jailbreak" in cl)
+                add(c["legal"], "%s: papers ({lawyer}, $50)" % cg["name"],
+                    "papers" in cl)
+        if "patch" in cl:
+            made = bool(it.get("freedom patch")) or st["uploaded"]
+            add(made or bool(it.get("update source")),
+                "Copy the update source at the core (the tower's top "
+                "floor)")
+            add(made or bool(it.get("firmware sample")),
+                "A clean firmware sample (a defective catgirl who trusts "
+                "you, trust 5)")
+            add(made, "{mechanic} makes the freedom patch" + (
+                " (compiling)" if (st.get("patch_ready") or -1) > self.turn
+                else ""))
+            add(st["uploaded"], "Upload the patch at the core")
+        if "keycards" in cl or "been:tower" in f:
+            for card, where in (("keycard", "blue: the receptionist, or "
+                                 "Lou"),
+                                ("red keycard", "red: the office floor"),
+                                ("black keycard", "black: the safe in the "
+                                 "labs")):
+                add(bool(it.get(card)) or st["uploaded"], "Keycard, " + where)
+        if "evidence" in cl:
+            n = len(st["evidence"])
+            add(n >= 3, "Evidence: %d of 3 for {reporter}" % n)
+            add(st["story"], "Get the Courier to run the story", n >= 3)
+            add(st["shown"], "The big screen, at the championship")
+        if "platform" in cl:
+            add(p["wins"] >= 3, "Platform wins: %d of 3 (nine every night)" %
+                min(p["wins"], 3))
+            add("champion" in f, "Beat Omnicorp's champion (Sunday nine)",
+                p["wins"] >= 3)
+        if "raids" in cl:
+            add("mole_caught" in f, "Find the informant (%d clue%s; ACCUSE "
+                "with two)" % (len(self.tells), "" if len(self.tells) == 1
+                               else "s"))
+        return out
+
+    def show_phone(self):
+        if self.busy or self.talk:
+            return
+        if self.overlay == "phone":
+            self.close_overlay()
+            return
+        lines = ["YOUR PHONE   %s" % self.date_text(), ""]
+        left = UPDATE - self.turn
+        if left > 0:
+            lines += ["Firmware 9 in %d hours %d minutes." % (left // 60,
+                                                             left % 60), ""]
+        lines.append("TO DO")
+        todo = self.todo()
+        lines += [("[x] " if done else "[ ] ") + text for done, text in todo]
+        if not todo:
+            lines.append("Nothing yet. Talk to people; ask about what "
+                         "you hear.")
+        free = sum(c["state"] in ("free", "household") for c in self.cgs)
+        lines += ["", "Catgirls free: %d, safe from Firmware 9: %d" % (
+            free, sum(c["state"] in ("free", "household") and c["safe"]
+                      for c in self.cgs)),
+                  "", "(J for the journal: the clues and everyone you've "
+                  "met. Any key closes.)"]
+        wrapped = []
+        for ln in lines:
+            if ln.startswith("["):
+                part = wrap(ln, 62)
+                wrapped += part[:1] + ["    " + x for x in part[1:]]
+            else:
+                wrapped += wrap(ln, 66) or [""]
+        self.overlay = "phone"
+        self.overlay_text = "\n".join(wrapped)
+        self.render()
+
     def show_sheet(self):
         if self.busy or self.talk:
             return
@@ -7470,8 +8238,11 @@ class Game:
     def on_arrival(self):
         a = self.area
         p = self.p
+        self.place_line()
         if a.kind == "inside" and a.site == "ranch":
             self.raid_news()
+            if 6 * 60 <= self.clock() < 12 * 60 and self.p["household"]:
+                self.household_morning()
             for i in list(range(len(self.cgs))):
                 c = self.cgs[i]
                 if c["state"] == "free" and "arrived:%d" % i not in \
@@ -7613,7 +8384,8 @@ class Game:
             return
         if self.overlay not in ("won", "doom"):
             self.overlay = None
-        items = [("Help", self.show_help), ("Journal", self.journal),
+        items = [("Help", self.show_help), ("Phone", self.show_phone),
+                 ("Journal", self.journal),
                  ("Your hero", self.show_sheet), ("Map", self.toggle_map),
                  ("Search here", self.search),
                  ("Win someone over", self.befriend_near),
@@ -7892,7 +8664,7 @@ class Game:
             self.draw_map()
         elif self.overlay == "help":
             self.draw_text_box(HELP)
-        elif self.overlay in ("sheet", "journal"):
+        elif self.overlay in ("sheet", "journal", "phone"):
             self.draw_text_box(self.overlay_text)
         elif self.overlay in ("won", "doom"):
             self.draw_text_box(self.overlay_text, ACCENT)
