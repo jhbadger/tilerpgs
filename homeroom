@@ -5073,7 +5073,17 @@ class Game:
             m.roam = {"gymfloor"}
             area.mobs.append(m)
         date = self.p.get("date")
-        if date and spots and not any(m.role == date for m in area.mobs):
+        if date == "sweetie" and spots and not any(
+                self.is_date(m) for m in area.mobs):
+            x, y = spots.pop()
+            m = Mob("sweetie", self.p["sweetie"], x, y)
+            self.make_sweetie(m, self.p["sweetie"])
+            m.roam = {"gymfloor"}
+            m.greet = "You came! I mean, of course you came. You're my " \
+                "DATE. I made you a cookie corsage. It's a cookie."
+            area.mobs.append(m)
+        elif date and date != "sweetie" and spots and not any(
+                m.role == date for m in area.mobs):
             x, y = spots.pop()
             area.mobs.append(make_person(self.world, date, x, y))
         if spots:
@@ -6933,29 +6943,8 @@ class Game:
     def reform_bully(self, mob):
         """A bully, zapped: she turns out to be the sweetest kid in town."""
         rng = random.Random()
-        mob.hostile = False
-        mob.reformed = True
-        mob.swapped = True
-        mob.aware = False
-        mob.stuck = mob.flee = 0
-        mob.tile = "sweetie"
-        mob.name = "%s %s" % (rng.choice(FEMALE), rng.choice(SURNAMES))
-        mob.title = "a former school bully"
-        mob.roam = {"street", "grass", "lawn", "boardwalk", "lot", "path",
-                    "floor", "tile", "carpet", "dfloor"}
-        mob.home = (mob.x, mob.y)
-        mob.greet = "Hiii! Oh my gosh. I'm SO sorry about the lunch money " \
-            "thing. I don't know what I was thinking."
-        mob.talk = {
-            "job": "I used to take lunch money. Now I bake cookies and "
-                   "volunteer at the animal shelter. It's a whole new me!",
-            "news": random.choice(TIPS + SNORR_RUMOURS),
-            "sorr": "I really am sorry. Being mean is SO much work. Being "
-                    "nice is way easier. Who knew?",
-            "lunc": "Your lunch money! I gave some back. The rest I spent "
-                    "on candy. I'm sorry! I'll make it up to you.",
-            "cook": "Chocolate chip. I'll bring you some on Saturday.",
-        }
+        self.make_sweetie(mob, "%s %s" % (rng.choice(FEMALE),
+                                          rng.choice(SURNAMES)))
         self.flags.add("zapped:" + mob.name)
         self.sound.play("level")
         self.say("ZORP! The bully goes pink, and sparkly, and... cute? "
@@ -6971,8 +6960,37 @@ class Game:
                      "'For all the lunches. I'm so sorry!'" % back, "gold")
             self.gain_tp(1, "for turning a bully into a sweetheart")
 
+    def make_sweetie(self, mob, name):
+        """What a bully is after the gun: pink, sparkly, and SO sorry."""
+        mob.hostile = False
+        mob.reformed = True
+        mob.swapped = True
+        mob.aware = False
+        mob.stuck = mob.flee = 0
+        mob.tile = "sweetie"
+        mob.name = name
+        mob.title = "a former school bully"
+        mob.roam = {"street", "grass", "lawn", "boardwalk", "lot", "path",
+                    "floor", "tile", "carpet", "dfloor"}
+        mob.home = (mob.x, mob.y)
+        mob.greet = "Hiii! Oh my gosh. I'm SO sorry about the lunch money " \
+            "thing. I don't know what I was thinking."
+        mob.talk = {
+            "job": "I used to take lunch money. Now I bake cookies and "
+                   "volunteer at the animal shelter. It's a whole new me!",
+            "news": random.choice(TIPS + SNORR_RUMOURS),
+            "sorr": "I really am sorry. Being mean is SO much work. Being "
+                    "nice is way easier. Who knew?",
+            "lunc": "Your lunch money! I gave some back. The rest I spent "
+                    "on candy. I'm sorry! I'll make it up to you.",
+            "cook": "Chocolate chip. I'll bring you some on Saturday.",
+            "form": "The Formal? I've never been to a dance. Nobody ever "
+                    "asked me. I mean, I used to give people wedgies, so.",
+        }
+
     def unreform_bully(self, mob):
         """Zapped back: and he remembers."""
+        mob.plain_name = mob.name
         mob.hostile = True
         mob.reformed = False
         mob.swapped = False
@@ -6984,6 +7002,10 @@ class Game:
         self.sound.play("horror")
         self.say("ZORP! Oh no. The bully's back, and he remembers "
                  "EVERYTHING. Especially the pink.", "bad")
+        if self.is_date_name(getattr(mob, "plain_name", None)):
+            self.p["date"] = self.p["sweetie"] = None
+            self.say("He is NOT going to the Formal with you. He says so, "
+                     "loudly, while chasing you.", "bad")
 
     def likes_change(self, mob):
         """Some people like what the gun did. Some really don't."""
@@ -8098,7 +8120,12 @@ class Game:
             st = self.side.get(e["id"])
             if st and st["state"] == "active":
                 greet = "Oh! It's you. Any luck?"
-        if getattr(mob, "reformed", False) and "met:" + mob.name in \
+        if getattr(mob, "reformed", False) and self.is_date(mob):
+            greet = random.choice((
+                "Hi, DATE! Eee! I've never had a date before!",
+                "I practised dancing in the mirror. I knocked over a lamp.",
+                "I'm baking cookies for Saturday. Like, a LOT of cookies."))
+        elif getattr(mob, "reformed", False) and "met:" + mob.name in \
                 self.flags:
             greet = random.choice(("Hi, friend!", "Want a cookie? I made "
                                    "cookies!", "You're my favourite "
@@ -8160,7 +8187,8 @@ class Game:
             words.append("SNORR")
         if "zapped:" + (mob.role or mob.name) in self.flags:
             words.append("CHANGE")
-        if mob.role in DATE_ROLES and "FORMAL" not in words:
+        if (mob.role in DATE_ROLES or getattr(mob, "reformed", False)) and \
+                "FORMAL" not in words:
             words.append("FORMAL")
         for w in getattr(self, "heard", []):
             if w not in words and w != "BYE":
@@ -8232,7 +8260,7 @@ class Game:
             self.chores()
             return
         if word[:4] in ("form", "date", "prom", "danc") and \
-                mob.role in DATE_ROLES:
+                (mob.role in DATE_ROLES or getattr(mob, "reformed", False)):
             self.ask_out(mob)
             return
         if mob.leader and word[:4] in ("snor", "grey", "gray", "agen"):
@@ -8316,14 +8344,17 @@ class Game:
         """Ask someone to the Formal: Cool (or Looks) against their Cool
         (or Smarts)."""
         p = self.p
-        role = mob.role
-        if p.get("date") == role:
+        sweet = getattr(mob, "reformed", False)
+        role = "sweetie" if sweet else mob.role
+        if self.is_date(mob):
             self.npc_say(mob, "We're already going together, silly!")
             return
         if p.get("date"):
             self.npc_say(mob, "Aren't you going with %s? I heard you were "
-                         "going with %s." % ((self.world["people"][
-                             p["date"]]["first"],) * 2))
+                         "going with %s." % ((self.date_name(True),) * 2))
+            return
+        if sweet:
+            self.ask_sweetie(mob)
             return
         key = "asked:%s:%d" % (role, self.day_no())
         if key in self.flags:
@@ -8379,6 +8410,60 @@ class Game:
             self.flags.add("admirer")
             self.npc_say(mob, "I'm never going to leave your side. Ever. "
                          "EVER.")
+
+    def ask_sweetie(self, mob):
+        """The bully you zapped sweet: she's never been asked to anything.
+        Easy to ask; the hard part is what everyone says."""
+        p = self.p
+        key = "asked:sweetie:%s:%d" % (mob.name, self.day_no())
+        if key in self.flags:
+            self.npc_say(mob, "You asked me already! I'm still thinking! "
+                         "(I'm not. I'm just nervous.)")
+            return
+        self.flags.add(key)
+        bonus = 2 * bool(p["items"].get("corsage")) + bool(
+            p["items"].get("formalwear"))
+        self.say("You ask %s to the Formal. She stares at you like you've "
+                 "handed her a puppy." % mob.name, "info")
+        margin = self.stat_roll("Cool", "date", diff=2, bonus=bonus,
+                                label="asking")
+        if margin <= 0:
+            self.npc_say(mob, random.choice((
+                "Me? ME? Is this a prank? Is this because of the wedgies? "
+                "...I need to think about it. Ask me tomorrow?",
+                "Oh my gosh. Oh my GOSH. I can't breathe. Ask me again "
+                "when I can breathe. Tomorrow.")))
+            return
+        p["date"], p["sweetie"] = "sweetie", mob.name
+        if p["items"].get("corsage"):
+            del p["items"]["corsage"]
+            self.say("She holds the corsage like it's made of glass.",
+                     "gold")
+        mob.known = True
+        self.npc_say(mob, random.choice((
+            "YES! Yes yes yes. I'm going to cry. I'm crying. Happy crying!",
+            "Nobody has EVER asked me to anything. Except to stop. Yes!",
+            "Yes! I'll wear pink. I only own pink now. It's a whole thing.")))
+        self.sound.play("level")
+        self.gain_tp(1, "for getting a date")
+        self.gain_tp(1, "for asking the former bully, of all people")
+
+    def is_date(self, mob):
+        if getattr(mob, "reformed", False):
+            return self.is_date_name(mob.name)
+        return bool(mob.role) and self.p.get("date") == mob.role
+
+    def is_date_name(self, name):
+        return bool(name) and self.p.get("date") == "sweetie" and \
+            self.p.get("sweetie") == name
+
+    def date_name(self, first=False):
+        """Who you're going to the Formal with."""
+        d = self.p.get("date")
+        if d == "sweetie":
+            n = self.p.get("sweetie") or "a former bully"
+            return n.split()[0] if first else n
+        return self.world["people"][d]["first" if first else "name"]
 
     def confront(self, mob):
         """Ask the Snorrian agent about Snorr."""
@@ -8744,7 +8829,9 @@ class Game:
             "Escape to stay\nat the party a while longer." % (
                 "*" * stars + "." * (5 - stars), p["name"], "the",
                 p["clique"].lower(),
-                ", who went with %s" % self.world["people"][date]["name"]
+                ", who went with %s%s" % (self.date_name(), (
+                    ", a former school bully (now the sweetest kid in "
+                    "Marigold Bay)") if date == "sweetie" else "")
                 if date else ", who went stag",
                 "The Snorrian agent was bonked back to Snorr.\n"
                 if "agent_bonked" in self.flags else "",
@@ -8949,7 +9036,7 @@ class Game:
                 lines.append("  - one somewhere in Marigold Bay")
         if p.get("date"):
             lines += ["", "Your date to the Formal: %s." %
-                      w["people"][p["date"]]["name"]]
+                      self.date_name()]
         if self.topics:
             lines += ["", "To look up: " + ", ".join(
                 sorted(t.title() for t in self.topics
@@ -9491,8 +9578,7 @@ class Game:
         if self.shards:
             lines.append("  carrying %d" % len(self.shards))
         if p.get("date"):
-            lines.append("Date: %s" % self.world["people"][p["date"]][
-                "first"])
+            lines.append("Date: %s" % self.date_name(True))
         self.show_panel(lines)
         cond = []
         if p["out"]:
