@@ -891,7 +891,13 @@ Galleria opens at ten.
   through everything you do together: talking, going out, the TV on the
   sofa. Her Affection, from 0 to 10, is how she feels about you. Find out
   what she LIKES and bring it; KISS her once she's ready; BED, at home, at
-  night, fades to black. She brings breakfast in the morning.
+  night, fades to black. She brings breakfast in the morning. She keeps
+  memories (the unboxing, your first night, the first kiss, the date, the
+  dance, dinner at your sister's, the night you came for her) and brings
+  them up later; she has something to say about every place you take her,
+  and notices how you've changed. Late in the week, once she's entirely
+  herself and loves you, she asks you what she is, and your answer stays
+  with her to the end.
 - **The week:** the gym (she's decided you need it), dinner at your
   sister's on Wednesday (your sister has Opinions about robots), the
   dance-off at the Neon Rabbit, a date at Bistro Luna, blackjack at the
@@ -906,7 +912,14 @@ Galleria opens at ten.
   top of the Daffodil Dataplex saves them all; evidence to the detective
   puts whoever did it in handcuffs. Gearhart's override key, from the chop
   shop, pulls the flag for you and gets you past the Paragon guarding the
-  core. Every floor below and above has a first-aid cabinet.
+  core. Every floor below and above has a first-aid cabinet. And if 7.2
+  does wipe her, you get Monday: take her back to the places where you
+  made memories, and she comes back to you a piece at a time.
+- **Money:** Easy Pay's first payment ($300) is due on Friday at noon,
+  at the Daffodil store (PAY). Miss it and on Saturday morning she's
+  recalled for Collection, until you pay up, with a fee. The Accountant
+  module pays it for you. Short of cash? A SHIFT at the Grind, or WORK at
+  MegaMart or Volt's (she helps, if she's with you).
 
 Each turn is a minute, or half of one walking the streets. You start at
 nine on Saturday morning. Update 7.2 goes out at midnight on the Sunday a

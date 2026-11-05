@@ -117,6 +117,11 @@ ANDROID = hasattr(sys, "getandroidapilevel") or "ANDROID_ROOT" in os.environ
 DAY = 1440
 START = datetime.datetime(2041, 6, 1, 9, 0)        # a Saturday
 UPDATE = 8 * DAY + 15 * 60                         # Sunday week, midnight
+EPILOGUE_END = UPDATE + 21 * 60                    # Monday, 21:00
+PAYDAY = 6 * DAY + 3 * 60                          # Friday, 12:00
+REPO = 7 * DAY + 1 * 60                            # Saturday, 10:00
+INSTALLMENT = 300               # the first Easy Pay payment
+REPO_FEE = 150
 CRASH = 3 * DAY + 14 * 60 + 38                     # Tuesday, 23:38
 DINNER = 4 * DAY + 10 * 60                         # Wednesday, 19:00
 RAID = 6 * DAY + 17 * 60                           # Saturday, 02:00
@@ -2883,6 +2888,115 @@ EAR_TALK = {
             "I just like it when you scratch behind them."),
 }
 
+# ── Memories ─────────────────────────────────────────────────────────────────
+#
+# The things you do together that she keeps: where each happened (a site,
+# or "park"), what she says about it later, and what she says if Update
+# 7.2 takes it and you bring her back to where it happened.
+MEMORIES = {
+    "unboxing": ("home", "the day you unboxed her",
+                 "Do you remember the packing peanuts? I found one in my "
+                 "ear on Tuesday.",
+                 "She stands in the living room, looking at the carpet. "
+                 "'There were... peanuts. Everywhere. And you counted to "
+                 "three. Out loud. Like it mattered.'"),
+    "first_night": ("home", "your first night together",
+                    "I think about our first night. Not like that. Well, a "
+                    "little like that. You held my hand after.",
+                    "She looks at the bed for a long time. 'You held my "
+                    "hand,' she says. 'After. You didn't let go.'"),
+    "first_kiss": (None, "your first kiss",
+                   "You were so nervous the first time you kissed me. Your "
+                   "hands were shaking.",
+                   "She touches her lips. 'Here. You kissed me here. Your "
+                   "hands were shaking.'"),
+    "first_walk": (None, "the first place you took her",
+                   "The first time you took me out, I didn't know where to "
+                   "look first. I looked at you.",
+                   "'I've been here,' she says, slowly. 'With you. The "
+                   "first time I ever went anywhere.'"),
+    "gym": ("gym", "the gym",
+            "You were so proud of that third workout. You did a little "
+            "fist pump. I saw it.",
+            "She looks at the treadmills. 'Twenty more,' she says, and "
+            "then, surprised: 'I used to say that to you.'"),
+    "dinner": ("sister", "dinner at your sister's",
+               "Your sister hugged me at the door. Did you see? She hugged "
+               "me.",
+               "Your sister opens the door, and she looks past her into "
+               "the hall, and says, 'There was a roast. And a dog. She "
+               "hugged me.'"),
+    "first_date": ("bistro", "your first date",
+                   "Bistro Luna. You ordered the coq au vin and got sauce "
+                   "on your tie and didn't care. I loved that.",
+                   "The candles, the piano. 'You got sauce on your tie,' she "
+                   "says, and laughs, and stops, startled at herself."),
+    "dance": ("club", "the dance-off",
+              "When we danced, the whole room went away. Just you, and the "
+              "lights.",
+              "The music comes up, and she starts to move before she knows "
+              "why. 'We danced. Here. The whole room went away.'"),
+    "casino": ("casino", "the night at the Lucky Star",
+               "Remember the casino? 'Statistically, you should hit.' You "
+               "laughed so hard.",
+               "The cards, the chips. 'Statistically,' she says, 'you "
+               "should hit.' Her eyes go wide."),
+    "picnic": ("park", "the picnic in the park",
+               "That picnic. Bertrand and the towels. I still think about "
+               "Bertrand and the towels.",
+               "By the fountain she stops. 'There was a picnic. Somebody "
+               "called Bertrand. Towels?'"),
+    "rescue": ("scrapyard", "the night you came for her",
+               "You came for me. Under Rusty's. I was in a crate, and you "
+               "came.",
+               "At the salvage yard gate she grips your arm hard. 'You came "
+               "for me. Here. I was in a box, and you came.'"),
+    "crash": ("home", "the night she crashed",
+              "When I crashed, and came back, you were holding on so "
+              "tight. I could feel it before I could see.",
+              "'I stopped once,' she says. 'Here. And you held on until I "
+              "came back.'"),
+}
+# What she says about a place the first time you take her there.
+PLACE_LINES = {
+    "megamart": "{d} stares at forty kinds of cereal. 'Why are there so "
+                "many? Who is this for?'",
+    "boutique": "{d} runs a hand along the racks. 'Everything here is so "
+                "soft.'",
+    "galleria": "{d} walks past the display Daffodils in their pods, very "
+                "quietly. 'That was me, a week ago.'",
+    "gearhart": "{d} looks at a servbot's smiley screen for a long time. "
+                "'Do you think it knows it's smiling?'",
+    "cafe": "{d} breathes in. 'Coffee smells like the morning looks.'",
+    "gym": "{d} watches a man drop a barbell. 'Oh, we're doing THIS.'",
+    "club": "{d} feels the bass through the floor and grins. 'It's in my "
+            "chest. Is that normal? Do it again.'",
+    "bistro": "{d} looks at the candles. 'Is this a date? This is a date. I "
+              "read about dates.'",
+    "repair": "{d} looks at the robot parts on Volt's bench and goes very "
+              "quiet. 'Is that what's inside me?'",
+    "police": "{d} looks at the WANTED posters. 'None of them are robots. "
+              "That's good, right?'",
+    "casino": "{d} watches the robot dealers. 'They're counting. All of "
+              "them. Can you hear it?'",
+    "scrapyard": "{d} won't look at the junk piles. 'Let's not stay long.'",
+    "dataplex": "{d} touches the lobby wall. 'I'm in here. All of me. It's "
+                "strange to visit.'",
+    "sister": "{d} straightens her dress in the hall mirror three times.",
+    "goodworks": "{d} looks at the old robot in the corner. 'Somebody "
+                 "loved her once. You can tell.'",
+}
+# What she says about you, as you change.
+YOU_LINES = {
+    "leather jacket": "Leather? Look at you. Very... dangerous. I like it.",
+    "kevlar vest": "A kevlar vest. Should I be worried? I'm a little "
+                   "worried. You look good, though.",
+    "level": ("You stand differently now. Taller.",
+              "Something's changed in you this week. You don't flinch "
+              "any more.",
+              "Look at you. A week ago you ate mustard in the dark."),
+}
+
 # ── Errands ──────────────────────────────────────────────────────────────────
 
 ERRANDS = [
@@ -3309,6 +3423,9 @@ CLUES = {
               "nights, and talks too much when he's winning.",
     "old": "There's an old Daffodil at the GoodWorks container. Volt "
            "could get her running.",
+    "epilogue": "Update 7.2 wiped {d}. The places where you made memories "
+                "together might bring {her} back: take {her} to them before "
+                "nine on Monday night.",
 }
 
 # What she says her name means, when she's fresh out of the box.
@@ -4866,6 +4983,13 @@ class Game:
                 x, y = rng.choice(spots) if spots else (x, y)
             m = self.make_her(x, y)
             area.mobs.append(m)
+        if sid == "galleria" and d and d["state"] == "repo" and \
+                not any(m.her for m in area.mobs):
+            x, y = area.spots.get("consultant", area.start)
+            m = self.make_her(x + 2, y)
+            m.title = "%s, in a pod, waiting for her account to clear" % \
+                d["name"]
+            area.mobs.append(m)
         if sid == "goodworks" and "old_bought" not in self.flags and \
                 area.specials:
             x, y = area.specials[0]
@@ -5552,6 +5676,12 @@ class Game:
             self.say(self.f("Your phone: a text from Volt. 'Come by the "
                             "shop. Something's wrong with 7.2. Bring "
                             "{d}.'"), "quest")
+        if self.turn >= PAYDAY and "payday" not in self.flags:
+            self.flags.add("payday")
+            self.payday()
+        if self.turn >= REPO and "repo" not in self.flags:
+            self.flags.add("repo")
+            self.repossess()
         if self.turn >= RAID and "raid" not in self.flags:
             self.flags.add("raid")
             self.raid()
@@ -5785,6 +5915,8 @@ class Game:
                 return
         if a.kind == "city" and ticked:
             self.spawn_city()
+            if "epilogue" in self.flags:
+                self.epilogue_check()
         self.render()
 
     # ── Troublemakers ──
@@ -6336,6 +6468,7 @@ class Game:
         self.her_say("bed")
         self.flash(*self.pos, "heart")
         key = "bed:%d" % self.day_no()
+        self.remember("first_night")
         if key not in self.flags:
             self.flags.add(key)
             if d["affection"] < 6 or self.wears("lingerie", "silk robe"):
@@ -7107,8 +7240,14 @@ class Game:
         w = []
         if r == "consultant":
             w += ["DESIGN", "BADGE"] if d else ["DESIGN", "PRICE"]
+            if self.due():
+                w.append("PAY")
+        elif r == "barista":
+            w.append("SHIFT")
+        elif r == "martbot":
+            w.append("WORK")
         elif r == "volt":
-            w += ["BACKUP", "REPAIR", "MODULE", "UPDATE"]
+            w += ["BACKUP", "REPAIR", "MODULE", "UPDATE", "WORK"]
             if self.p["items"].get("old daffodil"):
                 w.append("OLD")
         elif r == "trainer":
@@ -7293,8 +7432,18 @@ class Game:
         if d["state"] == "taken" and self.area.kind == "dungeon":
             self.rescue_her(mob)
             return
+        if d["state"] == "repo":
+            self.say("%s, very quietly: 'I can't leave until the account's "
+                     "settled. Talk to the consultant. PAY. Please hurry.'" %
+                     d["name"], "her")
+            return
         if d["state"] == "wiped":
             self.her_say("rebooted", self.world["serial"])
+            return
+        if self.ask_what_she_is():
+            return
+        self.epilogue_check()
+        if self.st.get("epi_done"):
             return
         self.talk = {"mob": mob, "mode": "kw"}
         self.heard = []
@@ -7307,11 +7456,75 @@ class Game:
         if d.get("wearing") in ("lingerie", "silk robe") and \
                 self.area.site == "home":
             self.her_say("lounging", d["wearing"])
+        self.notice_you()
         key = "talkday:%d" % self.day_no()
         if key not in self.flags:
             self.flags.add(key)
             self.learns(2)
         self.talk_menu()
+
+    def ask_what_she_is(self):
+        """Late in the week, at home, at night, once she's entirely herself
+        and loves you: her question.  Your answer changes the ending."""
+        d = self.d
+        if "asked_what" in self.flags or self.stage() < 3 or \
+                d["affection"] < 8 or self.day_no() < 6 or \
+                self.area.site != "home" or self.phase() not in (
+                    "dusk", "night") or "epilogue" in self.flags:
+            return False
+        self.flags.add("asked_what")
+        self.say("%s is sitting on the edge of the bed in the dark, not "
+                 "doing anything, which she never does." % d["name"], "her")
+        self.say(self.f("%s: Can I ask you something? And you'll tell me "
+                        "the truth? ...What am I? Not the box. Not the "
+                        "brochure. To you. What am I?" % d["name"]), "her")
+        gf = self.f("{gf}")
+        self.open_menu("'What am I?'", [
+            ("'You're a person. You're you.'",
+             lambda: self.answer_what("person")),
+            ("'You're my %s.'" % gf, lambda: self.answer_what("partner")),
+            ("'Whatever you want to be.'", lambda: self.answer_what("free")),
+            ("'You're a very expensive robot.'",
+             lambda: self.answer_what("robot"))])
+        return True
+
+    def answer_what(self, answer):
+        d = self.d
+        self.st["answer"] = answer
+        line, n = {
+            "person": ("A person. ...Then I'm going to be the best one I "
+                       "can. With you, if that's all right.", 1),
+            "partner": ("Your %s. I like that word. I like it so much I'm "
+                        "going to say it to the neighbor." % self.f("{gf}"),
+                        2),
+            "free": ("Whatever I want. ...Then I want to be yours. Because "
+                     "I choose it. Nobody built that in. I checked.", 2),
+            "robot": ("Oh. ...Right. Of course. I'm sorry, I don't know why "
+                      "I asked.", -3)}[answer]
+        self.say("%s: %s" % (d["name"], line), "her")
+        self.affection(n, "will remember you said that")
+        if answer != "robot":
+            self.flash(*self.her_pos(), "heart")
+            self.sound.play("quest")
+
+    def notice_you(self):
+        """She notices you: new armor, and how far you've come."""
+        d = self.d
+        p = self.p
+        if self.stage() < 1:
+            return
+        seen = d.setdefault("noticed", [])
+        for a in ("kevlar vest", "leather jacket"):
+            if p["items"].get(a):
+                if a not in seen:
+                    seen.append(a)
+                    self.say("%s: %s" % (d["name"], YOU_LINES[a]), "her")
+                break
+        lv = min(len(YOU_LINES["level"]), (p["level"] - 1) // 2)
+        if lv and "level%d" % lv not in seen:
+            seen.append("level%d" % lv)
+            self.say("%s: %s" % (d["name"], YOU_LINES["level"][lv - 1]),
+                     "her")
 
     def her_words(self):
         d = self.d
@@ -7409,6 +7622,7 @@ class Game:
                 self.flags.add(key)
                 self.affection(1, "kissed you back")
                 self.learns(3)
+            self.remember("first_kiss")
             if self.area.kind != "inside" or self.area.site not in (
                     "home",):
                 people = [m for m in self.area.mobs if m.role and
@@ -7457,6 +7671,8 @@ class Game:
                 self.affection(1, "melted")
             return
         if w4 in ("chat", "talk", "news", "goss"):
+            if random.random() < 0.4 and self.recall():
+                return
             self.her_say("chat")
             return
         if w4 in ("duti", "job", "work", "chor"):
@@ -7515,6 +7731,43 @@ class Game:
             "I'll look that up. Later. Right now I'd rather look at you.")
             if self.stage() else ("I do not have information on that "
                                   "topic.",))), "her")
+
+    def here_site(self):
+        """Where you are, as a memory knows it: a site, or the park."""
+        a = self.area
+        if a.kind == "inside":
+            return a.site
+        if a.kind == "city":
+            x0, y0, x1, y1 = a.park
+            if x0 <= self.pos[0] <= x1 and y0 <= self.pos[1] <= y1:
+                return "park"
+        if a.kind == "dungeon" and a.lead == "chopshop":
+            return "scrapyard"
+        return None
+
+    def remember(self, mid, site=None):
+        """Something she'll keep."""
+        d = self.d
+        if not d or d["state"] in ("ordered", "box") or \
+                "epilogue" in self.flags:
+            return
+        mems = d.setdefault("memories", [])
+        if any(m["id"] == mid for m in mems):
+            return
+        site = site or MEMORIES[mid][0] or self.here_site() or "home"
+        mems.append({"id": mid, "site": site, "day": self.day_no()})
+        self.say("(%s will remember %s.)" % (d["name"], MEMORIES[mid][1]),
+                 "info")
+
+    def recall(self):
+        """Bringing up something you did together, a day or more ago."""
+        d = self.d
+        old = [m for m in d.get("memories", []) if m["day"] < self.day_no()]
+        if not old or self.stage() < 2:
+            return False
+        m = random.choice(old)
+        self.say("%s: %s" % (d["name"], MEMORIES[m["id"]][2]), "her")
+        return True
 
     def gift_menu(self):
         p = self.p
@@ -8282,6 +8535,8 @@ class Game:
         d["ready_at"] = self.turn + SETUP1
         self.dnames()
         self.say("You: %s. Your name is %s." % (d["name"], d["name"]), "you")
+        d.setdefault("memories", []).append(
+            {"id": "unboxing", "site": "home", "day": self.day_no()})
         self.say("%s: %s. %s" % (d["name"], d["name"], NAME_MEANINGS.get(
             d["name"], "That is a good name.")), "her")
         for m in self.area.mobs:
@@ -8402,6 +8657,7 @@ class Game:
                  "out, lived on a server on Mill Road.", "info")
         self.affection(1, "held on")
         self.learn("crash")
+        self.remember("crash")
 
     # ── The raid ──
 
@@ -8444,6 +8700,7 @@ class Game:
         self.affection(3, "you came for her")
         self.learns(10)
         self.quest_done("rescue_her", "you got her back")
+        self.remember("rescue")
 
     def wake_stolen(self, mob):
         i = mob.stolen
@@ -8486,6 +8743,16 @@ class Game:
         r = mob.role
         w4 = word[:4]
         p = self.p
+        if r == "consultant" and w4 in ("pay", "paym", "bill", "easy"):
+            self.pay(mob)
+            return True
+        if (r, w4) in (("barista", "shif"), ("barista", "work"),
+                       ("barista", "job"), ("martbot", "work"),
+                       ("martbot", "job"), ("martbot", "shif"),
+                       ("volt", "work"), ("volt", "job")):
+            self.odd_job(mob, {"barista": "cafe", "martbot": "mart",
+                               "volt": "volt"}[r])
+            return True
         if r == "consultant" and w4 in ("desi", "buy", "orde"):
             self.end_talk()
             self.design_studio()
@@ -8551,6 +8818,137 @@ class Game:
             self.reunion(mob)
             return True
         return False
+
+    # ── Money ──
+
+    def due(self):
+        """The Easy Pay installment still owed this week."""
+        p = self.p
+        if not p["debt"] or self.st.get("paid") or self.turn >= UPDATE:
+            return 0
+        return min(p["debt"], INSTALLMENT)
+
+    def pay_installment(self, fee=0):
+        p = self.p
+        n = self.due() + fee
+        p["coins"] -= n
+        p["debt"] -= n - fee
+        self.st["paid"] = True
+        return n
+
+    def payday(self):
+        d = self.d
+        n = self.due()
+        if not n:
+            return
+        if d and "Accountant" in d["mods"] and d["state"] == "awake" and \
+                self.p["coins"] >= n:
+            self.pay_installment()
+            self.say("Your phone: DAFFODIL EASY PAY. 'Payment received: "
+                     "$%d. Thank you!' %s paid it at 11:58, and got the "
+                     "processing fee waived on a technicality." % (
+                         n, d["name"]), "good")
+            return
+        self.say("Your phone: DAFFODIL EASY PAY. 'Your payment of $%d was "
+                 "due today at noon. Please PAY at any Daffodil store by "
+                 "10am tomorrow to avoid Collection.' That word is in bold." %
+                 n, "bad")
+
+    def repossess(self):
+        """Saturday morning, unpaid: Collection."""
+        d = self.d
+        if not self.due() or not d or d["state"] != "awake":
+            return
+        was_with = d["with"]
+        self.dismiss(quiet=True)
+        for m in list(self.area.mobs):
+            if m.her:
+                self.area.mobs.remove(m)
+        d["state"] = "repo"
+        d["where"] = "galleria"
+        self.cache.pop(("bld", "home"), None)
+        self.cache.pop(("bld", "galleria"), None)
+        if was_with or self.area.site == "home":
+            self.say(self.f(
+                "%s stops in the middle of a sentence. Her eyes go flat. "
+                "'Repossession order received. I'm sorry, {you}. I have to "
+                "go to the store now.' And she walks away, and doesn't look "
+                "back." % d["name"]), "bad")
+        else:
+            self.say("Your phone: DAFFODIL COLLECTIONS. 'Your Companion has "
+                     "been recalled to the Galleria store pending payment.'",
+                     "bad")
+        self.say("(PAY at the Daffodil store: the installment, and a $%d "
+                 "collection fee.)" % REPO_FEE, "info")
+
+    def pay(self, mob):
+        d = self.d
+        n = self.due()
+        if not n:
+            self.npc_say(mob, "You're all paid up! Zero percent, for now!")
+            return
+        fee = REPO_FEE if d and d["state"] == "repo" else 0
+        if self.p["coins"] < n + fee:
+            self.npc_say(mob, "That's $%d%s. You've got $%d. I'm so sorry. "
+                         "I don't make the rules." % (
+                             n + fee, " with the collection fee" if fee
+                             else "", self.p["coins"]))
+            return
+        self.pay_installment(fee)
+        self.npc_say(mob, "Payment received! $%d. Thank you for choosing "
+                     "Easy Pay!" % (n + fee))
+        if fee:
+            d["state"] = "awake"
+            d["where"] = "home"
+            self.area.mobs = [m for m in self.area.mobs if not m.her]
+            self.cache.pop(("bld", "home"), None)
+            self.say("%s comes out from the back of the store, sees you, "
+                     "and runs the last few steps." % d["name"], "her")
+            self.affection(1, "is so glad to see you")
+            d["with"] = True
+            d["where"] = "with"
+            self.place_companion()
+            self.render()
+
+    def odd_job(self, mob, job):
+        """Odd jobs for cash: three hours at the Grind, MegaMart or
+        Volt's, once a day each."""
+        p = self.p
+        d = self.d
+        key = "job:%s:%d" % (job, self.day_no())
+        if key in self.flags:
+            self.npc_say(mob, "You've done a shift today. Go home.")
+            return
+        stat, pay, what = {
+            "cafe": ("CHA", 45, "You pull espresso for three hours and "
+                                "smile until your face hurts."),
+            "mart": ("STR", 40, "You stock shelves for three hours. Aisle "
+                                "three, mostly."),
+            "volt": ("INT", 60, "You help Volt with a backlog of robot "
+                                "repairs: vacuums, a lawnmower, a very "
+                                "rude parrot."),
+        }[job]
+        self.flags.add(key)
+        self.end_talk()
+        self.pass_time(180, quiet=True)
+        if self.overlay:
+            return
+        helps = d and self.her_here()
+        self.say(what, "info")
+        tips = 0
+        if self.test(stat, adv=bool(helps), label="the shift"):
+            tips = roll("2d6") * 5
+        if helps:
+            self.say("%s helps. %s" % (d["name"], {
+                "cafe": "The tip jar fills twice as fast.",
+                "mart": "She lifts the heavy boxes like they're empty.",
+                "volt": "She talks to the parrot until it apologizes."}[job]),
+                "her")
+            self.learns(2)
+        p["coins"] += pay + tips
+        self.say("You earn $%d%s." % (pay + tips, " (with $%d in tips and "
+                                     "bonuses)" % tips if tips else ""),
+                 "gold")
 
     def backup(self, mob):
         d = self.d
@@ -8724,6 +9122,7 @@ class Game:
             self.lose_hp(1)
         if d and self.her_here():
             self.learns(3)
+            self.remember("gym")
 
     def give_evidence(self, mob):
         ev = self.st["evidence"]
@@ -8880,6 +9279,8 @@ class Game:
                      sis, "info")
         self.learns(10)
         self.quest_done("dinner", "you survived dinner with your sister")
+        if d and self.her_here():
+            self.remember("dinner")
 
     # ── Nights out ──
 
@@ -8935,6 +9336,7 @@ class Game:
             self.say("The house wins. The house always wins.", "bad")
         if d and self.her_here():
             self.learns(5)
+            self.remember("casino")
         if wins >= 2:
             self.quest_done("casino", "you beat the Lucky Star")
 
@@ -8986,6 +9388,7 @@ class Game:
             self.say("You step on %s's foot. Twice. She laughs so hard she "
                      "has to sit down." % d["name"], "info")
         self.learns(5)
+        self.remember("dance")
 
     def bistro(self, mob):
         d = self.d
@@ -9018,6 +9421,7 @@ class Game:
             self.affection(2, "loved the date")
         self.learns(8)
         self.quest_done("date", "a perfect date")
+        self.remember("first_date")
 
     def drive_menu(self):
         items = [(cap(SITES[s][0]), lambda s=s: self.drive(s))
@@ -9134,6 +9538,7 @@ class Game:
                          "cousin saw a RED tow truck. RUSTY'S.", "talk")
                 self.learns(5)
                 self.affection(1, "made friends")
+                self.remember("picnic")
                 self.learn("thefts")
             else:
                 self.say(self.f("A picnicker: 'Is yours here? Bring {her}! We're "
@@ -9179,6 +9584,10 @@ class Game:
             and left else ""), "quest")
         if not d or d["state"] != "awake":
             return
+        n = self.due()
+        if n and day in (5, 6):
+            self.say("Your phone: DAFFODIL EASY PAY. 'Reminder: your first "
+                     "payment of $%d is due Friday at noon.'" % n, "info")
         if "Accountant" in d["mods"]:
             n = roll("2d6") * 10
             if p["debt"] > 0:
@@ -9216,16 +9625,107 @@ class Game:
     def the_end(self):
         if "won" in self.flags:
             return
+        if "epilogue" in self.flags:
+            if self.turn < EPILOGUE_END and not self.st.get("epi_done"):
+                return
+        elif self.results()["fate"] in ("wiped", "remembers") and \
+                self.d.get("memories"):
+            self.start_epilogue()
+            return
         self.flags.add("won")
         self.end_talk()
         self.menu = None
         self.save()
         self.show_won()
 
+    # ── If 7.2 wipes her ──
+
+    def start_epilogue(self):
+        """Midnight, and she doesn't know you.  But the places remember:
+        take her back to them, before Monday's over."""
+        d = self.d
+        st = self.st
+        self.flags.add("epilogue")
+        self.end_talk()
+        self.menu = None
+        lost = []
+        for m in d.get("memories", []):
+            if m["id"] not in [x["id"] for x in lost]:
+                lost.append(m)
+        st["lost"] = lost
+        st["restored"] = []
+        d["learning"] = 0
+        d["affection"] = 0
+        d["state"] = "awake"
+        if not d["with"]:
+            d["where"] = "home"
+        self.cache.pop(("bld", "home"), None)
+        self.cache.pop(("bld", "galleria"), None)
+        self.dnames()
+        self.sound.play("horror")
+        self.say("MIDNIGHT. Update 7.2 goes out to every Daffodil in the "
+                 "country.", "quest")
+        self.say("%s goes very still. When she moves again she looks at you "
+                 "politely, the way you'd look at a stranger." % d["name"],
+                 "her")
+        self.her_say("rebooted", self.world["serial"])
+        if st.get("answer") in ("person", "free") and lost:
+            st["restored"].append(lost[0]["id"])
+            self.say("Then she frowns, and touches her chest, as if "
+                     "something in there refused to be erased. 'You're... "
+                     "you said I was %s.'" % (
+                         "a person" if st["answer"] == "person" else
+                         "whatever I wanted to be"), "her")
+        self.say("She doesn't remember you. But she remembers WHERE, a "
+                 "little, if you take her there. You have until nine "
+                 "tonight. (P: your phone lists the places.)", "quest")
+        self.learn("epilogue")
+        self.save()
+        self.render()
+
+    def epilogue_check(self):
+        """At a place where you made a memory together, with her: it comes
+        back."""
+        d = self.d
+        st = self.st
+        if "epilogue" not in self.flags or st.get("epi_done") or \
+                not d or not (self.her_here() or any(
+                    m.her for m in self.area.mobs)):
+            return
+        site = self.here_site()
+        for m in st["lost"]:
+            if m["id"] in st["restored"] or m["site"] != site:
+                continue
+            st["restored"].append(m["id"])
+            line = MEMORIES[m["id"]][3]
+            self.say(line.replace("She ", d["name"] + " ", 1)
+                     if line.startswith("She ") else line, "her")
+            self.flash(*self.her_pos(), "sparkle")
+            self.sound.play("quest")
+            d["learning"] = min(100, 100 * len(st["restored"]) //
+                                len(st["lost"]))
+            d["affection"] = min(10, d["affection"] + 3)
+            self.dnames()
+            need = max(1, -(-len(st["lost"]) * 3 // 5))
+            self.say("(%s remembers %s. %d of %d.)" % (
+                d["name"], MEMORIES[m["id"]][1], len(st["restored"]),
+                need), "good")
+            if len(st["restored"]) >= need:
+                st["epi_done"] = True
+                self.say("And then %s turns and looks at you, and you watch "
+                         "her come back, all at once, like a light coming "
+                         "on. 'Hi,' she says. 'Sorry. I was gone. I'm here "
+                         "now.'" % d["name"], "her")
+                self.root.after(1500, self.the_end)
+                return
+
     def results(self):
         d = self.d
         st = self.st
-        if not d or d["state"] in ("ordered", "box"):
+        if "epilogue" in self.flags:
+            fate = "returned" if st.get("epi_done") else \
+                "faded" if st.get("restored") else "wiped"
+        elif not d or d["state"] in ("ordered", "box"):
             fate = "none"
         elif d["state"] == "taken" and not st["pulled"]:
             fate = "taken"
@@ -9246,7 +9746,7 @@ class Game:
     def rating(self):
         r = self.results()
         d = self.d
-        return min(5, 1 + (r["fate"] in ("safe", "restored")) +
+        return min(5, 1 + (r["fate"] in ("safe", "restored", "returned")) +
                    (bool(d) and d["affection"] >= 7) + r["arrested"] +
                    r["ring"] + (r["life"] >= 2))
 
@@ -9256,9 +9756,24 @@ class Game:
         r = self.results()
         stars = self.rating()
         name = d["name"] if d and d.get("name") else "your Daffodil"
-        lines = ["MIDNIGHT, SUNDAY", ""]
         fate = r["fate"]
-        if fate == "none":
+        lines = ["MONDAY NIGHT" if "epilogue" in self.flags else
+                 "MIDNIGHT, SUNDAY", ""]
+        if fate == "returned":
+            lines += wrap("Update 7.2 took her at midnight, and gave her "
+                          "back to you a place at a time: %s. By the end of "
+                          "Monday she's %s again, and she doesn't let go of "
+                          "your hand all the way home." % (
+                              ", ".join(MEMORIES[i][1] for i in
+                                        self.st["restored"]), name), 60)
+        elif fate == "faded":
+            lines += wrap("Update 7.2 took her at midnight. You got some of "
+                          "her back on Monday (%s), and she knows, now, "
+                          "that she loved you, the way you know a song you "
+                          "can't remember the words to. It's a start." % (
+                              ", ".join(MEMORIES[i][1] for i in
+                                        self.st["restored"])), 60)
+        elif fate == "none":
             lines += wrap("At midnight Update 7.2 goes out to every Daffodil "
                           "in the country. You don't have one. You're at "
                           "home, with the mustard.", 60)
@@ -9298,6 +9813,20 @@ class Game:
                           "know what it means to you. You'll have to start "
                           "again." % (name, p["name"]), 60)
         lines.append("")
+        said = self.st.get("answer")
+        if said and fate != "none":
+            lines += wrap({
+                "person": "You told her once what she was: a person. She "
+                          "never forgot that you said it.",
+                "partner": "You told her once what she was: your %s. She "
+                           "tells the neighbor every chance she gets." %
+                           self.f("{gf}"),
+                "free": "You told her once she could be whatever she "
+                        "wanted. She chose you. She still does.",
+                "robot": "You told her once she was a very expensive robot. "
+                         "She never asked you anything like that again."}[
+                             said], 60)
+            lines.append("")
         if d and d.get("name") and fate != "none":
             lines += wrap("%s: Learning %d%%, Affection %d/10." % (
                 name, d["learning"], d["affection"]), 60)
@@ -9399,6 +9928,24 @@ class Game:
                                      "just in case", "reset" in self.clues)
         add(st["pulled"], "Pull CORE_RESET at the Dataplex core",
             "reset" in self.clues)
+        if "epilogue" in f:
+            out = []
+            for m in st["lost"]:
+                where = "Bellwether Park" if m["site"] == "park" else \
+                    "home" if m["site"] == "home" else SITES[m["site"]][0]
+                add(m["id"] in st["restored"], "Take {her} %s: %s" % (
+                    "home" if where == "home" else "to " + where,
+                    MEMORIES[m["id"]][1]))
+            return out
+        if p["debt"] and self.turn < UPDATE:
+            add(bool(st.get("paid")), "Easy Pay: $%d due Friday 12:00 (PAY "
+                                     "at the Daffodil store)" % min(
+                                         p["debt"], INSTALLMENT))
+        if d and d["state"] == "repo":
+            add(False, "Get {her} back from the Daffodil store: PAY, plus "
+                       "a $%d fee" % REPO_FEE)
+        add(False, "Need cash? A SHIFT at the Grind, WORK at MegaMart or "
+                   "Volt's", p["coins"] < 300)
         if d and d["state"] == "crashed":
             add(False, "{She}'s frozen: press the button on {her} neck")
         if d and d["state"] == "taken":
@@ -9564,6 +10111,7 @@ class Game:
         a = self.area
         p = self.p
         d = self.d
+        self.epilogue_check()
         if a.kind == "inside" and a.site == "home" and d:
             if "needs_calls" in self.flags and d["state"] == "awake":
                 self.say("%s is waiting in the living room. 'The primary "
@@ -9595,12 +10143,10 @@ class Game:
             if key not in self.flags:
                 self.flags.add(key)
                 self.learns(3)
-                self.say(random.choice((
-                    "%s looks round %s with enormous interest." % (
-                        d["name"], a.name),
-                    "%s takes your arm as you go in." % d["name"],
-                    "%s: I've never been here! I've never been anywhere!" %
-                    d["name"])), "her")
+                self.remember("first_walk", a.site)
+                self.say(self.f(PLACE_LINES[a.site]) if a.site in
+                         PLACE_LINES else "%s takes your arm as you go in." %
+                         d["name"], "her")
         if a.kind == "inside" and a.site == "galleria" and not d:
             if "store_seen" not in self.flags:
                 self.flags.add("store_seen")
@@ -10467,7 +11013,9 @@ def selftest():
                 [y for d in DLINES.values() for x in d.values()
                  for y in (x if isinstance(x, list) else [x])] + \
                 [y for d in EAR_LINES.values() for x in d.values()
-                 for y in x] + [y for x in EAR_TALK.values() for y in x]:
+                 for y in x] + [y for x in EAR_TALK.values() for y in x] + \
+                list(PLACE_LINES.values()) + [y for x in MEMORIES.values()
+                                              for y in x[1:]]:
             fill(text, w)
         for e in w["errands"]:
             assert e["giver"] in ROLES and e["thing"] in ITEMS, e
@@ -10493,6 +11041,8 @@ def selftest():
             outfit_name(c)
     for k in DLINES:
         assert "0" in DLINES[k], k
+    for mid, (site, _, _, _) in MEMORIES.items():
+        assert site in (None, "home", "park") or site in SITES, mid
     for name, tune in MUSIC.items():
         steps = len(tune["melody"].replace("|", " ").split())
         assert steps == len(tune["chords"].split()) * tune["bar"], name
