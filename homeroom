@@ -381,6 +381,8 @@ ITEMS = {
     "soda": ("a can of Fizz-O: +1 Bonk", 1),
     "burger": ("a Blaster Burger: +2 Bonk", 3),
     "cosmo cake": ("a Cosmo Cake, cream-filled: +1 Bonk", 1),
+    "cookies": ("a tin of chocolate chip cookies, baked with love by a "
+                "former bully: +1 Bonk", 0),
     "ice cream": ("a triple scoop: +2 Bonk and a better mood", 2),
     "bonk regenerator": ("a Bonk Regenerator Ray: +2 Bonk, three charges",
                          10),
@@ -411,7 +413,8 @@ ITEMS = {
 }
 WORN = ("spring shoes", "rocket sneakers", "timestop makeup",
         "battle bikini", "formalwear")
-FOOD = {"soda": 1, "burger": 2, "cosmo cake": 1, "ice cream": 2}
+FOOD = {"soda": 1, "burger": 2, "cosmo cake": 1, "ice cream": 2,
+        "cookies": 1}
 
 # Wheels: name -> (how many squares a step, where it goes)
 WHEELS = {"car": (2, "road"), "saucer": (2, "air"), "jetbike": (3, "ground"),
@@ -2634,6 +2637,203 @@ CLOSES = {"flowers", "icecream", "gadgets", "formal", "cakes", "wheels",
           "surf", "snacks", "nurse", "lunch"}
 
 
+# ── The week, with somebody ──────────────────────────────────────────────────
+#
+# Each possible date: where they'd love to go, their running joke (told an
+# outing at a time), what they wear to the Formal (as a guy, as a girl),
+# what they say when you arrive, and where they are, years later.
+DATE_INFO = {
+    "jockkid": {
+        "likes": "burger",
+        "joke": ("Is a mole an animal? Coach says it's a unit. A unit of "
+                 "WHAT?",
+                 "I studied! I made flash cards! ...They're of plays.",
+                 "Good news: I passed the chem quiz. Bad news: it was a "
+                 "different class's quiz."),
+        "formal": ("a tux with the letterman jacket over it",
+                   "a gown with the letterman jacket over it"),
+        "arrive": "I wore the jacket. I always wear the jacket. It's lucky.",
+        "later": "passed chemistry, barely, and still says it was your "
+                 "flash cards"},
+    "brainkid": {
+        "likes": "library",
+        "joke": ("The Vegan Science Academy sent me a brochure. It's in a "
+                 "language that's just smells.",
+                 "I calculated the odds of this going well. I'm not telling "
+                 "you. They're good, though.",
+                 "I've decided: M.I.T. AND the Crab Nebula. I'll commute."),
+        "formal": ("a bow tie and a calculator-watch cummerbund",
+                   "a gown with a periodic-table sash"),
+        "arrive": "Statistically this is the best night of my life. I've "
+                  "checked. Twice.",
+        "later": "got into M.I.T. and the Crab Nebula, and commutes"},
+    "prepkid": {
+        "likes": "scoops",
+        "joke": ("I've made a seating chart for the Formal. You're at table "
+                 "one. Table one is me.",
+                 "The committee meeting ran three hours. We voted on "
+                 "napkins. Twice.",
+                 "I have a clipboard for my clipboards now."),
+        "formal": ("a white dinner jacket with a STUDENT COUNCIL pin",
+                   "a ballgown with a STUDENT COUNCIL sash"),
+        "arrive": "Everything's running exactly on time. Except my heart. "
+                  "That's running fast.",
+        "later": "ran for mayor at nineteen, and won"},
+    "exchangekid": {
+        "likes": "drivein",
+        "joke": ("On Earth one 'goes Dutch'. I have prepared to become "
+                 "Dutch.",
+                 "Your 'brain freeze'. I thought it was a weapon. I am "
+                 "still not sure.",
+                 "I have learned your custom of holding hands. I have also "
+                 "learned that I have too many."),
+        "formal": ("something from {world} that glows faintly",
+                   "something from {world} that glows faintly"),
+        "arrive": "On {world} we wear this for weddings, funerals and "
+                  "dances. Mostly dances.",
+        "later": "went home to {world}, where Earth dancing is now a craze"},
+    "rebelkid": {
+        "likes": "arcade",
+        "joke": ("This isn't a date. It's two people being somewhere. "
+                 "Together. ...Okay. It's a date.",
+                 "The jacket's real. The leather's fake. Tell anyone and "
+                 "you're dead.",
+                 "I don't smile. It's a muscle thing. ...Shut up."),
+        "formal": ("a black tux with the leather jacket over it",
+                   "a black dress with the leather jacket over it"),
+        "arrive": "Don't make it a thing. ...You look really good.",
+        "later": "still doesn't do clubs, and started a band, which is a "
+                 "club"},
+    "cheer": {
+        "likes": "boardwalk",
+        "joke": ("Gimme a D! Gimme an A! Gimme a... T? Is that how you "
+                 "spell date?",
+                 "I've got a cheer for every occasion. This one's for ice "
+                 "cream. It's mostly screaming.",
+                 "Pom-poms are great. They're also great napkins. Don't "
+                 "tell Coach."),
+        "formal": ("a tux in the school colours",
+                   "a sequined gown in the school colours"),
+        "arrive": "Gimme an F! Gimme an O! ...I forgot the rest. You look "
+                  "AMAZING!",
+        "later": "leads the cheer squad at the Galactic Games"},
+    "sweetie": {
+        "likes": "scoops",
+        "joke": ("I made cookies for the occasion. The occasion is that "
+                 "it's a day.",
+                 "Someone asked for their lunch money back today. I gave "
+                 "them double. And a cookie.",
+                 "I used to give swirlies. Now I give hugs. It's the same "
+                 "move, really, only nicer."),
+        "formal": ("a pink tux", "a pink gown with a cookie corsage"),
+        "arrive": "You came! I mean, of course you came. You're my DATE.",
+        "later": "opened a bakery called Second Chances, where the cookies "
+                 "are free if you were ever mean to anybody"},
+}
+# Where you can take them: (label, price, what happens, what goes wrong,
+# the hours it's open).
+OUTINGS = {
+    "scoops": ("Ice cream at Scoops", 3,
+               "You share a banana split at Scoops. The ice cream lady "
+               "gives you two spoons and a wink.",
+               "You both reach for the cherry. The banana split ends up on "
+               "the floor. The ice cream lady sighs.", (11, 21)),
+    "burger": ("Burgers at Burger Blaster", 4,
+               "A basket of Blaster Fries and two shakes. You steal fries "
+               "off each other's side and pretend you didn't.",
+               "The fry cook gets your order wrong four times. You get a "
+               "fish sandwich. Neither of you ordered fish.", (10, 22)),
+    "arcade": ("Games at the Galaxy Arcade", 2,
+               "Air hockey, then skee-ball, then the claw machine, which "
+               "for once gives up the stuffed alien.",
+               "You lose every game, including one that was broken. A "
+               "ten-year-old laughs at you.", (10, 22)),
+    "drivein": ("A movie at the Starlite Drive-In", 5,
+                "ATTACK OF THE FIFTY-FOOT PROM QUEEN, on the big screen, "
+                "with the stars out above it. Nobody watches much of the "
+                "movie.",
+                "The speaker on the window only plays a radio station from "
+                "Fresno. You watch the whole movie to polka.", (19, 24)),
+    "boardwalk": ("A walk on the boardwalk", 0,
+                  "You walk the boardwalk while the sun goes down. A seagull "
+                  "steals nothing. It's perfect.",
+                  "A seagull steals your date's hat. You chase it the length "
+                  "of the pier. The seagull wins.", (7, 22)),
+    "library": ("Studying at the library", 0,
+                "You study together in the stacks, and pass notes, and the "
+                "librarian pretends not to notice.",
+                "SHHHHH! The librarian throws you both out for giggling. "
+                "Worth it.", (9, 20)),
+}
+# The judges, at the Formal: what each of them wants.
+JUDGE_WANTS = (
+    "A conga line! On Glorbia we conga to greet the dawn. Show me an Earth "
+    "conga!",
+    "Earth snacks! I have heard of your Cosmo Cake. Bring me food from "
+    "your planet.",
+    "A dance from your world! The famous one. The... 'Robot'?",
+)
+# Senior superlatives, for the yearbook: (what you did, how much counts,
+# what it says).
+SUPERLATIVES = (
+    ("zaps", 3, "Most Likely To Have Changed Everyone in Town (Twice)"),
+    ("self_zaps", 2, "Most Likely To Answer to Either Name"),
+    ("bonks", 10, "Most Likely To Bonk First and Ask Questions Later"),
+    ("truant", 2, "Most Likely To Be Somewhere Else"),
+    ("class", 4, "Most Likely To Actually Graduate"),
+    ("detention", 1, "Most Likely To Know the Janitor by Name"),
+    ("outings", 3, "Cutest Couple"),
+    ("chores", 3, "Most Likely To Take Out the Trash Without Being Asked"),
+    ("research", 3, "Most Likely To Have Overdue Library Books"),
+    ("errands", 3, "Most Helpful"),
+    ("cats", 2, "Most Likely To Be Followed Home by a Space Hamster"),
+    ("freakouts", 3, "Most Likely To Scream at a Rubber Monster"),
+    ("bonked_out", 2, "Most Likely To Wake Up in the Nurse's Office"),
+    ("grounded", 1, "Most Likely To Climb Out a Window"),
+    ("unreformed", 1, "Most Likely To Undo a Good Deed"),
+)
+CLIFFHANGERS = (
+    "Somewhere on Snorr, a very grey committee votes, unanimously and "
+    "without enthusiasm, to try again next year.",
+    "And deep under the drive-in, one last monster-movie reel is quietly "
+    "rewinding itself...",
+    "P.S. The Galactic judges left a card: NEXT YEAR, THE INTERGALACTIC "
+    "PROM. YOUR PLANET. BE READY.",
+)
+
+# The former bully: the people she says sorry to, a day at a time.
+AMENDS = (
+    "I went round to {brainkid_full}'s house and said sorry for the swirly "
+    "in seventh grade. We both cried. Their mom made lemonade.",
+    "I paid back everybody's lunch money. With interest. I did the interest "
+    "wrong. Everybody got a LOT.",
+    "I said sorry to {janitor_full} for the thing with the toilet paper. He "
+    "said it was the most creative mess he'd ever cleaned. Then I helped "
+    "him mop.",
+    "I wrote apology cards to the whole JV team. With glitter. They'll "
+    "never get it out. That part I'm not sorry about.",
+)
+
+# Your little brother or sister's own big week: the eighth-grade Spring
+# Social on Friday.  Beats come at breakfast, on or after these days.
+SIB_BEAT_DAYS = (1, 2, 4, 5)
+SIB_CRUSHES = ("Becky Tran", "Kevin Ortiz", "Wendy Park", "Marcus Bell",
+               "Tiffany Shore", "Danny Okafor")
+SIB_ADVICE = (
+    ("corsage", "'Bring a corsage. Trust me.'",
+     "It worked. {crush} said yes, and wore the corsage all night. Your "
+     "little {sib} thinks you're a genius. Don't get used to it."),
+    ("yourself", "'Just be yourself.'",
+     "Being themself went great right up until the Robot. Then it went "
+     "even better."),
+    ("custom", "'Tell them it's an Earth custom.'",
+     "{crush} is from Earth, and was very confused, and said yes anyway."),
+    ("mom", "'Ask Mom.'",
+     "Mom's advice was from 1971. It worked anyway. Everyone's a little "
+     "scared of how well it worked."),
+)
+
+
 def make_people(rng):
     people = {}
     for role, (tile, sex, honorific, title, alien) in ROLES.items():
@@ -3589,6 +3789,12 @@ CLUES = {
                "see what happens.",
     "suspect": "You figured something out: {agent_full} lied to you about "
                "Snorr.",
+    "sub": "The grey substitute teacher was taking orders from "
+           "{agent_full}, {agent_title}. Ask them about SNORR.",
+    "greyed": "Somebody greyed the former bully with a Snorrian Boredom "
+              "Ray. She remembers who: {agent_full}, {agent_title}, who said "
+              "'this is for your own good' in a very flat voice. Ask them "
+              "about SNORR.",
     "final": "All four shards are in! Dr. Fizzwick has rebuilt the "
              "Hyperdisco in the gym. Be there Saturday between 8 pm and "
              "midnight, and switch it on (walk into it).",
@@ -5028,6 +5234,7 @@ class Game:
         guard.roam, guard.home = {"sand"}, (12, 26)
         snack = make_person(self.world, "snack", 16, 20)
         area.mobs = list(area.folk) + [fisher, guard, snack]
+        self.place_sweetheart(area)
         self.apply_swaps(area)
         for m in area.mobs:
             self.give_errand(m)
@@ -5054,6 +5261,7 @@ class Game:
             if area.grid[y][x] != "gymfloor":
                 x, y = spots.pop()
             m = Mob("judge", name, x, y)
+            m.judge = n
             m.title = "a Galactic party judge"
             m.greet = random.choice(("This party is... adequate so far.",
                                      "Where is the famous Hyperdisco?",
@@ -5089,6 +5297,17 @@ class Game:
         if spots:
             x, y = spots.pop()
             area.mobs.append(make_person(self.world, "fizzwick", x, y))
+        if spots:
+            x, y = spots.pop()
+            dad = make_person(self.world, "dad", x, y)
+            dad.title = "your dad, chaperoning"
+            dad.greet = random.choice((
+                "I'm not here! Pretend I'm not here! ...Hi!",
+                "Is this what the kids call 'the hustle'?",
+                "Your mother says I'm not allowed to do the Sprinkler. I'm "
+                "going to do the Sprinkler."))
+            dad.roam = {"gymfloor"}
+            area.mobs.append(dad)
 
     def enter(self, area, pos, sound="door"):
         self.area = area
@@ -5272,6 +5491,11 @@ class Game:
             self.say("%s RWP +%d (now %d)." % (why, p["rwp"] - old,
                                               p["rwp"]), "good")
 
+    def tally(self, key, n=1):
+        """Count something you did, for the yearbook."""
+        t = self.p.setdefault("tally", {})
+        t[key] = t.get(key, 0) + n
+
     def gain_tp(self, n, why):
         self.p["tp"] += n
         self.p["tp_total"] += n
@@ -5358,12 +5582,14 @@ class Game:
             if not self.ok("Luck", diff=3, label="Luck, not getting "
                            "caught cutting class"):
                 self.flags.add("truant:%d" % day)
+                self.tally("truant")
                 self.say("The truant officer spots you. The school calls "
                          "your folks.", "bad")
                 self.lose_rwp(2, "Cutting class!")
         if t.hour == 6 and "morning:%d" % day not in self.flags:
             self.flags.add("morning:%d" % day)
             self.morning()
+            self.grey_her()
 
     def morning(self):
         """A new day: your folks wake up feeling the way they feel."""
@@ -5372,6 +5598,8 @@ class Game:
             if not p["grounded"]:
                 self.say("Your folks have talked it over: you're GROUNDED. "
                          "(RWP below zero. Chores will help.)", "bad")
+            if not p["grounded"]:
+                self.tally("grounded")
             p["grounded"] = True
         elif p["grounded"]:
             p["grounded"] = False
@@ -5427,8 +5655,10 @@ class Game:
         if self.overlay:
             if self.overlay in ("won", "doom") and k in ("n", "N"):
                 self.new_game()
-            elif self.overlay not in ("won", "doom") or k in ("Escape",
-                                                              "Return"):
+            elif self.overlay == "won" and k == "Escape":
+                self.action_menu()
+            elif self.overlay not in ("won", "doom") or k in (
+                    "Escape", "Return", "space", "KP_Enter"):
                 self.close_overlay()
             return
         if self.aim:
@@ -5472,6 +5702,13 @@ class Game:
             self.ask_new_game()
 
     def close_overlay(self):
+        pages = getattr(self, "won_pages", None)
+        if self.overlay == "won" and pages and \
+                self.won_page < len(pages) - 1:
+            self.won_page += 1
+            self.overlay_text = pages[self.won_page]
+            self.render()
+            return
         if self.overlay in ("won", "doom"):
             self.action_menu()
             return
@@ -6068,6 +6305,7 @@ class Game:
             "They run off, smoking slightly, muttering about your "
             "parents."), "good")
         self.sound.play("kill")
+        self.tally("bonks")
         if getattr(mob, "shard", None):
             a.items[(mob.x, mob.y)] = "shard"
             self.say("Something sparkly falls out: a Disco Shard!", "gold")
@@ -6190,6 +6428,7 @@ class Game:
         a = self.area
         p["out"] = 1 + max(0, -p["bonk"])
         p["fainted"] = False
+        self.tally("bonked_out")
         p["held"] = 0
         p["flying"] = False
         self.walking = None
@@ -6308,6 +6547,7 @@ class Game:
     def freak_out(self):
         p = self.p
         kind = random.choice(("scream", "run", "faint", "giggle"))
+        self.tally("freakouts")
         self.sound.play("horror")
         if kind == "scream":
             p["held"] = 1
@@ -6856,6 +7096,7 @@ class Game:
     def boy_girl(self):
         p = self.p
         p["swapped"] = not p["swapped"]
+        self.tally("self_zaps")
         self.sound.play("spell")
         self.say("ZORP! You're %s now. Your clothes %s." % (
             "a guy" if (p["sex"] == "M") != p["swapped"] else "a girl",
@@ -6890,6 +7131,7 @@ class Game:
                          "lady", "gentleman")), mob.name.replace(
                              "the ", "")), "mad")
         else:
+            self.tally("zaps")
             key = "swapped:" + (mob.role or mob.name)
             if key in self.flags:
                 self.flags.discard(key)
@@ -6950,6 +7192,9 @@ class Game:
         self.say("ZORP! The bully goes pink, and sparkly, and... cute? "
                  "%s blinks big eyes at you, then bursts into happy "
                  "tears." % mob.name, "mad")
+        if not self.p.get("reformed") and "unreformed" not in self.flags:
+            self.p["reformed"] = {"name": mob.name, "day": self.day_no(),
+                                  "amends": 0, "grey": False}
         if "reformed_bully" not in self.flags:
             self.flags.add("reformed_bully")
             back = min(10, max(3, self.p.get("stolen", 0)))
@@ -6988,6 +7233,114 @@ class Game:
                     "asked me. I mean, I used to give people wedgies, so.",
         }
 
+    def is_sweetheart(self, mob):
+        """Whether this is THE former bully, the one with a story."""
+        sw = self.p.get("reformed")
+        return bool(sw) and sw["name"] == mob.name
+
+    def sweet_amends(self, mob, asked=False):
+        """She's been going round saying sorry, a person a day."""
+        sw = self.p["reformed"]
+        day = self.day_no()
+        key = "amends:%d" % day
+        if day <= sw["day"] or key in self.flags or sw["amends"] >= len(
+                AMENDS):
+            if asked:
+                self.npc_say(mob, "I'm working my way down the list. It's a "
+                             "long list. I was a LOT.")
+            return
+        self.flags.add(key)
+        self.npc_say(mob, fill(AMENDS[sw["amends"]], self.world))
+        sw["amends"] += 1
+        if sw["amends"] == len(AMENDS):
+            self.gain_tp(1, "for a whole list of sorries (hers, but you "
+                         "started it)")
+
+    def sweet_cookies(self, mob):
+        key = "cookies:%d" % self.day_no()
+        if key in self.flags:
+            self.npc_say(mob, "That was today's batch! Tomorrow's are "
+                         "oatmeal. Don't tell anyone, they'll riot.")
+            return
+        self.flags.add(key)
+        self.p["items"]["cookies"] = self.p["items"].get("cookies", 0) + 1
+        self.npc_say(mob, "Here! A whole tin. Give them to someone who needs "
+                     "a smile. Or eat them. I'm not your mom.")
+        self.say("You get a tin of cookies.", "gold")
+
+    def grey_her(self):
+        """Snorr can't stand a sweetheart: one night, the Boredom Ray."""
+        sw = self.p.get("reformed")
+        day = self.day_no()
+        if not sw or sw.get("grey") or "greyed" in self.flags or \
+                "agent_bonked" in self.flags or day < sw["day"] + 2 or \
+                day > 4:
+            return
+        sw["grey"] = True
+        self.flags.add("greyed")
+        self.say("Word at school: %s, the former bully, has gone grey and "
+                 "quiet overnight. Grey like a Snorrian. (Find her, and "
+                 "CHEER her UP.)" % sw["name"], "bad")
+        for a in [self.cache.get(("city",))]:
+            for m in (a.mobs if a else []):
+                if m.name == sw["name"]:
+                    self.grey_mob(m)
+
+    def grey_mob(self, m):
+        m.title = "a former school bully, gone grey"
+        m.greet = random.choice((
+            "Fun is... inefficient.", "Cookies are a waste of flour.",
+            "I have stopped smiling. It saves energy."))
+
+    def cheer_up(self, mob):
+        p = self.p
+        sw = p["reformed"]
+        bonus = 0
+        for snack in ("cookies", "cosmo cake", "ice cream"):
+            if p["items"].get(snack):
+                p["items"][snack] -= 1
+                if not p["items"][snack]:
+                    del p["items"][snack]
+                bonus = 2
+                self.say("You offer her %s." % ITEMS[snack][0].split(":")[0],
+                         "info")
+                break
+        stat = "Cool" if self.stat("Cool") >= self.stat("Looks") else "Looks"
+        if not self.ok(stat, "party" if stat == "Cool" else "charm", diff=4,
+                       bonus=bonus, label="cheering her up"):
+            self.npc_say(mob, "That is a joke. I recognise the shape of it. "
+                         "It does nothing for me.")
+            return
+        sw["grey"] = False
+        self.make_sweetie(mob, mob.name)
+        self.sound.play("level")
+        self.say("She snorts. Then giggles. Then laughs so hard she has to "
+                 "sit down, and the colour comes flooding back: pink, and "
+                 "sparkly, and her.", "good")
+        self.npc_say(mob, "Oh my GOSH. Somebody ZAPPED me. A grey ray. They "
+                     "said 'this is for your own good,' all flat. I know "
+                     "who it was!")
+        self.learn("greyed")
+        self.gain_tp(1, "for un-greying a sweetheart")
+
+    def place_sweetheart(self, area):
+        """She lives somewhere, now: by the boardwalk, most days."""
+        sw = getattr(self, "p", None) and self.p.get("reformed")
+        if not sw or any(m.name == sw["name"] for m in area.mobs):
+            return
+        rng = random.Random("%s:sweet" % self.world["seed"])
+        spots = [(x, y) for y in range(area.h) for x in range(area.w)
+                 if area.grid[y][x] in ("boardwalk", "street")
+                 and not area.mob_at(x, y) and 6 <= y <= 54]
+        if not spots:
+            return
+        x, y = rng.choice(spots)
+        m = make_monster("bully", x, y)
+        self.make_sweetie(m, sw["name"])
+        if sw.get("grey"):
+            self.grey_mob(m)
+        area.mobs.append(m)
+
     def unreform_bully(self, mob):
         """Zapped back: and he remembers."""
         mob.plain_name = mob.name
@@ -7006,6 +7359,16 @@ class Game:
             self.p["date"] = self.p["sweetie"] = None
             self.say("He is NOT going to the Formal with you. He says so, "
                      "loudly, while chasing you.", "bad")
+        sw = self.p.get("reformed")
+        if sw and sw["name"] == getattr(mob, "plain_name", None):
+            self.p["reformed"] = None
+            self.flags.add("unreformed")
+            self.tally("unreformed")
+            self.p["tp"] = max(0, self.p["tp"] - 2)
+            self.say("You've undone the nicest thing that happened all week. "
+                     "(-2 Teener Points.) Somewhere, a tin of cookies goes "
+                     "uneaten.", "bad")
+            self.lose_rwp(1, "Word gets round what you did.")
 
     def likes_change(self, mob):
         """Some people like what the gun did. Some really don't."""
@@ -7875,6 +8238,7 @@ class Game:
             self.render()
             return
         self.pass_time(60)
+        self.tally("research")
         self.flags.add("research:" + topic)
         self.say("An hour later, you find it:", "info")
         self.say(fill(text, self.world), "talk")
@@ -7927,7 +8291,125 @@ class Game:
                                  "The radio's playing the Formal song "
                                  "again."))) if hours >= 5 else ""),
             "good")
+        if hours >= 5:
+            self.breakfast()
         self.render()
+
+    def breakfast(self):
+        """Breakfast at home: your folks, in the mood your RWP left them
+        in, their views on your week, and your little brother or sister's
+        own big week."""
+        p = self.p
+        w = self.world
+        key = "breakfast:%d" % self.day_no()
+        if key in self.flags or not self.at_home():
+            return
+        self.flags.add(key)
+        sib = w["people"]["sibling"]["first"]
+        rwp = p["rwp"]
+        if p["grounded"]:
+            line = ("Breakfast is very quiet. Your folks pass the toast "
+                    "without looking at you. %s is enjoying this "
+                    "enormously." % sib)
+        elif rwp <= 1:
+            line = ("Mom slides you a bowl of cold cereal. Dad reads the "
+                    "paper very loudly.")
+        elif rwp <= 3:
+            line = ("Toast, juice, and your dad's opinions about the "
+                    "traffic on the coast highway.")
+        else:
+            line = ("Pancakes! Mom's made them in the shape of your "
+                    "initials. Dad gives you a thumbs-up over the paper.")
+        self.say(line, "good" if rwp > 3 else "info")
+        self.folks_react()
+        self.sib_beat()
+
+    def folks_react(self):
+        """Your folks, on your date, and on the new you."""
+        p = self.p
+        f = self.flags
+        d = p.get("date")
+        if d and "folks_date" not in f:
+            f.add("folks_date")
+            first = self.date_name(True)
+            self.say("Mom: 'So! Who's this %s I keep hearing about?'" % first,
+                     "talk")
+            self.say({
+                "sweetie": "Dad: 'The one who took your LUNCH MONEY?' Mom: "
+                           "'People change, dear. Look at your father.'",
+                "exchangekid": "Dad: 'From another planet? Well. As long as "
+                               "they have you home by one.'",
+                "rebelkid": "Dad: 'Leather jacket, huh? I had a leather "
+                            "jacket.' Mom: 'You had a vinyl jacket.'",
+                "jockkid": "Dad: 'The QUARTERBACK? Ask them about the "
+                           "Bulldogs game. No, don't. Yes, do.'",
+                "brainkid": "Mom: 'The class brain! Maybe some of it will "
+                            "rub off.' Dad: 'What's that supposed to mean?'",
+            }.get(d, "Dad: 'Do I need to have a talk with their "
+                     "parents?' Mom: 'You do not.'"), "talk")
+        if p["swapped"] and "folks_swapped" not in f:
+            f.add("folks_swapped")
+            self.say("Dad looks at you. Then at Mom. Then back at you. "
+                     "'Pass the syrup... kiddo.' Mom: 'Is this one of those "
+                     "phases, honey? It's fine if it is.'", "mad")
+        elif not p["swapped"] and "folks_swapped" in f and \
+                "folks_unswapped" not in f:
+            f.add("folks_unswapped")
+            self.say("Mom: 'Oh! You're back. I'd only just got used to the "
+                     "other you.'", "talk")
+
+    def sib_crush(self):
+        return random.Random("%s:crush" % self.world["seed"]).choice(
+            SIB_CRUSHES)
+
+    def sib_beat(self):
+        """Your little brother or sister, and the eighth-grade Spring
+        Social on Friday."""
+        p = self.p
+        w = self.world
+        n = p.get("sib_beat", 0)
+        if n >= len(SIB_BEAT_DAYS) or self.day_no() < SIB_BEAT_DAYS[n]:
+            return
+        p["sib_beat"] = n + 1
+        sib = w["people"]["sibling"]["first"]
+        crush = self.sib_crush()
+        if n == 0:
+            self.say("%s won't stop talking about somebody called %s in the "
+                     "eighth grade. There's an eighth-grade Spring Social on "
+                     "Friday. You are NOT to mention it." % (sib, crush),
+                     "info")
+        elif n == 1:
+            def advise(k, text):
+                p["sib_advice"] = k
+                self.say("You tell %s: %s %s nods very seriously." % (
+                    sib, text, sib), "info")
+            self.open_menu("%s, very quietly, over the cereal: 'How do you "
+                           "ask somebody to a dance?'" % sib,
+                           [(text, lambda k=k, t=text: advise(k, t))
+                            for k, text, _ in SIB_ADVICE],
+                           lambda: None)
+        elif n == 2:
+            self.say("Big night tonight: %s's social. They've combed their "
+                     "hair four times, and borrowed your cologne. All of "
+                     "it." % sib, "info")
+        else:
+            self.say("%s comes down to breakfast floating. %s" % (
+                sib, self.sib_outcome(story=True)), "good")
+
+    def sib_outcome(self, story=False):
+        """How the social went, by your advice."""
+        p = self.p
+        if p.get("sib_beat", 0) < 2 and not story:
+            return None
+        sib = self.world["people"]["sibling"]["first"]
+        k = p.get("sib_advice")
+        text = next((o for kk, _, o in SIB_ADVICE if kk == k),
+                    "Nobody asked you, so %s went to the social and danced "
+                    "with a chair. They say it was fine." % sib)
+        text = text.replace("{crush}", self.sib_crush()).replace(
+            "{sib}", sib)
+        return text if story else "Your little %s %s: %s" % (
+            fill("{sib}", self.world), sib, text)
 
     def bed_spot(self, area):
         for y in range(area.h):
@@ -7945,25 +8427,100 @@ class Game:
             ("Sit through class", self.go_to_class),
             ("Not now (keep cutting it close)", lambda: None)])
 
+    def sub_day(self):
+        """The day a grey substitute takes Galactic Studies."""
+        return self.day_no() == random.Random("%s:sub" % self.world[
+            "seed"]).randint(1, 4)
+
     def go_to_class(self):
+        """A class, and one thing you do in it."""
+        sub = self.sub_day()
+        subject = "Galactic Studies, with a substitute" if sub else \
+            random.choice(("algebra", "history", "chemistry", "English",
+                           "Galactic Studies"))
+        if sub:
+            self.say("Galactic Studies has a substitute today: Mx. Grey, in "
+                     "a grey suit and a grey tie, with a grey face, who "
+                     "lectures on the importance of sitting still.", "mad")
+        date = self.date_name(True) if self.p.get("date") else None
+        items = [("Answer a question (Smarts)",
+                  lambda: self.class_done("answer")),
+                 ("Pass a note to %s (Cool)" % (date or "your crush"),
+                  lambda: self.class_done("note")),
+                 ("Doodle Snorr theories in the margins",
+                  lambda: self.class_done("doodle")),
+                 ("Take a nap", lambda: self.class_done("nap"))]
+        if sub:
+            items.insert(0, ("Watch the substitute (Smarts)",
+                             lambda: self.class_done("sub")))
+        self.open_menu("You sit through %s. What do you do?" % subject,
+                       items, lambda: self.class_done("nap"))
+
+    def class_done(self, what):
         t = self.now()
         mins = (SCHOOL_HOURS[1] - t.hour) * 60 - t.minute
-        self.say("You sit through %s. %s" % (
-            random.choice(("algebra", "history", "chemistry", "English",
-                           "Galactic Studies")),
-            random.choice(("The teacher drones. You doodle.",
-                           "A note gets passed to you. It just says 'HI'.",
-                           "Somebody's antennae block the blackboard.",
-                           "There's a pop quiz. You pass. Probably."))),
-            "info")
+        p = self.p
+        day = self.day_no()
+        caught = False
+        rumour = 4
+        if what == "answer":
+            if self.ok("Smarts", "figure", diff=4, label="the answer"):
+                self.say("'Correct!' Half the class turns round to look at "
+                         "you.", "good")
+                if "answered" not in self.flags:
+                    self.flags.add("answered")
+                    self.gain_tp(1, "for knowing a thing")
+                self.gain_rwp(1, "A gold star!")
+            else:
+                self.say("You answer with total confidence. You are totally "
+                         "wrong.", "mad")
+        elif what == "note":
+            if self.ok("Cool", "date", diff=3, label="passing it"):
+                if p.get("date"):
+                    p["spark"] = min(10, p.get("spark", 0) + 1)
+                    self.say("The note comes back from %s with a heart on "
+                             "it, and 'SAT!!!' (Spark +1: %d/10)" % (
+                                 self.date_name(True), p["spark"]), "good")
+                else:
+                    role = random.choice(DATE_ROLES)
+                    p["note_to"] = role
+                    self.say("The note comes back from %s: 'Who IS this?' "
+                             "and a smiley face. (Ask them to the FORMAL.)" %
+                             self.world["people"][role]["name"], "good")
+            else:
+                self.say("The teacher intercepts the note and reads it "
+                         "aloud. To everybody.", "bad")
+                caught = True
+        elif what == "doodle":
+            self.say("You fill the margins with grey men, saucers, and the "
+                     "word SNORR in bubble letters.", "info")
+            rumour = 2
+        elif what == "sub":
+            if self.ok("Smarts", "figure", diff=5, label="watching"):
+                self.say("Mx. Grey takes a grey phone call in the hall. You "
+                         "catch: 'Yes, %s. The children are very nearly "
+                         "bored.'" % self.world["people"][self.world[
+                             "agent"]]["title"], "good")
+                self.learn("sub")
+            else:
+                self.say("Mx. Grey stares at you until you stop watching. "
+                         "It takes forty minutes.", "mad")
+        else:
+            if self.ok("Luck", diff=3, label="Luck, not getting caught"):
+                self.say("You nap. You dream about the Formal. It's lovely, "
+                         "and also on the moon.", "info")
+                p["bonk"] = min(self.max_bonk(), p["bonk"] + 1)
+            else:
+                self.say("You snore. Loudly. During the quiet bit.", "bad")
+                caught = True
         self.pass_time(mins, quiet=True)
         if self.overlay:
             return
-        day = self.day_no()
+        self.tally("class")
         if "class:%d" % day not in self.flags:
             self.flags.add("class:%d" % day)
             self.gain_rwp(1, "A good report from school!")
-            if self.ok("Smarts", "figure", diff=3, quiet=True):
+            if self.ok("Smarts", "figure", diff=rumour, quiet=True):
                 live = [lid for lid in self.world["leads"]
                         if "known:" + lid not in self.flags]
                 if live:
@@ -7971,8 +8528,36 @@ class Game:
                     self.say("In the hall after the bell, you overhear: "
                              "'%s'" % text, "talk")
                     self.hear(text)
+        if caught:
+            self.detention()
+            return
         self.say("RRRRING! It's %s. School's out." % self.date_text(),
                  "quest")
+        self.render()
+
+    def detention(self):
+        """An hour after school with the janitor, who knows things."""
+        self.say("RRRRING! School's out, but not for you: DETENTION.",
+                 "bad")
+        self.tally("detention")
+        self.lose_rwp(1, "Detention!")
+        self.pass_time(60, quiet=True)
+        if self.overlay:
+            return
+        w = self.world
+        live = [lid for lid in w["leads"] if "known:" + lid not in self.flags]
+        if "boiler" in live:
+            live = ["boiler"]
+        self.say("%s mops round your desk. 'You know,' he says, not looking "
+                 "up, 'a person hears things, mopping.'" % w["people"][
+                     "janitor"]["name"], "info")
+        if live:
+            text = fill(RUMOURS[live[0]], w)
+            self.say("%s: '%s'" % (w["people"]["janitor"]["name"], text),
+                     "talk")
+            self.hear(text)
+        self.say("Detention's over. It's %s." % self.date_text(), "info")
+        self.render()
         self.render()
 
     def window_menu(self):
@@ -8025,6 +8610,7 @@ class Game:
                      "more. You won't.", "info")
             return
         self.flags.add(key)
+        self.tally("chores")
         self.pass_time(30, quiet=True)
         self.say("You take out the trash, do the dishes, and feed the "
                  "goldfish (a normal one).", "info")
@@ -8125,6 +8711,9 @@ class Game:
                 "Hi, DATE! Eee! I've never had a date before!",
                 "I practised dancing in the mirror. I knocked over a lamp.",
                 "I'm baking cookies for Saturday. Like, a LOT of cookies."))
+        elif getattr(mob, "reformed", False) and self.is_sweetheart(mob) \
+                and self.p["reformed"].get("grey"):
+            greet = mob.greet
         elif getattr(mob, "reformed", False) and "met:" + mob.name in \
                 self.flags:
             greet = random.choice(("Hi, friend!", "Want a cookie? I made "
@@ -8141,8 +8730,11 @@ class Game:
                                    "I bought shoes. For Saturday."))
         self.npc_say(mob, "We're closed. Come back tomorrow." if
                      self.closed(mob) else greet)
+        if getattr(mob, "reformed", False) and self.is_sweetheart(mob) and \
+                not self.p["reformed"].get("grey"):
+            self.sweet_amends(mob)
         for e in self.world["errands"]:
-            if e.get("to") == mob.role:
+            if e.get("to") and e.get("to") == mob.role:
                 self.deliver(mob, e)
         if e is not None and self.errand_ready(e):
             self.finish_errand(mob, e)
@@ -8190,6 +8782,13 @@ class Game:
         if (mob.role in DATE_ROLES or getattr(mob, "reformed", False)) and \
                 "FORMAL" not in words:
             words.append("FORMAL")
+        if self.is_date(mob) and self.turn < FORMAL:
+            words.append("HANG OUT")
+        if getattr(mob, "judge", None) is not None:
+            words.append("WANT")
+        if getattr(mob, "reformed", False) and self.is_sweetheart(mob):
+            words += ["CHEER UP"] if self.p["reformed"].get("grey") else \
+                ["COOKIES", "SORRY"]
         for w in getattr(self, "heard", []):
             if w not in words and w != "BYE":
                 words.append(w)
@@ -8259,6 +8858,24 @@ class Game:
         if mob.role in ("mom", "dad") and word[:4] in ("chor", "tras"):
             self.chores()
             return
+        if word[:4] in ("hang", "out", "outi") and self.is_date(mob):
+            self.outing_menu(mob)
+            return
+        if getattr(mob, "judge", None) is not None and word[:4] in (
+                "want", "requ", "judg", "plea", "help"):
+            self.judge_request(mob)
+            return
+        if getattr(mob, "reformed", False) and self.is_sweetheart(mob):
+            if word[:4] in ("chee", "hug", "joke", "laug", "smil") and \
+                    self.p["reformed"].get("grey"):
+                self.cheer_up(mob)
+                return
+            if word[:4] in ("cook", "bake"):
+                self.sweet_cookies(mob)
+                return
+            if word[:4] in ("sorr", "amen", "apol"):
+                self.sweet_amends(mob, asked=True)
+                return
         if word[:4] in ("form", "date", "prom", "danc") and \
                 (mob.role in DATE_ROLES or getattr(mob, "reformed", False)):
             self.ask_out(mob)
@@ -8372,6 +8989,9 @@ class Game:
             bonus += 1
         if "Incredible Cute" in p["powers"]:
             bonus += 2
+        if p.get("note_to") == role:
+            bonus += 1
+            notes.append("the note from class")
         if mob.alien and "Fake Out" in p["powers"]:
             bonus += 3
             notes.append("telling them it's an Earth custom")
@@ -8448,6 +9068,363 @@ class Game:
         self.gain_tp(1, "for getting a date")
         self.gain_tp(1, "for asking the former bully, of all people")
 
+    def date_role(self):
+        """Your date's key in DATE_INFO, or None."""
+        d = self.p.get("date")
+        return d if d in DATE_INFO else None
+
+    def date_sex(self):
+        d = self.p.get("date")
+        if d == "sweetie":
+            return "F"
+        return self.world["people"][d]["sex"] if d else "M"
+
+    def outing_menu(self, mob):
+        """HANG OUT: somewhere to go, once a day, before Saturday."""
+        key = "outing:%d" % self.day_no()
+        if key in self.flags:
+            self.npc_say(mob, "We already hung out today! Tomorrow?")
+            return
+        info = DATE_INFO[self.date_role()]
+        if "toldfav" not in self.flags:
+            self.flags.add("toldfav")
+            fav = OUTINGS[info["likes"]][0]
+            self.npc_say(mob, "Ooh, where? I LOVE %s." % (fav[0].lower() +
+                                                          fav[1:]))
+        h = self.now().hour
+        items = []
+        for k, (label, price, _, _, (a, b)) in OUTINGS.items():
+            if not a <= h < b:
+                continue
+            text = label + (", $%d" % price if price else "") + (
+                " (their favourite)" if k == info["likes"] else "")
+            items.append((text, lambda k=k: self.outing(mob, k)))
+        if not items:
+            self.npc_say(mob, "Everything's closed! Ask me in the morning.")
+            return
+        items.append(("Not now", lambda: None))
+        self.end_talk()
+        self.open_menu("Where do you go with %s?" % self.date_name(True),
+                       items)
+
+    def outing(self, mob, k):
+        p = self.p
+        label, price, good, bad, _ = OUTINGS[k]
+        if p["cash"] < price:
+            self.say("You can't afford that. ($%d; you have $%d.)" % (
+                price, p["cash"]), "bad")
+            return
+        p["cash"] -= price
+        self.flags.add("outing:%d" % self.day_no())
+        info = DATE_INFO[self.date_role()]
+        n = p.get("outings", 0)
+        p["outings"] = n + 1
+        self.tally("outings")
+        self.pass_time(90, quiet=True)
+        if self.overlay:
+            return
+        fav = k == info["likes"]
+        first = self.date_name(True)
+        self.say("%s with %s." % (label, first), "info")
+        if self.ok("Cool", "date", diff=3, bonus=2 if fav else 0,
+                   label="the date"):
+            self.say(good, "good")
+            gain = 2 if fav else 1
+            p["spark"] = min(10, p.get("spark", 0) + gain)
+            self.say("(Spark +%d: %d/10)" % (gain, p["spark"]), "good")
+        else:
+            self.say(bad, "mad")
+            self.say("(It's still kind of great.)", "info")
+        self.npc_say(mob, fill(info["joke"][n % 3], self.world))
+        if n == 0:
+            self.gain_tp(1, "for a real date")
+        self.jealous(mob)
+        self.render()
+
+    def jealous(self, mob):
+        """Your number one fan does not like your date."""
+        fan = self.p.get("admirer")
+        if not fan or "jealous:%d" % self.day_no() in self.flags:
+            return
+        self.flags.add("jealous:%d" % self.day_no())
+        self.say(random.choice((
+            "%s is watching you both from behind a potted plant, glaring.",
+            "%s walks past three times, very slowly, sighing loudly.",
+            "A note arrives, from %s: 'I SAW THAT.'")) % fan, "mad")
+        self.npc_say(mob, random.choice((
+            "Who IS that? They keep staring.",
+            "Is that your... fan? Your fan is a lot.",
+            "I think someone's jealous. I think it's that one.")))
+
+    # ── The Formal, as a night ──
+
+    def formal_arrival(self):
+        """Your date, by the punch bowl, and your dad, chaperoning."""
+        p = self.p
+        if "formal_met" in self.flags:
+            return
+        self.flags.add("formal_met")
+        role = self.date_role()
+        if role:
+            info = DATE_INFO[role]
+            outfit = fill(info["formal"][self.date_sex() == "F"], self.world)
+            first = self.date_name(True)
+            self.say("%s is waiting by the punch bowl in %s." % (first,
+                                                                 outfit),
+                     "quest")
+            self.say("%s: %s" % (first, fill(info["arrive"], self.world)),
+                     "talk")
+            self.say("%s: %s" % (first, random.choice((
+                "And look at YOU. You clean up nice.",
+                "Is that a real tux? Is that a real YOU?",
+                "Okay. Wow. Okay.")) if p["items"].get("formalwear") else
+                random.choice((
+                    "You came like THAT? ...Okay. I can work with this.",
+                    "Bold choice. Wearing that. To a formal.")),),
+                "talk")
+        self.say("Oh no. Your dad is here, as a chaperone, in his good suit "
+                 "and his 'Kiss the Cook' apron. He waves at you. With both "
+                 "arms.", "mad")
+
+    def judge_request(self, mob):
+        n = mob.judge
+        p = self.p
+        if "judge:%d" % n in self.flags:
+            self.npc_say(mob, random.choice((
+                "I have written you down as EXCELLENT.",
+                "Very satisfactory. I am using my happy clipboard.")))
+            return
+        self.npc_say(mob, JUDGE_WANTS[n])
+        if n == 1:
+            food = next((f for f in ("cookies", "cosmo cake", "burger",
+                                     "ice cream", "soda")
+                         if p["items"].get(f)), None)
+            if not food:
+                self.npc_say(mob, "Bring me something to eat. I will wait. "
+                             "I am patient. I am a crab.")
+                return
+            p["items"][food] -= 1
+            if not p["items"][food]:
+                del p["items"][food]
+            self.flags.add("judge:1")
+            self.say("You give Judge Vexa %s." % ITEMS[food][0].split(
+                ":")[0], "info")
+            self.npc_say(mob, "Baked with love, by a former bully? This is "
+                         "the most Earth thing I have ever eaten. I weep "
+                         "from all eyes." if food == "cookies" else
+                         "Delicious! Your planet is a FOOD planet!")
+            self.gain_tp(1, "for feeding a Galactic judge")
+            return
+        self.pass_time(10, quiet=True)
+        stat = "Cool" if n == 0 else "Bod"
+        if self.ok(stat, "party", diff=4, label="the request"):
+            self.flags.add("judge:%d" % n)
+            self.say(("You start a conga line. Coach joins. The PRINCIPAL "
+                      "joins. Judge Glorp joins, with all six legs.",
+                      "You do the Robot. Judge Mmmf, who is a robot, is "
+                      "deeply moved.")[n // 2], "good")
+            self.gain_tp(1, "for a happy Galactic judge")
+        else:
+            self.say(("Your conga line is you, then Judge Glorp, then "
+                      "nobody. Judge Glorp writes something down.",
+                      "You do the Robot. Judge Mmmf, who is a robot, asks "
+                      "if you are malfunctioning.")[n // 2], "mad")
+            self.npc_say(mob, "Try again. I have until midnight.")
+
+    def formal_night(self, beat=0):
+        """After the Hyperdisco: a slow dance, a rival, your dad, and the
+        judges."""
+        p = self.p
+        first = self.date_name(True) if p.get("date") else None
+        beats = (["slow", "rival"] if first else []) + ["dad", "end"]
+        if beat >= len(beats):
+            return
+        b = beats[beat]
+
+        def on():
+            self.render()
+            self.root.after(300, lambda: self.formal_night(beat + 1))
+        if b == "slow":
+            def slow():
+                bonus = p.get("spark", 0) // 3 + bool(
+                    p["items"].get("formalwear"))
+                stat = "Cool" if self.stat("Cool") >= self.stat("Looks") \
+                    else "Looks"
+                if self.ok(stat, "date" if stat == "Cool" else "charm",
+                           diff=4, bonus=bonus, label="the slow dance"):
+                    self.flags.add("slowdance")
+                    self.say("The Hyperdisco throws stars across the floor, "
+                             "and you and %s turn slowly under them, and "
+                             "for one whole song the Galaxy goes quiet." %
+                             first, "good")
+                else:
+                    self.say("You step on %s's foot. Twice. %s laughs, and "
+                             "it's sort of perfect anyway." % (first, first),
+                             "mad")
+                on()
+
+            def punch():
+                self.say("You get punch. It fizzes. %s dances with the "
+                         "coach. It's fine." % first, "info")
+                on()
+            self.open_menu("The music slows down. %s looks at you." % first,
+                           [("Slow dance with %s" % first, slow),
+                            ("Get some punch", punch)], punch)
+        elif b == "rival":
+            fan = p.get("admirer")
+            if fan:
+                rival = fan
+            else:
+                others = [r for r in DATE_ROLES if r != p.get("date")]
+                rival = self.world["people"][random.Random(
+                    self.world["seed"]).choice(others)]["name"]
+
+            def let():
+                self.flags.add("rival_ok")
+                self.say("You step aside. %s dances one song with %s, then "
+                         "comes straight back. 'That was nice of you. "
+                         "Pity dance, though.'" % (first, rival), "good")
+                on()
+
+            def stand():
+                if self.ok("Cool", "date", diff=4, label="standing your "
+                           "ground"):
+                    self.flags.add("rival_ok")
+                    self.say("'Nope.' %s backs off. %s squeezes your hand." %
+                             (rival, first), "good")
+                else:
+                    self.say("%s cuts in anyway. %s rolls their eyes the "
+                             "whole song, and comes back." % (rival, first),
+                             "mad")
+                on()
+            items = [("Let them cut in", let), ("Stand your ground (Cool)",
+                                                 stand)]
+            if "boy/girl gun" in p["gadgets"]:
+                def zap():
+                    self.flags.add("rival_ok")
+                    self.tally("zaps")
+                    self.say("ZORP! %s is the other one now, looks down, "
+                             "and runs off to find a bathroom." % rival,
+                             "mad")
+                    on()
+                items.append(("Zap them with the Boy/Girl Gun", zap))
+            self.open_menu("%s taps %s on the shoulder: 'Mind if I cut in?'"
+                           % (rival, first), items, let)
+        elif b == "dad":
+            def dance():
+                self.flags.add("dad_dance")
+                if self.ok("Cool", "party", diff=3, label="being a good "
+                           "sport"):
+                    self.say("You do the Sprinkler WITH him. The gym goes "
+                             "wild. Judge Mmmf writes: PARENTAL UNITS, "
+                             "ADORABLE.", "good")
+                    self.gain_rwp(1, "Dancing with your dad!")
+                else:
+                    self.say("You both do the Sprinkler. Badly. It's the "
+                             "best night of your dad's life.", "mad")
+                on()
+
+            def hide():
+                self.say("You hide behind the punch bowl. Your dad does the "
+                         "Sprinkler alone. He's having the time of his "
+                         "life.", "info")
+                on()
+            self.open_menu("The DJ plays the Sprinkler song. Your dad, the "
+                           "chaperone, starts doing the Sprinkler. "
+                           "Everybody looks at you.",
+                           [("Dance with your dad", dance),
+                            ("Pretend you don't know him", hide)], hide)
+        else:
+            met = sum("judge:%d" % n in self.flags for n in range(3))
+            self.say("The judges huddle. They've had %d of their three "
+                     "wishes. They hold up their scorecards..." % met,
+                     "quest")
+            self.save()
+            self.render()
+            self.root.after(1200, self.show_won)
+
+    # ── The yearbook ──
+
+    def yearbook(self):
+        """Pages: the night, the superlatives, and where they are now."""
+        p = self.p
+        w = self.world
+        stars = self.rating()
+        date = p.get("date")
+        night = (
+            "THE HYPERDISCO SPINS!\n\nThe judges confer. They hold up "
+            "their\nscorecards: Earth is officially a FUN PLANET.\n\n"
+            "Party rating: %s\n\n%s, %s %s%s.\n%s%s"
+            "Teener Points earned: %d.\n\n(Return: turn the page.)" % (
+                "*" * stars + "." * (5 - stars), p["name"], "the",
+                p["clique"].lower(),
+                ", who went with %s%s" % (self.date_name(), (
+                    ", a former school bully (now the sweetest kid in "
+                    "Marigold Bay)") if date == "sweetie" else "")
+                if date else ", who went stag",
+                "The Snorrian agent was bonked back to Snorr.\n"
+                if "agent_bonked" in self.flags else "",
+                "Your RWP is %d; your folks are proud of you.\n" % p["rwp"]
+                if p["rwp"] >= 0 else "You're still grounded. Worth it.\n",
+                p["tp_total"]))
+        t = p.get("tally", {})
+        got = [(t.get(k, 0) / n, text) for k, n, text in SUPERLATIVES
+               if t.get(k, 0) >= n]
+        for flag, text in (("agent_bonked", "Most Likely To Save the "
+                            "Planet (Again)"),
+                           ("danced", "Best Dancer"),
+                           ("dad_dance", "Best Sprinkler (Shared with "
+                            "Dad)"),
+                           ("slowdance", "Most Romantic")):
+            if flag in self.flags:
+                got.append((1.0, text))
+        if date == "sweetie":
+            got.append((2.0, "Most Likely To Turn an Enemy into a Date"))
+        if p.get("admirer"):
+            got.append((1.5, "Most Likely To Have a Fan Club (of One)"))
+        got.sort(key=lambda g: -g[0])
+        sup = [text for _, text in got[:4]] or [
+            "Most Likely To Have Been There"]
+        superl = "\n".join(
+            ["MARIGOLD BAY HIGH YEARBOOK, CLASS OF '97", "",
+             "%s, the %s:" % (p["name"], p["clique"].lower()), ""] +
+            ["  * " + x for x in sup] + ["", "(Return: turn the page.)"])
+        later = ["WHERE ARE THEY NOW?", ""]
+        role = self.date_role()
+        if role:
+            spark = p.get("spark", 0)
+            later.append("%s %s%s." % (
+                self.date_name(), fill(DATE_INFO[role]["later"], w),
+                "; still writes to you every week" if spark >= 6 else
+                "; sends a card at Christmas" if spark >= 3 else ""))
+        else:
+            later.append("You went stag, and danced with everyone. Mostly "
+                         "the judges.")
+        sw = p.get("reformed")
+        if sw and date != "sweetie":
+            later.append("%s, the former bully, %s." % (
+                sw["name"], "stayed grey for a while, then got better" if
+                sw.get("grey") else "runs the animal shelter's bake sale, "
+                "and never took another lunch"))
+        if p.get("admirer"):
+            later.append("%s started your fan club. It has one member. It "
+                         "meets daily." % p["admirer"])
+        sib = self.sib_outcome()
+        if sib:
+            later.append(sib)
+        later.append("Dr. Fizzwick is building a bigger Hyperdisco: 'For "
+                     "the Intergalactic Prom. Are you free next spring?'")
+        later.append("%s is back on Snorr, filling in forms about it, in "
+                     "triplicate." % w["people"][w["agent"]]["name"])
+        later.append("")
+        later.append(random.Random(w["seed"]).choice(CLIFFHANGERS))
+        later += ["", "Press N for a new week, or Escape to stay", "at the "
+                  "party a while longer."]
+        wrapped = []
+        for ln in later:
+            wrapped += wrap(ln, 52) or [""]
+        return [night, superl, "\n".join(wrapped)]
+
     def is_date(self, mob):
         if getattr(mob, "reformed", False):
             return self.is_date_name(mob.name)
@@ -8467,7 +9444,8 @@ class Game:
 
     def confront(self, mob):
         """Ask the Snorrian agent about Snorr."""
-        if "dossier" not in self.flags and "suspect" not in self.clues:
+        if "dossier" not in self.flags and not {"suspect", "sub",
+                                                "greyed"} & set(self.clues):
             self.npc_say(mob, "Snorr? Never heard of it. Sounds very dull.")
             if "doubt:snorr" not in self.flags:
                 self.flags.add("doubt:snorr")
@@ -8733,6 +9711,9 @@ class Game:
         if not self.p["items"].get("formalwear"):
             self.say("Everyone's dressed up but you. The judges write "
                      "something down.", "bad")
+        self.formal_arrival()
+        self.say("(The judges each want something. Ask them what they "
+                 "WANT.)", "info")
         if len(self.returned) < 4:
             self.say("The Hyperdisco hangs dark and dented over the dance "
                      "floor. It's missing %d shard%s." % (
@@ -8808,36 +9789,23 @@ class Game:
             self.flags.add("danced")
         self.save()
         self.render()
-        self.root.after(1200, self.show_won)
+        self.root.after(600, self.formal_night)
 
     def rating(self):
+        """One to five stars, from ten things that make a party."""
         p = self.p
-        stars = 1 + ("agent_bonked" in self.flags) + bool(p.get("date")) + \
-            bool(p["items"].get("formalwear")) + ("danced" in self.flags)
-        return stars
+        f = self.flags
+        score = ("agent_bonked" in f) + bool(p.get("date")) + bool(
+            p["items"].get("formalwear")) + ("danced" in f) + (
+            "slowdance" in f) + ("rival_ok" in f) + ("dad_dance" in f) + \
+            sum("judge:%d" % n in f for n in range(3))
+        return 1 + score * 4 // 10
 
     def show_won(self):
-        p = self.p
-        stars = self.rating()
-        date = p.get("date")
+        self.won_pages = self.yearbook()
+        self.won_page = 0
         self.overlay = "won"
-        self.overlay_text = (
-            "THE HYPERDISCO SPINS!\n\nThe judges confer. They hold up "
-            "their\nscorecards: Earth is officially a FUN PLANET.\n\n"
-            "Party rating: %s\n\n%s, %s %s%s.\n%s%s"
-            "Teener Points earned: %d.\n\nPress N for a new week, or "
-            "Escape to stay\nat the party a while longer." % (
-                "*" * stars + "." * (5 - stars), p["name"], "the",
-                p["clique"].lower(),
-                ", who went with %s%s" % (self.date_name(), (
-                    ", a former school bully (now the sweetest kid in "
-                    "Marigold Bay)") if date == "sweetie" else "")
-                if date else ", who went stag",
-                "The Snorrian agent was bonked back to Snorr.\n"
-                if "agent_bonked" in self.flags else "",
-                "Your RWP is %d; your folks are proud of you.\n" % p["rwp"]
-                if p["rwp"] >= 0 else "You're still grounded. Worth it.\n",
-                p["tp_total"]))
+        self.overlay_text = self.won_pages[0]
         self.render()
 
     def doom(self):
@@ -8962,6 +9930,7 @@ class Game:
 
     def finish_errand(self, mob, e):
         self.side[e["id"]]["state"] = "done"
+        self.tally("errands")
         self.npc_say(mob, "%s! You found %s! Here, take this." % (
             e["cat"], "it"))
         self.p["cash"] += e["pay"]
@@ -8986,6 +9955,7 @@ class Game:
                 "Bod", "balance", diff=3, label="grabbing"):
             self.area.mobs.remove(mob)
             self.flags.add("cat:" + e["id"])
+            self.tally("cats")
             self.say("You scoop up %s, who squeaks, and then purrs." %
                      e["cat"], "good")
             self.sound.play("gold")
@@ -9035,8 +10005,13 @@ class Game:
             else:
                 lines.append("  - one somewhere in Marigold Bay")
         if p.get("date"):
-            lines += ["", "Your date to the Formal: %s." %
-                      self.date_name()]
+            lines += ["", "Your date to the Formal: %s. Spark %d/10 (ask "
+                      "them to HANG OUT)." % (self.date_name(),
+                                              p.get("spark", 0))]
+        sw = p.get("reformed")
+        if sw and sw.get("grey"):
+            lines += ["", "%s, the former bully, has gone grey. CHEER her "
+                      "UP." % sw["name"]]
         if self.topics:
             lines += ["", "To look up: " + ", ".join(
                 sorted(t.title() for t in self.topics

@@ -275,9 +275,47 @@ Words in CAPITALS are worth asking about, and worth looking up at the
 library or the video store. Shopkeepers answer BUY.
 
 Ask a classmate to the FORMAL. You roll your Cool or Looks against their
-Cool or Smarts. A corsage, formalwear, a favour you did them, or (for an
-alien) a good Fake Out all help. Don't do too well, or they'll follow you
-everywhere.
+Cool or Smarts. A corsage, formalwear, a favour you did them, a note passed
+in class, or (for an alien) a good Fake Out all help. Don't do too well, or
+they'll follow you everywhere. Zap the school bully with a Boy/Girl Gun and
+he turns into the sweetest kid in town. She'll go to the Formal with you
+too, if you ask.
+
+Once you have a date, ask them to HANG OUT, once a day before Saturday:
+ice cream at Scoops, burgers, the arcade, the drive-in, the boardwalk or
+the library. Each date has a favourite, and a running joke that grows one
+outing at a time. Good outings raise their Spark, which helps with the slow
+dance. Your number one fan, if you have one, is very jealous.
+
+### School, home, and the former bully
+
+- **Class:** sit through class and choose what to do there. You can answer
+  a question, pass a note to your date or your crush, doodle Snorr theories
+  (and overhear more), or nap. Get caught and you have detention with the
+  janitor, who hears things while he mops. One day a grey substitute takes
+  Galactic Studies. Watch them closely.
+- **Home:** breakfast after a night's sleep goes the way your RWP has left
+  your folks: pancakes, or cold cereal and silence. They have opinions
+  about your date, and about the new you if you zapped yourself. Your
+  little brother or sister has an eighth-grade Social on Friday and comes
+  to you for advice, which they take.
+- **The former bully:** she goes round town saying sorry, a person a day
+  (ask her about SORRY), bakes you COOKIES (good for a hungry judge), and is
+  just the kind of cheerfulness Snorr can't stand. If she goes grey, CHEER
+  her UP and she'll tell you who did it. Zap her back, and it costs you.
+
+### The Formal
+
+Your date meets you by the punch bowl, dressed for it, and has views on
+what you're wearing. Your dad is chaperoning. The three Galactic judges
+each WANT something: a conga line, some Earth snacks, the Robot. Once the
+Hyperdisco spins, there's a slow dance, someone who wants to cut in, and
+your dad doing the Sprinkler, which you can join or not. The party rating,
+one to five stars, counts ten things: the agent bonked, a date,
+formalwear, dancing, the slow dance, the rival, your dad, and each judge.
+Then comes the yearbook, a page at a time: the night, your senior
+superlatives (Most Likely To Know the Janitor by Name, and so on, from what
+you did all week), and where everyone is now.
 
 ### Keys
 
