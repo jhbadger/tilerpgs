@@ -154,6 +154,35 @@ Sanity roll.
 At zero Sanity or zero hit points your investigator is lost. A friend takes
 up the case, along with the notes.
 
+### The casebook, the paper and your dreams
+
+- **The casebook** (P, or the Casebook button) has three pages:
+  - a to-do list: Dr. Armitage, each leaf (where it is, that you have it,
+    or that he has it), how many leaves are still unaccounted for, words
+    to look up, the cult's master to confront, a disorder to have treated,
+    a doctor or rest when you need one, the Rite, and your errands;
+  - your particulars;
+  - the suspects: the respectable citizens Armitage can't rule out. Ask
+    them about the LANTERN, and Psychology notes who seems to tell the
+    truth and who lied.
+- **The Arkham Advertiser** comes out every morning at seven. Day by day it
+  tracks the Pale Lantern's work, as far as the paper understands it: a
+  student missing, cattle drained, lights over the island, nightmares in
+  every house. After you've taken a leaf, it reports what you left behind,
+  and it reports any investigator lost.
+- **Dreams:** a full night's sleep brings dreams, for a Sanity roll. Make a
+  POW roll and you remember one, and it points to a hiding place you
+  haven't found, or to the Lantern's master, with a word worth asking
+  about.
+
+### The end
+
+When the door is closed, the ending runs a page at a time: the next
+morning's *Advertiser* (a gas main, it says), the case file with your
+honours (Most Tomes Read, Shot First, Kept Their Wits, Lost No One), a
+memorial for any investigators lost along the way, and what became of
+Arkham. If the door opens, you get the night, and the memorial.
+
 ### Talking
 
 Walk into a person, or into a counter with someone behind it, then choose or
@@ -172,14 +201,14 @@ the library. Shopkeepers answer BUY.
 | C | Cast a spell |
 | U | Use or ready an item |
 | I | Investigator sheet |
-| P | Your phone: the to-do list |
+| P | Casebook: what's to do, your particulars, the suspects |
 | J | Journal: the clues and the evidence |
 | M | Map |
 | ? | Help |
 
 Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X fires,
-Y casts, LB uses an item, RB opens the journal, View shows the map and Start
-opens the menu.
+Y casts, LB uses an item, RB opens the casebook, View shows the map and
+Start opens the menu.
 
 The Rite of Dismissal must be spoken (`C`) in the stone circle beneath the
 island, or at its threshold, and takes three uninterrupted turns.

@@ -62,8 +62,8 @@ App bundle (macOS):  miskatonic --build-app [DIR]   builds miskatonic.app
                      miskatonic --icon-png SIZE [OUT.png]
 
 Keys: arrows or WASD move, Space waits, E searches, F fires and R reloads,
-C casts, U uses or readies something, I shows your investigator, J the
-journal, M the map, ? help.  The Rite of Dismissal must be spoken (C) in
+C casts, U uses or readies something, I shows your investigator, P the
+casebook, J the journal, M the map, ? help.  The Rite of Dismissal must be spoken (C) in
 the stone circle beneath the island, or at its threshold, and takes three
 uninterrupted turns.
 
@@ -3618,6 +3618,110 @@ CLUES = {
             "midnight on Hallowe'en.",
 }
 
+# ── The Arkham Advertiser ────────────────────────────────────────────────────
+#
+# The morning paper, a day at a time: what the Pale Lantern is up to, as
+# the Advertiser understands it (which is not very well).  {names} are
+# filled in from the case.
+
+HEADLINES = (
+    ("PROFESSOR STILL MISSING", "Miskatonic's Prof. Ashcroft has not been "
+     "seen in a week. The University declines to comment."),
+    ("STUDENT VANISHES ON FRENCH HILL", "A Miskatonic sophomore walked out "
+     "of a lecture on Tuesday and has not been seen since. Police are "
+     "'looking into it'."),
+    ("CATTLE FOUND DRAINED ON MEADOW HILL", "Three of a farmer's cows were "
+     "found in a ring, quite bloodless. Dogs, says the county."),
+    ("LIGHTS OVER THE RIVER ISLAND", "Residents of Rivertown report green "
+     "lights, and singing, on the island in the Miskatonic. Boys with "
+     "lanterns, says the sergeant."),
+    ("GRAVE ROBBERS IN OLD ARKHAM GRAVEYARD", "Six graves were found "
+     "opened from below. The sexton has asked for a dog. A big one."),
+    ("RIOT IN RIVERTOWN", "A brawl at the docks left two men in St. Mary's "
+     "and a third, from Innsmouth, nowhere to be found."),
+    ("SANITARIUM PATIENTS 'RESTLESS'", "{director_full}'s patients at the "
+     "Arkham Sanitarium have taken to drawing the same shape on their "
+     "walls. 'The weather,' says the director."),
+    ("NO CHILD IN ARKHAM SLEEPS", "Parents across town report nightmares, "
+     "every night this week, of a door in a stone. Doctors are "
+     "baffled."),
+    ("STRANGE STARS, SAYS OBSERVATORY", "The University observatory "
+     "reports a 'disagreement' between the sky and its charts. The "
+     "astronomer has gone home early."),
+    ("HALLOWE'EN TONIGHT", "Mayor reminds citizens: be home by midnight. "
+     "He gave no reason. He was not smiling."),
+)
+# The morning after you've taken a leaf from one of them.
+LEAD_HEADLINES = {
+    "crypt": ("VANDALS AT THE {FAM} MAUSOLEUM", "The family tomb was found "
+              "open, and something in it was found smashed. The sexton "
+              "will say only that it was 'not a man'."),
+    "witch": ("FIRE AT THE WITCH HOUSE", "A small fire in the cellars of "
+              "the old house by the river. The landlady blames the rats. "
+              "The rats, she says, blame the lodger."),
+    "sanitarium": ("BREAK-IN AT THE SANITARIUM", "Someone got into the "
+                   "basement of the Arkham Sanitarium. The director says "
+                   "nothing is missing. The morgue says otherwise."),
+    "tunnels": ("STEAM TUNNEL EXPLOSION AT MISKATONIC", "A loud bang under "
+                "Science Hall. The janitor reports 'a smell like the "
+                "inside of a star'. Classes go on."),
+    "warehouse": ("MARSH WAREHOUSE FLOODED", "The Rivertown warehouse was "
+                  "found knee-deep in seawater. It is two miles from the "
+                  "sea."),
+    "woods": ("TREES FALL IN BILLINGTON'S WOODS", "A stand of oaks came "
+              "down on Meadow Hill on a windless night. A farmer says they "
+              "walked."),
+}
+
+# Dreams, a night at a time: (where it points, the dream, the word in it to
+# ask about or look up).
+DREAMS = {
+    "crypt": "You dream of a door wrapped in chains, and of something "
+             "underneath a family name, {FAM}, gnawing upward. MAUSOLEUM, "
+             "says a voice that is not a voice.",
+    "witch": "You dream of a crooked room where the corners are wrong, and "
+             "a small thing with a man's face, running. KEZIAH, it "
+             "whispers. KEZIAH.",
+    "sanitarium": "You dream you are strapped to a cold table, and the "
+                  "doctor leaning over you has been dead for years. The "
+                  "SANITARIUM, you think, waking. The basement.",
+    "tunnels": "You dream of heat, and pipes that sing, and a buzzing voice "
+               "under the University that wants your brain in a jar. The "
+               "TUNNELS.",
+    "warehouse": "You dream of the sea coming up through a warehouse floor, "
+                 "and men with wide wet eyes from INNSMOUTH, waiting.",
+    "woods": "You dream of a hill with a mouth, and black trees with too "
+             "many legs, under MEADOW Hill.",
+    "island": "You dream of the ISLAND, and a ring of stones, and a door in "
+              "the stone that is very slightly open.",
+    "lantern": "You dream of a pale lantern, and a face behind it you have "
+               "met in daylight, smiling. LANTERN, it says.",
+}
+
+# The case file, at the end: (tally, how much counts, what it says).
+CASE_HONOURS = (
+    ("books", 2, "Most Tomes Read (%d)"),
+    ("research", 4, "Never Left the Library (%d hours of research)"),
+    ("shots", 12, "Shot First (%d rounds fired)"),
+    ("kills", 8, "Not a Fighting Man, Officially (%d foes)"),
+    ("horrors", 5, "Has Seen Things (%d kinds of horror)"),
+    ("spells", 3, "Dabbler in the Forbidden (%d spells cast)"),
+    ("mythos", 10, "Knows Too Much (Cthulhu Mythos %d)"),
+    ("dreams", 3, "Dreamed True (%d dreams remembered)"),
+    ("errands", 2, "A Good Neighbour (%d errands)"),
+    ("insanity", 2, "Not Entirely All There (%d episodes)"),
+    ("hospital", 2, "Regular at St. Mary's (%d stays)"),
+)
+EPILOGUE_HOOKS = (
+    "In Innsmouth, someone reads the Advertiser twice, and makes a note.",
+    "In the restricted stacks, the Necronomicon has been moved. Nobody "
+    "moved it.",
+    "Far out at sea, something that was waiting turns over, and goes back "
+    "to sleep. For now.",
+    "On the river island, one of the stones is a little warmer than the "
+    "others.",
+)
+
 # ── UI ───────────────────────────────────────────────────────────────────────
 
 PANEL = "#141216"
@@ -3704,6 +3808,8 @@ C                   cast a spell      U  use something
 I                   your investigator: characteristics
                     and skills
 J                   journal: the case, clues, errands
+P                   casebook: what's to do, your
+                    particulars, and the suspects
 M                   map of Arkham
 + / -               zoom      V sound      B music
 N                   new game  Ctrl-Q / Cmd-Q  quit (saved)
@@ -3719,7 +3825,7 @@ horror destroyed give some back. Bring leaves to Dr.
 Armitage at the University Library: your skills improve.
 
 Gamepad: d-pad moves, A waits or chooses, B backs out,
-X fires, Y casts, LB uses, RB journal, View map, Start menu.
+X fires, Y casts, LB uses, RB casebook, View map, Start menu.
 
 Press any key to close."""
 
@@ -3765,7 +3871,7 @@ class Game:
                                 ("fire", "Fire", self.ready_fire),
                                 ("cast", "Cast", self.choose_spell),
                                 ("use", "Use", self.use_menu),
-                                ("sheet", "Sheet", self.show_sheet),
+                                ("casebook", "Casebook", self.casebook),
                                 ("journal", "Journal", self.journal),
                                 ("map", "Map", self.toggle_map),
                                 ("menu", "Menu", self.action_menu)):
@@ -3932,7 +4038,7 @@ class Game:
                 self.say("Never mind.", "info")
             return
         {"a": self.wait, "x": self.ready_fire, "y": self.choose_spell,
-         "lb": self.use_menu, "rb": self.journal, "view": self.toggle_map,
+         "lb": self.use_menu, "rb": self.casebook, "view": self.toggle_map,
          "start": self.action_menu}.get(name, lambda: None)()
 
     def animate(self):
@@ -4210,6 +4316,8 @@ class Game:
         self.side = {}                  # errands: id -> state
         self.turn = 0
         self.lost_count = 0
+        self.fallen = []                # investigators lost to the case
+        self.tallies = {}               # what everyone did, for the end
         self.city = None
         self.reset_view()
         self.log.config(state="normal")
@@ -4258,6 +4366,8 @@ class Game:
         self.side = {str(k): dict(v) for k, v in g.get("side", {}).items()}
         self.turn = int(g.get("turn", 0))
         self.lost_count = int(g.get("lost", 0))
+        self.fallen = list(g.get("fallen", []))
+        self.tallies = dict(g.get("tallies", {}))
         self.city = None
         self.reset_view()
         city = self.get_area(("city",))
@@ -4295,6 +4405,7 @@ class Game:
                 "topics": sorted(self.topics), "leaves": self.leaves,
                 "returned": self.returned, "side": self.side,
                 "turn": self.turn, "lost": self.lost_count,
+                "fallen": self.fallen, "tallies": self.tallies,
                 "key": list(self.area.key), "pos": self.pos,
                 "city_pos": self.city_pos,
                 "surface": [list(self.surface[0]), self.surface[1]]
@@ -4600,8 +4711,10 @@ class Game:
                 self.new_game()
             elif self.overlay == "lost":
                 self.successor()
-            elif self.overlay not in ("won", "doom") or k in ("Escape",
-                                                              "Return"):
+            elif self.overlay in ("won", "doom") and k == "Escape":
+                self.action_menu()
+            elif self.overlay not in ("won", "doom") or k in (
+                    "Return", "space", "KP_Enter"):
                 self.close_overlay()
             return
         if self.aim:
@@ -4625,6 +4738,8 @@ class Game:
             self.use_menu()
         elif k in ("space", "period", "KP_5"):
             self.wait()
+        elif k in ("p", "P"):
+            self.casebook()
         elif k in ("i", "I"):
             self.show_sheet()
         elif k in ("m", "M"):
@@ -4644,7 +4759,20 @@ class Game:
         elif k in ("n", "N"):
             self.ask_new_game()
 
+    def next_page(self):
+        """Turn the page of the casebook or the end; False at the last."""
+        pages = getattr(self, "pages", None)
+        if self.overlay in ("casebook", "won", "doom") and pages and \
+                self.page < len(pages) - 1:
+            self.page += 1
+            self.overlay_text = pages[self.page]
+            self.render()
+            return True
+        return False
+
     def close_overlay(self):
+        if self.next_page():
+            return
         if self.overlay == "lost":
             self.successor()
             return
@@ -4845,6 +4973,7 @@ class Game:
         if a.kind == "city":
             self.spawn_city()
         self.listen()
+        self.daily_paper()
         self.render()
 
     def can_go(self, mob, x, y):
@@ -5072,7 +5201,13 @@ class Game:
             self.say(text + ". (%d)" % dmg, "good")
             self.sound.play("hit")
 
+    def tally(self, key, n=1):
+        """Count something done, for the case file at the end."""
+        t = self.tallies
+        t[key] = t.get(key, 0) + n
+
     def kill(self, mob):
+        self.tally("kills")
         a = self.area
         if mob in a.mobs:
             a.mobs.remove(mob)
@@ -5168,6 +5303,7 @@ class Game:
 
     def wake_in_hospital(self, days=1):
         p = self.p
+        self.tally("hospital")
         bill = 10
         self.cache = {k: v for k, v in self.cache.items() if k[0] != "dun"}
         hours = (24 * days + 8 - self.now().hour) % 24 or 24
@@ -5288,6 +5424,7 @@ class Game:
         p = self.p
         w = self.weapon()
         self.attacked = True
+        self.tally("shots")
         p["loaded"][p["weapon"]] -= 1
         self.sound.play("shot")
         self.noise()
@@ -5372,6 +5509,8 @@ class Game:
                 continue
             a.san_seen.add(m.kind)
             first = "seen:" + m.kind not in self.flags
+            if first:
+                self.tally("horrors")
             self.flags.add("seen:" + m.kind)
             self.say("You see %s%s." % (
                 "it: " if m.boss else "", self.the(m) if m.boss else
@@ -5404,6 +5543,7 @@ class Game:
         p["san"] -= n
         p["sanlog"] = [e for e in p["sanlog"] if self.turn - e[0] < 60]
         p["sanlog"].append([self.turn, n, before])
+        self.tally("san_lost", n)
         self.say("You lose %d Sanity%s." % (n, " (%s)" % what if what else
                                             ""), "mad")
         self.sound.play("horror")
@@ -5444,6 +5584,7 @@ class Game:
                  "babble": roll("1d10") * 10,
                  "hallucinate": roll("1d10") * 10}[kind]
         self.p["insane"] = {"kind": kind, "turns": turns}
+        self.tally("insanity")
         self.say({"faint": "You faint dead away.",
                   "panic": "Panic! You must get away!",
                   "babble": "You are babbling. You can't stop. Nobody can "
@@ -5489,6 +5630,13 @@ class Game:
         self.end_talk()
         self.walking = None
         self.lost_count += 1
+        d = self.now().day
+        self.fallen.append({"name": p["name"], "occ": p["occ"], "why": why,
+                            "date": "%s the %d%s" % (
+                                self.now().strftime("%A"), d,
+                                "th" if 10 <= d % 100 <= 20 else
+                                {1: "st", 2: "nd", 3: "rd"}.get(d % 10,
+                                                                "th"))})
         self.sound.play("death")
         if why == "dead":
             text = ("%s IS DEAD.\n\nThe Advertiser will call it an "
@@ -5553,28 +5701,26 @@ class Game:
         self.menu = None
         self.end_talk()
         self.overlay = "doom"
-        self.overlay_text = (
-            "MIDNIGHT, HALLOWE'EN.\n\nOn the river island the Pale Lantern "
-            "sings,\nand the door in the stone opens.\n\nWhat comes through "
-            "is not a thing that Arkham\nwill survive, or remember.\n\n"
-            "Leaves returned to Dr. Armitage: %d of 4.\n\nPress N for a new "
-            "case." % len(self.returned))
+        self.pages, self.page = self.end_pages(False), 0
+        self.overlay_text = self.pages[0]
         self.sound.play("horror")
         self.render()
 
     def show_won(self):
         self.overlay = "won"
-        self.overlay_text = (
+        self.pages = [(
             "THE DOOR IS CLOSED.\n\nThe Rite of Dismissal echoes under the "
             "island,\nand the Dweller Between goes back to where\nit "
             "belongs. The lantern goes out.\n\nArkham wakes on the 1st of "
-            "November to rain,\nand never knows.\n\n%s, %s, with %d "
-            "Sanity left%s.\n\nPress N for a new case, or Escape to walk\n"
-            "Arkham a while longer." % (
+            "November to rain,\nand never knows.\n\n%s, %s,\nwith %d "
+            "Sanity left%s.\n\n(Return, or a tap: the morning paper.)" % (
                 self.p["name"], self.p["occ"].lower(), self.p["san"],
                 "" if not self.lost_count else
                 " (%d investigator%s lost)" % (
-                    self.lost_count, "s" if self.lost_count > 1 else "")))
+                    self.lost_count, "s" if self.lost_count > 1 else "")))] + \
+            self.end_pages(True)
+        self.page = 0
+        self.overlay_text = self.pages[0]
         self.render()
 
     # ── Magic ──
@@ -5606,6 +5752,7 @@ class Game:
             self.aim = ("spell", name)
             self.say("Cast %s which way?" % name, "info")
             return
+        self.tally("spells")
         p["mp"] -= s["mp"]
         self.lose_san(roll(s["san"]), name)
         if p["san"] <= 0:
@@ -5621,6 +5768,7 @@ class Game:
     def cast_at(self, name, dx, dy):
         p = self.p
         s = SPELLS[name]
+        self.tally("spells")
         mob, path = self.target_in_line(dx, dy, 8)
         p["mp"] -= s["mp"]
         self.sound.play("spell")
@@ -5808,6 +5956,7 @@ class Game:
             return
         if not again:
             p["read"].append(title)
+            self.tally("books")
             self.say(b.desc, "info")
             if b.occult:
                 p["skills"]["Occult"] = min(99, p["skills"]["Occult"] +
@@ -5832,6 +5981,7 @@ class Game:
         p = self.p
         p["skills"]["Cthulhu Mythos"] = min(99, p["skills"]["Cthulhu Mythos"]
                                             + n)
+        self.tally("mythos", n)
         self.say("Cthulhu Mythos +%d. Your maximum Sanity falls to %d." % (
             n, self.max_san()), "mad")
         p["san"] = min(p["san"], self.max_san())
@@ -6201,6 +6351,7 @@ class Game:
             self.render()
             return
         self.pass_time(120)
+        self.tally("research", 2)
         self.flags.add("research:" + topic)
         self.say("Two hours later, you find it:", "info")
         self.say(fill(text, self.world), "talk")
@@ -6256,7 +6407,8 @@ class Game:
                 hours = 4
         else:
             hours = 4
-        self.say("You sleep %d hours." % hours, "info")
+        self.say("You sleep %d hour%s." % (hours, "" if hours == 1 else "s"),
+                 "info")
         self.pass_time(hours * 60, quiet=True)
         if self.overlay:
             return
@@ -6266,12 +6418,16 @@ class Game:
                      "mad")
             self.lose_san(1, "nightmares")
         elif hours >= 6:
+            self.dream()
+            if self.overlay:
+                return
             heal = roll("1d3")
             p["hp"] = min(self.max_hp(), p["hp"] + heal)
             self.say("You wake, %s. (+%d HP)" % (self.date_text(), heal),
                      "good")
         else:
             self.say("You wake, %s." % self.date_text(), "good")
+        self.daily_paper()
         self.render()
 
     def bed_spot(self, area):
@@ -6456,6 +6612,20 @@ class Game:
             return
         if mob.leader and word[:4] in ("lant", "cult", "orde", "mast"):
             self.confront(mob)
+            return
+        if mob.role in LEADER_ROLES and word[:4] in ("lant", "cult",
+                                                     "orde", "mast"):
+            self.npc_say(mob, random.choice((
+                "A lantern? I've no idea what you mean.",
+                "The Pale what? Is this one of those student societies?",
+                "Never heard of it. Is it a club? I'm in several clubs.")))
+            if "psych:" + mob.role not in self.flags:
+                self.flags.add("psych:" + mob.role)
+                if self.check("Psychology"):
+                    self.flags.add("honest:" + mob.role)
+                    self.say("As far as your Psychology can tell, %s is "
+                             "telling the truth. (Noted in your casebook.)"
+                             % mob.name, "info")
             return
         if mob.role == "armitage":
             if word[:4] == "leav" and self.returned:
@@ -6927,6 +7097,7 @@ class Game:
 
     def finish_errand(self, mob, e):
         self.side[e["id"]]["state"] = "done"
+        self.tally("errands")
         self.npc_say(mob, "%s! Oh, you found her! Here, take this." %
                      e["cat"])
         self.p["cash"] += e["pay"]
@@ -7017,6 +7188,12 @@ class Game:
         if self.overlay == "sheet":
             self.close_overlay()
             return
+        self.overlay = "sheet"
+        self.overlay_text = "\n".join(self.sheet_lines("Any key closes."))
+        self.render()
+
+    def sheet_lines(self, foot):
+        """The investigator's particulars."""
         p = self.p
         c = p["chars"]
         lines = ["%s, %s" % (p["name"], p["occ"]), "",
@@ -7044,10 +7221,289 @@ class Game:
             lines += ["Books: " + ", ".join(p["books"])]
         if p["disorder"]:
             lines += ["", "Disorder: " + p["disorder"]]
-        lines += ["", "Any key closes."]
-        self.overlay = "sheet"
-        self.overlay_text = "\n".join(lines)
+        lines += ["", foot]
+        return lines
+
+    # ── The casebook ──
+
+    def casebook(self):
+        """The investigator's casebook: what's to do, your particulars,
+        and the suspects."""
+        if self.busy or self.talk:
+            return
+        if self.overlay == "casebook":
+            self.close_overlay()
+            return
+        self.menu = None
+        self.pages = [self.cb_todo(), "\n".join(self.sheet_lines(
+            "(Turn the page: any key, or a tap.)"))]
+        if "case" in self.clues:
+            self.pages.append(self.cb_suspects())
+        self.pages[-1] = self.pages[-1].replace(
+            "(Turn the page: any key, or a tap.)",
+            "(Any key, or a tap, closes the casebook.)")
+        self.page = 0
+        self.overlay = "casebook"
+        self.overlay_text = self.pages[0]
         self.render()
+
+    def todo(self):
+        """What there is to do: (done, what), from where things stand."""
+        w, p, f = self.world, self.p, self.flags
+        out = []
+        out.append(("met_armitage" in f, "See Dr. Armitage at the "
+                    "University Library, south of the river"))
+        for lid in w["leads"]:
+            leaf = w["leaves"][lid]
+            if lid in self.returned:
+                out.append((True, "%s, with Dr. Armitage" % cap(leaf)))
+            elif lid in self.leaves:
+                out.append((False, "Take %s to Dr. Armitage" % leaf))
+            elif "known:" + lid in f:
+                out.append((False, "Find the leaf in %s" % fill(
+                    LEADS[lid].name, w)))
+        lost = [lid for lid in w["leads"] if lid not in self.returned and
+                lid not in self.leaves and "known:" + lid not in f]
+        if lost:
+            out.append((False, "Find where %s leaf%s %s hidden (ask about "
+                        "the NEWS; look things up)" % (
+                            ("one more" if len(lost) == 1 else
+                             "%d more" % len(lost)),
+                            "" if len(lost) == 1 else "s",
+                            "is" if len(lost) == 1 else "are")))
+        todo = sorted(t.title() for t in self.topics
+                      if "research:" + t not in f)
+        if todo:
+            out.append((False, "Look up %s (a library, or the Advertiser's "
+                        "morgue)" % ", ".join(todo[:5])))
+        if "diary" in self.clues or "suspect" in self.clues:
+            out.append(("unmasked" in f or "leader_dead" in f,
+                        fill("Confront {leader_full} about the LANTERN", w)))
+        if p["disorder"]:
+            out.append((False, "Have the Sanitarium treat your %s" %
+                        p["disorder"]))
+        if p["hp"] <= self.max_hp() // 2:
+            out.append((False, "See a doctor at St. Mary's (HP %d/%d)" % (
+                max(0, p["hp"]), self.max_hp())))
+        if p["san"] < 30:
+            out.append((False, "Rest, and keep away from horrors (Sanity "
+                        "%d)" % p["san"]))
+        if "rite" in self.clues:
+            out.append(("won" in f, "Row to the island and speak the Rite "
+                        "before midnight on Hallowe'en"))
+        for e in w["errands"]:
+            if self.side.get(e["id"], {}).get("state") == "active":
+                out.append((False, "Find %s the cat for %s" % (
+                    e["cat"], w["people"][e["giver"]]["short"])
+                    if e["kind"] == "cat" else "Take %s to %s" % (
+                        e["thing"], w["people"][e["to"]]["name"])))
+        return out
+
+    def cb_todo(self):
+        left = DEADLINE - self.turn
+        lines = ["CASEBOOK   %s" % self.date_text(), "-" * 50,
+                 "TO DO   (%d days, %d hours to midnight on Hallowe'en)" % (
+                     max(0, left) // DAY, max(0, left) % DAY // 60), ""]
+        for done, text in self.todo():
+            parts = wrap(text, 44)
+            lines += [("[x] " if done else "[ ] ") + parts[0]] + [
+                "    " + x for x in parts[1:]]
+        lines += ["", "(Turn the page: any key, or a tap.)"]
+        return "\n".join(lines)
+
+    def cb_suspects(self):
+        w, f = self.world, self.flags
+        lines = ["CASEBOOK: SUSPECTS", "-" * 50]
+        lines += wrap("The respectable citizens Dr. Armitage can't rule "
+                      "out. Ask them about the LANTERN; Psychology can "
+                      "tell a lie from the truth.", 50) + [""]
+        for role in LEADER_ROLES:
+            who = w["people"][role]
+            leader = role == w["leader"]
+            if leader and "leader_dead" in f:
+                note = "DEAD. It was them."
+            elif leader and "unmasked" in f:
+                note = "UNMASKED: the master of the Pale Lantern"
+            elif leader and "diary" in self.clues:
+                note = "named in Ashcroft's diary"
+            elif leader and "suspect" in self.clues:
+                note = "LIED to you about the Pale Lantern"
+            elif "honest:" + role in f:
+                note = "seems to be telling the truth"
+            elif "psych:" + role in f or (leader and "psych:lantern" in f):
+                note = "questioned; you couldn't tell"
+            else:
+                note = "not yet questioned"
+            lines += wrap("%s, %s: %s" % (who["name"], who["title"], note),
+                          50)
+        lines += ["", "(Turn the page: any key, or a tap.)"]
+        return "\n".join(lines)
+
+    # ── The morning paper, and dreams ──
+
+    def daily_paper(self):
+        """The Advertiser, once a day, from seven in the morning."""
+        day, hour = self.clock()
+        key = "paper:%d" % day
+        if hour < 7 or key in self.flags or self.turn >= DEADLINE or \
+                "won" in self.flags:
+            return
+        self.flags.add(key)
+        w = self.world
+        news = None
+        for lid in w["leads"]:
+            if (lid in self.returned or lid in self.leaves) and \
+                    "reported:" + lid not in self.flags:
+                self.flags.add("reported:" + lid)
+                news = LEAD_HEADLINES[lid]
+                break
+        if news is None and len(self.fallen) > int(
+                self.tallies.get("fallen_told", 0)):
+            self.tallies["fallen_told"] = len(self.fallen)
+            gone = self.fallen[-1]
+            news = ("%s %s" % (gone["name"].upper(), "FOUND DEAD" if
+                               gone["why"] == "dead" else "COMMITTED"),
+                    "The %s was %s. 'An accident,' say police. Friends say "
+                    "they had been asking questions." % (
+                        gone["occ"].lower(), "found at dawn" if gone["why"]
+                        == "dead" else "taken to the Sanitarium"))
+        if news is None:
+            news = HEADLINES[min(day, len(HEADLINES)) - 1]
+        head, text = news
+        self.say("The Arkham Advertiser, %s: %s" % (
+            self.now().strftime("%A"), fill(head, w)), "quest")
+        self.say(fill(text, w), "info")
+
+    def dream(self):
+        """A night's sleep, and what comes in it: a Sanity roll, and a POW
+        roll to remember where it points."""
+        w = self.world
+        unknown = [lid for lid in w["leads"]
+                   if "known:" + lid not in self.flags and
+                   lid not in self.returned and lid not in self.leaves]
+        rng = random.Random("%s:dream:%d" % (w["seed"], self.clock()[0]))
+        if unknown:
+            where = rng.choice(unknown)
+        elif "diary" not in self.clues and "unmasked" not in self.flags:
+            where = "lantern"
+        else:
+            where = "island"
+        if rng.random() < 0.3:
+            self.say("You sleep without dreams, or don't remember them.",
+                     "info")
+            return
+        self.say("You dream.", "mad")
+        self.san_check("0", "1", "a dream")
+        if self.p["san"] <= 0:
+            return
+        if self.char_roll("POW", 5, label="POW x5, remembering it"):
+            text = fill(DREAMS[where], w)
+            self.say(text, "mad")
+            self.hear(text)
+            self.tally("dreams")
+        else:
+            self.say("It slips away as you wake: water, a door, a name.",
+                     "info")
+
+    # ── The end, in pages ──
+
+    def end_pages(self, won):
+        w, p, f = self.world, self.p, self.flags
+        leader = w["people"][w["leader"]]
+        pages = []
+        if won:
+            if "leader_dead" in f:
+                fate = ("%s, %s, was found dead on Hallowe'en night. Heart "
+                        "failure, says the coroner." % (leader["name"],
+                                                       leader["title"]))
+            elif "unmasked" in f:
+                fate = ("%s, %s, has left Arkham suddenly, 'for reasons of "
+                        "health'." % (leader["name"], leader["title"]))
+            else:
+                fate = ("%s, %s, has made a generous gift to the "
+                        "Sanitarium, and was photographed smiling." % (
+                            leader["name"], leader["title"]))
+            paper = ["THE ARKHAM ADVERTISER", "Sunday, November 1st, 1925",
+                     "-" * 50, "GAS MAIN BLAMED FOR LIGHTS ON RIVER ISLAND",
+                     ""]
+            for text in (
+                    "Rivertown residents who reported green lights, singing "
+                    "and 'a noise like the sky tearing' on the river island "
+                    "last night may rest easy: it was a gas main, says the "
+                    "city engineer. There is no gas main on the island.",
+                    fate,
+                    "Miskatonic University reports Professor Ashcroft still "
+                    "missing. A memorial service is planned."):
+                paper += wrap(text, 50) + [""]
+            paper.append("(Turn the page: the case file.)")
+            pages.append("\n".join(paper))
+            t = self.tallies
+            honours = []
+            for key, need, text in CASE_HONOURS:
+                n = t.get(key, 0)
+                if n >= need:
+                    honours.append((n / float(need), text % n))
+            if not self.fallen:
+                honours.append((2.0, "Lost No One"))
+            if p["san"] >= 0.8 * p["chars"]["POW"] * 5:
+                honours.append((1.5, "Kept Their Wits (Sanity %d)" %
+                                p["san"]))
+            if "unmasked" in f or "leader_dead" in f:
+                honours.append((1.4, "Unmasked the Master"))
+            if self.turn < DEADLINE - DAY:
+                honours.append((1.2, "With a Day to Spare"))
+            honours.sort(key=lambda h: -h[0])
+            case = ["CASE FILE: THE ASHCROFT MANUSCRIPT", "-" * 50,
+                    "Closed by %s, %s." % (p["name"], p["occ"].lower()), ""]
+            case += ["  * " + h[1] for h in honours[:5]] or [
+                "  * Closed the Door"]
+            case += ["", "Leaves recovered: 4 of 4.   Sanity lost, all told: "
+                     "%d." % t.get("san_lost", 0), "",
+                     "(Turn the page.)"]
+            pages.append("\n".join(case))
+        else:
+            pages.append(
+                "MIDNIGHT, HALLOWE'EN.\n\nOn the river island the Pale "
+                "Lantern sings,\nand the door in the stone opens.\n\nWhat "
+                "comes through is not a thing that Arkham\nwill survive, or "
+                "remember.\n\nLeaves returned to Dr. Armitage: %d of 4.\n\n"
+                "(Turn the page.)" % len(self.returned))
+        if self.fallen:
+            mem = ["IN MEMORIAM", "-" * 50, ""]
+            for x in self.fallen:
+                mem += wrap("%s, %s. %s, %s." % (
+                    x["name"], x["occ"].lower(), "Died" if x["why"] == "dead"
+                    else "Committed to the Arkham Sanitarium", x["date"]), 50)
+            mem += [""] + wrap("They read the books, and asked the "
+                               "questions, and went down the stairs.", 50)
+            mem += ["", "(Turn the page.)"]
+            pages.append("\n".join(mem))
+        if won:
+            rng = random.Random("%s:after" % w["seed"])
+            after = ["WHAT BECAME OF ARKHAM", "-" * 50, ""]
+            for text in (
+                    "Dr. Armitage locked the Ashcroft manuscript in the "
+                    "restricted stacks, and changed the lock, and then "
+                    "changed it again.",
+                    fill("{landlady_full} kept your room on French Hill "
+                         "just as you left it, and still won't let anyone "
+                         "else have it.", w),
+                    fill("{boatman_full} won't row anyone to the island now, "
+                         "not for any money.", w),
+                    fill("{sexton_full} got his dog. It won't go near the "
+                         "{fam} mausoleum either.", w)):
+                after += wrap(text, 50)
+            if "leader_dead" not in f and "unmasked" not in f:
+                after += wrap("%s will be at the Christmas charity ball, "
+                              "smiling." % leader["name"], 50)
+            after += [""] + wrap(rng.choice(EPILOGUE_HOOKS), 50)
+            after += ["", "Press N for a new case, or Escape to walk",
+                      "Arkham a while longer."]
+            pages.append("\n".join(after))
+        else:
+            pages[-1] = pages[-1].replace("(Turn the page.)",
+                                          "Press N for a new case.")
+        return pages
 
     # ── Menus ──
 
@@ -7135,7 +7591,9 @@ class Game:
             return
         if self.overlay not in ("won", "doom"):
             self.overlay = None
-        items = [("Help", self.show_help), ("Journal", self.journal),
+        items = [("Help", self.show_help),
+                 ("Casebook: to do, particulars, suspects", self.casebook),
+                 ("Journal", self.journal),
                  ("Investigator", self.show_sheet), ("Map", self.toggle_map),
                  ("Search here", self.search), ("Reload", self.reload),
                  ("Zoom in", lambda: self.zoom(1)),
