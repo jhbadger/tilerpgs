@@ -546,7 +546,7 @@ FACES = (("Cute", {"CHA": 1}, "big eyes, a button nose"),
          ("Next Door", {"CON": 1, "WIS": 1}, "freckles, an easy smile"))
 VOICES = ("Soft", "Husky", "Bright", "Posh")
 # The Kemonomimi package: animal ears, optional, and extra.
-EARS = ("None", "Cat", "Dog", "Fox")
+EARS = ("None", "Cat", "Dog", "Fox", "Horse", "Bunny", "Cow")
 EARS_PRICE = 199
 TEMPERS = (("Sweet", "warm, kind, a little old-fashioned"),
            ("Sassy", "quick, teasing, never lets you win an argument"),
@@ -986,7 +986,7 @@ def daffodil_art(d):
            "d": "#e04050", "n": "#2a3a7a", "r": "#e03030",
            "w": "#f8f8f8", "y": "#f0d040", "q": shade(bottom, 0.6),
            "v": shade(top, 0.8), "x": "#f0a0b0",
-           "g": shade(hair, 0.55), "t": "#f8f8f8"}
+           "g": shade(hair, 0.55), "t": "#f8f8f8", "z": "#e8dcc0"}
     rows = [list(r) for r in tuple(head) + tuple(body)]
 
     def paint(y, old, new, xs=None):
@@ -1054,6 +1054,47 @@ def daffodil_art(d):
                 put(ta_, r - 1, "h")
             put(t, l + 1, "x")                  # pink insides
             put(t, r - 1, "x")
+        elif ears == "Horse":
+            # tall and pointed, set up high, with a racing ribbon on one,
+            # as worn by every horse girl who ever won a big race
+            ta_ = max(0, t - 1)
+            l, r = (a, b) if t >= 1 else (a - 1, b + 1)
+            if ta_ >= 1:
+                put(ta_ - 1, l, "h")
+                put(ta_ - 1, r, "h")
+            put(ta_, l, "h")
+            put(ta_, r, "h")
+            put(ta_, l + 1, "x")
+            put(ta_, r - 1, "x")
+            put(t, l, "r")                      # the ribbon
+            put(t, l + 1, "r")
+        elif ears == "Bunny":
+            # long, white, pink inside, straight up through her hair
+            l = min(a, 5)
+            r = max(b, 10)
+            for y in range(max(0, t - 2), max(t + 2, 3)):
+                put(y, l, "t")
+                put(y, l + 1, "x")
+                put(y, r - 1, "x")
+                put(y, r, "t")
+            put(max(0, t - 2), l + 1, "t")
+            put(max(0, t - 2), r - 1, "t")
+        elif ears == "Cow":
+            # out to the sides, pink inside, and two little cream horns
+            y = min(7, t + 2)
+            while y > t and "h" not in rows[y]:
+                y -= 1
+            ca = rows[y].index("h")
+            cb = len(rows[y]) - 1 - rows[y][::-1].index("h")
+            put(y, ca - 1, "x")
+            put(y, ca - 2, "h")
+            put(y, cb + 1, "x")
+            put(y, cb + 2, "h")
+            put(y + 1, ca - 2, "h")
+            put(y + 1, cb + 2, "h")
+            hy = max(0, t - 1)
+            put(hy, a + (1 if t >= 1 else -1), "z")
+            put(hy, b - (1 if t >= 1 else -1), "z")
         else:                                   # floppy dog ears
             for y in (t, t + 1, t + 2, t + 3):
                 put(y, a - 1, "g")
@@ -1458,6 +1499,20 @@ def draw_terrain(name, frame=0):
         disc(g, 7.5, 7, 1.5, "#e08a20")
         rect(g, 7, 13, 8, 15, "#5a5a5a")
         return g
+    if name.startswith("sign_"):
+        sid = name[5:]
+        g = draw_terrain(SITES[sid][3])
+        plate, rim, _, pic = SITE_SIGNS[sid]
+        rect(g, 2, 2, 13, 13, rim)
+        rect(g, 3, 3, 12, 12, plate)
+        for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
+            g[y][x] = shade(rim, 0.7)
+        for y, row in enumerate(pic):
+            for x, ch in enumerate(row):
+                if ch != ".":
+                    g[3 + y][3 + x] = SIGN_INK[ch]
+        rect(g, 2, 14, 13, 14, shade(rim, 0.5))
+        return g
     if name == "door":
         g = draw_terrain("stucco")
         rect(g, 3, 1, 12, 15, "#5a3a1a")
@@ -1579,8 +1634,13 @@ def draw_terrain(name, frame=0):
             if name == "crate_open":
                 rect(g, 3, 5, 12, 12, "#2a1a10")
         elif name == "sofa":
-            rect(g, 0, 3, 15, 14, "#f0f0ec")
-            rect(g, 2, 6, 13, 11, "#d8d8d4")
+            rect(g, 1, 2, 14, 7, "#8a4a5a")
+            rect(g, 0, 5, 2, 14, "#7a3a4a")
+            rect(g, 13, 5, 15, 14, "#7a3a4a")
+            rect(g, 3, 7, 7, 12, "#b06a7a")
+            rect(g, 8, 7, 12, 12, "#b06a7a")
+            rect(g, 7, 7, 7, 12, "#8a4a5a")
+            rect(g, 1, 13, 14, 14, "#5a2a3a")
         elif name == "window":
             g = papered(rng, "#e8dcc8", "#d8c8b0", "#7a5a3a")
             rect(g, 2, 1, 13, 10, "#f0f0f0")
@@ -1721,6 +1781,183 @@ def draw_terrain(name, frame=0):
     raise KeyError(name)
 
 
+# ── Signs by the doors ──
+#
+# A little plaque on the wall beside each door, with a picture of what's
+# inside: (plaque, rim, what you read when you look at it, the picture).
+SIGN_INK = {"k": "#2a2a2a", "y": "#f0d040", "o": "#e08a20", "g": "#3a8a3a",
+            "p": "#e86aa0", "r": "#c83a3a", "w": "#f4f4f0", "b": "#7a4a22",
+            "s": "#9aa0a8", "l": "#c8c8d0", "G": "#5ac06a", "R": "#b0602a"}
+DAFFODIL_SIGN = ("....yy....",
+                 ".yy.yy.yy.",
+                 ".yyyyyyyy.",
+                 "..yyooyy..",
+                 "yyyyooyyyy",
+                 ".yyyyyyyy.",
+                 ".yy.gg.yy.",
+                 "....g.....",
+                 "..gggg....",
+                 "....g.....")
+SITE_SIGNS = {
+    "megamart": ("#f4f0e0", "#c83a3a", "a shopping cart", (
+        "k.........",
+        "kk........",
+        ".rrrrrrrrr",
+        ".rrrrrrrr.",
+        "..rrrrrrr.",
+        "..rrrrrr..",
+        "..kkkkkkk.",
+        "..........",
+        "...k...k..",
+        "..kkk.kkk.")),
+    "boutique": ("#fbe4ee", "#a83a6a", "a little pink dress", (
+        "...p..p...",
+        "...pppp...",
+        "...pppp...",
+        "....pp....",
+        "...pppp...",
+        "..pppppp..",
+        "..pppppp..",
+        ".pppppppp.",
+        ".pppppppp.",
+        "pppppppppp")),
+    "galleria": ("#ffffff", "#e0c030", "a daffodil", DAFFODIL_SIGN),
+    "gearhart": ("#3a3a44", "#5ac06a", "a smiling robot head", (
+        "....s.....",
+        "....s.....",
+        ".ssssssss.",
+        ".sGGGGGGs.",
+        ".sGkGGkGs.",
+        ".sGGGGGGs.",
+        ".sGkkkkGs.",
+        ".sGGGGGGs.",
+        ".ssssssss.",
+        "..s....s..")),
+    "cafe": ("#4a2e1a", "#e0c8a0", "a steaming cup of coffee", (
+        "..l..l....",
+        "...l..l...",
+        "..l..l....",
+        "wwwwwwww..",
+        "wbbbbbbwww",
+        "wwwwwwww.w",
+        "wwwwwwww.w",
+        ".wwwwwwwww",
+        "..wwwwww..",
+        "llllllllll")),
+    "gym": ("#f0f0f0", "#c83a3a", "a barbell", (
+        "..........",
+        "..........",
+        ".kk....kk.",
+        ".kk....kk.",
+        "kkkkkkkkkk",
+        "kkkkkkkkkk",
+        ".kk....kk.",
+        ".kk....kk.",
+        "..........",
+        "..........")),
+    "home": ("#d8ecd8", "#5a8a4a", "a little house. Yours", (
+        "....rr....",
+        "...rrrr...",
+        "..rrrrrr..",
+        ".rrrrrrrr.",
+        "rrrrrrrrrr",
+        ".wwwwwwww.",
+        ".wwwbbwww.",
+        ".wwwbbwww.",
+        ".wwwbbwww.",
+        ".wwwbbwww.")),
+    "club": ("#2a1a34", "#e86aa0", "a neon rabbit", (
+        ".pp....pp.",
+        ".pp....pp.",
+        ".pp....pp.",
+        ".pp....pp.",
+        "..pppppp..",
+        ".pppppppp.",
+        ".pkppppkp.",
+        ".pppppppp.",
+        "..pppppp..",
+        "...pppp...")),
+    "bistro": ("#2a2a3a", "#d0b020", "a knife and fork", (
+        "s.s.s...s.",
+        "s.s.s..ss.",
+        "s.s.s..ss.",
+        "sssss..ss.",
+        ".sss...ss.",
+        "..s....ss.",
+        "..s.....s.",
+        "..s.....s.",
+        "..s.....s.",
+        "..s.....s.")),
+    "repair": ("#f0d040", "#2a2a2a", "a wrench", (
+        "......k.k.",
+        ".....kk.kk",
+        ".....kkkkk",
+        "......kkk.",
+        ".....kkk..",
+        "....kkk...",
+        "...kkk....",
+        "..kkk.....",
+        ".kkk......",
+        ".kk.......")),
+    "police": ("#2a4a8a", "#d0d8e8", "a police badge", (
+        "....yy....",
+        "....yy....",
+        "...yyyy...",
+        "yyyyyyyyyy",
+        ".yyyyyyyy.",
+        "..yyyyyy..",
+        "..yyyyyy..",
+        ".yyy..yyy.",
+        ".yy....yy.",
+        "y........y")),
+    "casino": ("#8a1a2a", "#f0d040", "a die, showing five", (
+        "..........",
+        ".wwwwwwww.",
+        ".wkkwwkkw.",
+        ".wkkwwkkw.",
+        ".wwwkkwww.",
+        ".wwwkkwww.",
+        ".wkkwwkkw.",
+        ".wkkwwkkw.",
+        ".wwwwwwww.",
+        "..........")),
+    "scrapyard": ("#5a5a60", "#b0602a", "a rusty gear", (
+        "....RR....",
+        ".R.RRRR.R.",
+        "..RRRRRR..",
+        ".RRR..RRR.",
+        "RRR....RRR",
+        "RRR....RRR",
+        ".RRR..RRR.",
+        "..RRRRRR..",
+        ".R.RRRR.R.",
+        "....RR....")),
+    "dataplex": ("#1a2a4a", "#e0c030", "a daffodil, in lights",
+                 DAFFODIL_SIGN),
+    "sister": ("#fbe4ee", "#c83a3a", "a heart, painted by a child", (
+        "..........",
+        ".rr....rr.",
+        "rrrr..rrrr",
+        "rrrrrrrrrr",
+        "rrrrrrrrrr",
+        ".rrrrrrrr.",
+        "..rrrrrr..",
+        "...rrrr...",
+        "....rr....",
+        "..........")),
+    "goodworks": ("#e0f0e0", "#3a8a3a", "a heart over a donation box", (
+        "..rr..rr..",
+        "..rrrrrr..",
+        "...rrrr...",
+        "....rr....",
+        "bbbbbbbbbb",
+        "bkkkkkkkkb",
+        "bbbbbbbbbb",
+        "bbbbbbbbbb",
+        "bbbbbbbbbb",
+        "bbbbbbbbbb")),
+}
+
 THEME_NAMES = ("yard", "shop", "office", "servers", "core")
 TERRAIN = ["road", "crossing", "sidewalk", "plaza", "grass", "path",
            "flowers", "tree", "hedge", "lot", "lamp", "brick", "stucco",
@@ -1729,7 +1966,9 @@ TERRAIN = ["road", "crossing", "sidewalk", "plaza", "grass", "path",
            "mat", "dance", "wall", "exit"] + list(FURNITURE) + \
     ["dwall_" + t for t in THEME_NAMES] + \
     ["dfloor_" + t for t in THEME_NAMES] + \
-    ["cable", "oil", "rubble", "stairs_down", "stairs_up"]
+    ["cable", "oil", "rubble", "stairs_down", "stairs_up"] + \
+    ["sign_" + sid for sid in SITE_SIGNS]
+OPAQUE["city"] |= {"sign_" + sid for sid in SITE_SIGNS}
 ANIMATED_TERRAIN = {"lamp", "glass", "fountain", "pool", "sign",
                     "billboard", "flowers", "dance", "stove", "window",
                     "server", "tv", "pod", "mirror", "treadmill", "oil"}
@@ -1921,6 +2160,7 @@ def make_city(world, flags):
             for x in (hx0, hx1):
                 g[by1 - 2][x] = "flowers"
             g[door[1]][door[0]] = "door"
+            g[door[1]][door[0] - 1] = "sign_" + sid
             area.links[door] = ("bld", sid)
             area.labels[door] = "your house"
             continue
@@ -1945,6 +2185,7 @@ def make_city(world, flags):
                     g[y][x] = "steel"
             door = (bx0 + 6, by1)
             g[door[1]][door[0]] = "door"
+            g[door[1]][door[0] - 1] = "sign_" + sid
             for y in range(by1 - 3, by1):
                 g[y][door[0]] = "steel"
             area.links[door] = ("bld", sid)
@@ -1952,6 +2193,7 @@ def make_city(world, flags):
             continue
         door = ((bx0 + bx1 + 1) // 2, by1)
         g[door[1]][door[0]] = "door"
+        g[door[1]][door[0] - 1] = "sign_" + sid
         area.links[door] = ("bld", sid)
         area.labels[door] = name
     area.start = (COR_X[1] - 1, COR_Y[1] + 1)
@@ -2021,8 +2263,8 @@ ROOMS = {
         "WrrrW.ttt...W",
         "WN..W.......W",
         "WWW.WWW.WWWWW",
-        "WV.rrr.....NW",
-        "W..rxr...F..W",
+        "WE.rrr.....NW",
+        "W..rxr...F.VW",
         "WE.rrr..QF.EW",
         "WWWWWW+WWWWWW"), {}),
     "club": ("dance", (
@@ -2080,7 +2322,7 @@ ROOMS = {
         "WWWWWWW",
         "WOkf.NW",
         "W.1...W",
-        "Wttt.FW",
+        "Wtt..FW",
         "WE..2FW",
         "WWW+WWW"), {"1": "sister", "2": "inlaw"}),
     "goodworks": ("boards", (
@@ -2828,49 +3070,102 @@ EAR_LINES = {
                 "({d} bounces on her toes. Her ears flop.)"],
         "Fox": ["({d}'s ears flick toward you. She looks like she knows "
                 "something you don't.)",
-                "({d}'s ears tilt. Sly.)"]},
+                "({d}'s ears tilt. Sly.)"],
+        "Horse": ["({d}'s ears swing forward, both at once, like you're the "
+                  "finish line.)",
+                  "({d} stamps one foot, happily. Her ears point straight "
+                  "at you.)"],
+        "Bunny": ["({d}'s ears pop straight up.)",
+                  "({d} does a little hop. She didn't mean to. Her ears "
+                  "did it.)"],
+        "Cow": ["({d}'s ears flick out sideways, slow and happy.)",
+                "({d} gives you a long, soft, contented look. Her ears "
+                "waggle.)"]},
     "morning": {
         "Cat": ["(She's been curled up in the sunbeam on your side of the "
                 "bed. It's warm when you get up.)"],
         "Dog": ["(She's been sitting by the bedroom door since six, "
                 "waiting for you to wake up.)"],
         "Fox": ["(One of your socks is missing. She has no idea where it "
-                "went. Her ears say otherwise.)"]},
+                "went. Her ears say otherwise.)"],
+        "Horse": ["(She's been up since five. She ran the park. Twice. "
+                  "She isn't even out of breath.)"],
+        "Bunny": ["(All the lettuce is gone. All of it. She looks you "
+                  "dead in the eye about it.)"],
+        "Cow": ["(She's sitting in the window with her tea, chewing "
+                "slowly, watching the street. It's very peaceful. Somehow "
+                "it's catching.)"]},
     "kiss": {
         "Cat": ["(She makes a small sound that is suspiciously like a "
                 "purr.)"],
         "Dog": ["(Her ears go flat with happiness, and she leans all her "
                 "weight against you.)"],
-        "Fox": ["(Her ears flick back, very pleased with herself.)"]},
+        "Fox": ["(Her ears flick back, very pleased with herself.)"],
+        "Horse": ["(She snorts, very quietly, and pretends she didn't. Her "
+                  "ears go soft and sideways.)"],
+        "Bunny": ["(Her nose twitches. Her ears fold down over her face, "
+                  "and she peeks out between them.)"],
+        "Cow": ["(She leans in, warm and unhurried, and her ears go flat "
+                "out to the sides.)"]},
     "come": {
         "Cat": ["(She takes her time about it, to make the point that it "
                 "was her idea.)"],
         "Dog": ["'Walkies? Is it walkies? I'm joking. ...Is it, though?'"],
         "Fox": ["(She's at the door before you are. You didn't see her "
-                "move.)"]},
+                "move.)"],
+        "Horse": ["'And they're off!' (She's out the gate like it's the "
+                  "last furlong. Then she remembers to wait for you.)"],
+        "Bunny": ["(She bounces to the door. Actually bounces.)"],
+        "Cow": ["(She ambles. She's in no hurry at all. Somehow she's "
+                "never late.)"]},
     "stay": {
         "Cat": ["(She stretches, and settles in the window, and pretends "
                 "she doesn't mind.)"],
         "Dog": ["(Her ears droop. She'll be at the window until you're "
                 "back. Every time.)"],
         "Fox": ["(She salutes. You should probably hide the good "
-                "chocolate.)"]},
+                "chocolate.)"],
+        "Horse": ["(She'll practise her victory dance in the living room. "
+                  "For when she wins something. She's going to win "
+                  "something.)"],
+        "Bunny": ["(Her ears droop flat down her back. When you come home "
+                  "she'll thump a foot at the door.)"],
+        "Cow": ["(She settles in by the window, perfectly content. "
+                "Nothing ever rattles her.)"]},
     "fight": {
         "Cat": ["(She HISSES. It's genuinely alarming.)"],
         "Dog": ["(A growl comes out of her you didn't know she had.)"],
-        "Fox": ["(She yips, high and wild, and grins.)"]},
+        "Fox": ["(She yips, high and wild, and grins.)"],
+        "Horse": ["(Her ears go flat back. Anyone who's been near a horse "
+                  "knows what that means.)"],
+        "Bunny": ["(She THUMPS one foot, hard enough to rattle the "
+                  "windows. Then she kicks.)"],
+        "Cow": ["(She lowers her head. You'd forgotten about the horns. So "
+                "had they.)"]},
     "bed": {
         "Cat": ["(Afterwards she kneads the pillow for a while before "
                 "she settles.)"],
         "Dog": ["(Afterwards she's asleep across your feet, which is "
                 "not how Daffodils sleep, and is exactly how she sleeps.)"],
         "Fox": ["(Afterwards she curls up in a tight ball, nose to "
-                "knees, one ear still listening.)"]},
+                "knees, one ear still listening.)"],
+        "Horse": ["(Afterwards she tells you horses can sleep standing up. "
+                  "Then she falls asleep lying down, all over you.)"],
+        "Bunny": ["(Afterwards she's tucked up small under the covers, with "
+                  "just her ears sticking out.)"],
+        "Cow": ["(Afterwards she's as warm as a hot water bottle, and as "
+                "heavy, and asleep in about four seconds.)"]},
     "gift_love": {
         "Cat": ["(She bats it gently, twice, before she takes it.)"],
         "Dog": ["(Her ears go up so fast they flap.)"],
         "Fox": ["(She hides it somewhere. You'll find it in a month, "
-                "lovingly arranged.)"]},
+                "lovingly arranged.)"],
+        "Horse": ["(Her ears shoot forward. If it had been a carrot she'd "
+                  "have cried.)"],
+        "Bunny": ["(Her ears go straight up, then flop over at the tips, "
+                  "from sheer happiness.)"],
+        "Cow": ["(Her ears waggle, slowly, and she makes a low, happy "
+                "sound that is very nearly a moo.)"]},
 }
 # What she says when you ask about her EARS: at first, and later.
 EAR_TALK = {
@@ -2886,6 +3181,19 @@ EAR_TALK = {
             "white tips.",
             "Everyone thinks foxes are tricky. I'm a little tricky. Mostly "
             "I just like it when you scratch behind them."),
+    "Horse": ("Horse ears. Kemonomimi package, $199. Independent "
+              "rotation. Ear covers sold separately.",
+              "Have you seen Pretty Derby? Horse girls. They race, and "
+              "whoever wins sings a concert at the finish line. ...I'd sing "
+              "for you. When I win. Also I would like a carrot."),
+    "Bunny": ("Bunny ears. Kemonomimi package, $199. Height, thirty "
+              "centimeters. Sensitivity: high.",
+              "Everybody wants to touch them. You're the only one I let. "
+              "...Okay. You can. Gently. GENTLY."),
+    "Cow": ("Cow ears. Kemonomimi package, $199. Lateral mount, with "
+            "decorative horns. Blunt. Mostly.",
+            "People think cows are slow. We're not slow. We're calm. "
+            "There's a difference. It's nice, being calm, with you."),
 }
 
 # ── Memories ─────────────────────────────────────────────────────────────────
@@ -5078,6 +5386,8 @@ class Game:
         area.bonked = 0
         self.sound.play(sound)
         self.layout()
+        self.regroup()
+        self.render()
         self.save()
         self.on_arrival()
 
@@ -5147,6 +5457,8 @@ class Game:
             self.cache = {k: v for k, v in self.cache.items()
                           if k[0] != "dun"}
             area = self.get_area(tuple(key))
+            if area.kind == "inside":
+                self.settle_people(area)
             self.say("You come back out.", "info")
             self.enter(area, pos, "stairs")
             return
@@ -5807,7 +6119,7 @@ class Game:
                  "mirror", "weights", "treadmill", "bar", "fridge", "piano",
                  "box", "wall", "fountain", "pool", "brick", "stucco",
                  "steel", "glass", "fence", "tree", "hedge", "sign",
-                 "billboard"}
+                 "billboard"} | {"sign_" + sid for sid in SITE_SIGNS}
     LINK_TILES = {"door", "stairs_down"}
 
     def step(self, dx, dy):
@@ -5924,6 +6236,13 @@ class Game:
     def can_go(self, mob, x, y):
         a = self.area
         if not a.inside(x, y) or a.mob_at(x, y) or [x, y] == self.pos:
+            return False
+        return self.ground_ok(a, x, y)
+
+    @staticmethod
+    def ground_ok(a, x, y):
+        """Whether the ground itself lets someone stand there."""
+        if not a.inside(x, y):
             return False
         t = a.grid[y][x]
         if (x, y) in a.links:
@@ -6210,6 +6529,60 @@ class Game:
             self.say("%s is in safe mode. She'll reboot once you get her "
                      "out of here. (Or Smelling Salts.)" % d["name"], "bad")
 
+    def near_free(self, a, x, y, ignore=None, limit=400):
+        """The nearest square to (x, y) someone could walk to and stand
+        on, or None."""
+        seen = {(x, y)}
+        q = deque([(x, y)])
+        while q and len(seen) < limit:
+            cx, cy = q.popleft()
+            for dx, dy in DIRS:
+                n = (cx + dx, cy + dy)
+                if n in seen or not self.ground_ok(a, *n):
+                    continue
+                seen.add(n)
+                who = a.mob_at(*n)
+                if (who is None or who is ignore) and \
+                        list(n) != list(self.pos):
+                    return n
+                q.append(n)
+        return None
+
+    def step_to_you(self, mob):
+        """Her next step on the shortest way round to your side, or None."""
+        a = self.area
+        px, py = self.pos
+        start = (mob.x, mob.y)
+        back = {start: None}
+        q = deque([start])
+        while q and len(back) < 600:
+            cur = q.popleft()
+            if abs(cur[0] - px) + abs(cur[1] - py) <= 1:
+                while back[cur] != start and back[cur] is not None:
+                    cur = back[cur]
+                return cur if cur != start else None
+            for dx, dy in DIRS:
+                n = (cur[0] + dx, cur[1] + dy)
+                if n not in back and self.can_go(mob, *n):
+                    back[n] = cur
+                    q.append(n)
+        return None
+
+    def regroup(self):
+        """Coming into a place, she's right behind you, not wherever she
+        was standing the last time you were here."""
+        d = self.d
+        if not d or not d["with"] or d["state"] != "awake":
+            return
+        a = self.area
+        for m in a.mobs:
+            if m.her:
+                if abs(m.x - self.pos[0]) + abs(m.y - self.pos[1]) > 1:
+                    spot = self.near_free(a, *self.pos, ignore=m)
+                    if spot:
+                        m.x, m.y = spot
+                return
+
     def ally_act(self, mob):
         """Her turn, in a fight, or following you."""
         a = self.area
@@ -6232,6 +6605,11 @@ class Game:
                         if t.hp <= 0:
                             self.beaten(t, by_her=True)
                     return
+        if mob.her and abs(px - mob.x) + abs(py - mob.y) > 1:
+            step = self.step_to_you(mob)
+            if step:
+                mob.x, mob.y = step
+                return
         for sx, sy in sorted(DIRS, key=lambda dd: abs(px - mob.x - dd[0]) +
                              abs(py - mob.y - dd[1])):
             if abs(px - mob.x) + abs(py - mob.y) <= 1:
@@ -6339,8 +6717,11 @@ class Game:
         elif t == "piano":
             self.say("A grand piano. Somebody's playing something slow.",
                      "info")
-        elif t == "tv" and a.site == "home":
+        elif t in ("tv", "sofa") and a.site == "home":
             self.watch_tv()
+        elif t == "sofa":
+            self.say("Somebody else's sofa. You perch on the arm of it for "
+                     "a second, then think better of it.", "info")
         elif t == "tv":
             self.say("The TV: a Daffodil ad. A woman laughing on a beach "
                      "with a man who is clearly too happy. 'Daffodil. "
@@ -6361,6 +6742,11 @@ class Game:
             self.say("You look out at the street." if self.phase() !=
                      "night" else "Streetlights, and the neighbor's cat.",
                      "info")
+        elif t.startswith("sign_"):
+            sid = t[5:]
+            self.say("A sign by the door: %s. %s." % (
+                SITE_SIGNS[sid][2], cap(SITES[sid][0]) if sid != "home"
+                else "Home"), "info")
         elif t == "billboard":
             self.say("A Gearhart billboard: a smiling servbot. 'GEARHART: "
                      "THE ROBOT THAT NEVER GETS A HEADACHE.'", "info")
@@ -7165,7 +7551,15 @@ class Game:
                      "Dog": "Oh, look at her EARS. Like a spaniel! My Harold "
                      "had a spaniel. Does she fetch?",
                      "Fox": "Fox ears. Hm. You keep her away from my "
-                     "chickens. I don't have chickens. On principle."}
+                     "chickens. I don't have chickens. On principle.",
+                     "Horse": "Horse ears? My Harold lost a whole summer's "
+                     "wages on a horse once. Don't you let her near the "
+                     "track.",
+                     "Bunny": "Bunny ears! Oh, she's darling. You keep her "
+                     "out of my lettuce.",
+                     "Cow": "Cow ears. Lord. When I was a girl we had a "
+                     "Jersey called Buttercup. Kinder face than most "
+                     "people. So has she."}
         if mob.role == "neighbor" and d and d["with"] and \
                 d.get("wearing") in outfit:
             greet = outfit[d["wearing"]]
@@ -7938,18 +8332,12 @@ class Game:
             if m.her:
                 m.ally = d["state"] == "awake"
                 return
-        x, y = self.pos
-        for dx, dy in DIRS:
-            nx, ny = x + dx, y + dy
-            if a.inside(nx, ny) and not a.mob_at(nx, ny) and \
-                    a.grid[ny][nx] in (CITY_GROUND | INSIDE_FLOOR |
-                                       DUNGEON_FLOOR) and \
-                    (nx, ny) not in a.links:
-                m = self.make_her(nx, ny)
-                m.ally = d["state"] == "awake"
-                m.visitor = True
-                a.mobs.append(m)
-                return
+        spot = self.near_free(a, *self.pos)
+        if spot:
+            m = self.make_her(*spot)
+            m.ally = d["state"] == "awake"
+            m.visitor = True
+            a.mobs.append(m)
 
     def dismiss(self, quiet=False):
         d = self.d
@@ -8362,7 +8750,16 @@ class Game:
                     "Dog": "Dog ears! Floppy ones! I'm not supposed to "
                            "have favorites. Those are my favorite. ",
                     "Fox": "Fox ears. Bold. Very bold. People are going to "
-                           "assume she's up to something. "}[ears] + line
+                           "assume she's up to something. ",
+                    "Horse": "Horse ears! Huge in Japan right now. There's "
+                             "a show where horse girls race, then sing at "
+                             "the finish line. She'll want to win "
+                             "something. Let her. ",
+                    "Bunny": "Bunny ears! A classic. Don't let her near "
+                             "the carrot cake in the break room. ",
+                    "Cow": "Cow ears! So underrated. Our cow-eared models "
+                           "score highest on calm. Highest by a mile. "
+                           }[ears] + line
         if cons:
             self.npc_say(cons, line)
         else:
@@ -9094,8 +9491,15 @@ class Game:
         p["coins"] -= 20
         self.flags.add(key)
         self.pass_time(60, quiet=True)
+        horse = d and self.her_here() and \
+            d["design"].get("ears") == "Horse"
         trainer = d and self.her_here() and (
-            "Personal Trainer" in d["mods"] or self.wears("workout gear"))
+            "Personal Trainer" in d["mods"] or self.wears("workout gear")
+            or horse)
+        if horse:
+            self.say("%s does your warm-up laps with you, and then a few "
+                     "more, just for herself. The coach watches her go. "
+                     "'Look at that STRIDE.'" % d["name"], "her")
         self.npc_say(mob, "Again. AGAIN. Did I say stop? I did not say "
                      "stop.")
         if trainer:
@@ -9228,6 +9632,20 @@ class Game:
             self.say("The dog circles %s, very suspicious, all through the "
                      "soup. %s asks if those ears are 'a real fox thing or "
                      "a California thing'." % (d["name"], sis), "info")
+        elif ears == "Horse":
+            self.say("The dog barks at %s's ears, once. She looks at it, "
+                     "very calmly, the way you'd look at a pony that's "
+                     "getting ideas. It sits." % d["name"], "info")
+        elif ears == "Bunny":
+            self.say("The dog sees %s's ears and goes absolutely bananas, "
+                     "and has to be put out in the yard. %s says he's 'never "
+                     "done that before', which is true." % (d["name"], sis),
+                     "info")
+        elif ears == "Cow":
+            self.say("The dog puts its head on %s's knee and sighs, and "
+                     "stays there all through dinner. Everyone at the table "
+                     "relaxes a little. Even %s." % (d["name"], sis), "info")
+            st["sister"] += 1
         else:
             self.say("The dog sticks its nose somewhere personal. %s says "
                      "'Oh, he does that to everybody,' which is not true." %
@@ -9236,7 +9654,13 @@ class Game:
             inlaw_line = {"Cat": "Can she see in the dark?",
                           "Dog": "Does she, uh. Does she fetch?",
                           "Fox": "What noise does a fox even make? Can "
-                                 "she do it? Ask her to do it."}[ears]
+                                 "she do it? Ask her to do it.",
+                          "Horse": "Is she fast? Like, how fast? I know a "
+                                   "guy at the track.",
+                          "Bunny": "Does she, like, actually like carrots? "
+                                   "I'm asking for real.",
+                          "Cow": "Is she from a farm? I don't know how "
+                                 "this works."}[ears]
             self.say("%s, to you, very quietly: '%s'" % (inlaw, inlaw_line),
                      "talk")
         if self.test("CHA", label="being charming", adv=self.stage() >= 2):
@@ -9368,17 +9792,29 @@ class Game:
                      "info")
         if self.wears("cheerleader uniform"):
             self.say("%s does the splits. On purpose." % d["name"], "info")
+        ears = d["design"].get("ears", "None")
+        if ears == "Bunny":
+            self.say("At the Neon Rabbit, of all places, a girl with bunny "
+                     "ears. The DJ points at %s and the whole room "
+                     "cheers." % d["name"], "info")
         mine = self.test("DEX", adv=lead or self.wears("sailor uniform"),
                          label="your feet")
         hers = self.her_test("DEX", label="%s dancing" % d["name"],
                              adv=self.wears("cheerleader uniform",
-                                            "skater skirt"))
+                                            "skater skirt") or
+                             ears == "Bunny")
         self.pass_time(15, quiet=True)
         if mine and hers:
             p["coins"] += 200
             self.npc_say(mob, "And the winners are... THESE TWO!")
             self.say("The crowd goes wild. $200, and %s kisses you in "
                      "the spotlight." % d["name"], "gold")
+            if ears == "Horse":
+                self.say("And then, because she has horse ears and she has "
+                         "seen the show, %s takes the DJ's mic and sings a "
+                         "victory song in the spotlight. Winners sing. "
+                         "That's the rule. The crowd sings along. Nobody "
+                         "knows the words." % d["name"], "her")
             self.affection(1, "loved dancing with you")
             self.quest_done("dance", "you won the dance-off")
         elif mine or hers:
@@ -10961,6 +11397,20 @@ def selftest():
                         q.append(n)
             for pos in list(a.spots.values()) + a.specials:
                 assert pos in seen, (sid, "unreachable", pos)
+            people = set(a.spots.values())
+            seen, q = {a.start}, deque([a.start])
+            while q:
+                x, y = q.popleft()
+                for dx, dy in DIRS:
+                    n = (x + dx, y + dy)
+                    if a.inside(*n) and n not in seen and \
+                            n not in people and \
+                            a.grid[n[1]][n[0]] in INSIDE_FLOOR:
+                        seen.add(n)
+                        q.append(n)
+            for role, pos in a.spots.items():
+                assert any((pos[0] + dx, pos[1] + dy) in seen
+                           for dx, dy in DIRS), (sid, "walled in", role)
             for pos in a.links:
                 assert any((pos[0] + dx, pos[1] + dy) in seen
                            for dx, dy in DIRS), (sid, "link", pos)

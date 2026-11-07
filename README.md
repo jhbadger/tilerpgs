@@ -950,9 +950,11 @@ Galleria opens at ten.
   frame (she or he), build, height, skin, hair and hairstyle, eyes, face,
   voice, and a personality from three choices (Sweet, Sassy, Shy or Bold;
   Bookish, Bubbly, Practical or Dreamy; Prim, Playful or Naughty), with a
-  live preview, and the optional Kemonomimi package ($199): cat, dog or
-  fox ears, on her sprite, and in how she (and your neighbor, and your
-  sister's dog) behaves. Then the modules: Gourmet Chef, Accountant, Personal
+  live preview, and the optional Kemonomimi package ($199): cat, dog,
+  fox, horse, bunny or cow ears, on her sprite, and in how she (and your
+  neighbor, and your sister's dog) behaves. Horse ears keep up with you at
+  the gym (and a horse girl who wins sings about it), bunny ears are a hit
+  at the Neon Rabbit, and cow ears calm a whole dinner table. Then the modules: Gourmet Chef, Accountant, Personal
   Trainer, Bodyguard, Tech Suite, Masseuse, Dance, Mathematics and Driver.
   Pay cash, or use Easy Pay (zero percent for a year!).
 - **Unbox her:** she's delivered in three hours, in a silver box with a
