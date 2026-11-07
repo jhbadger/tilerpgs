@@ -7856,7 +7856,7 @@ class Game:
             self.draw_map()
         elif self.overlay == "help":
             self.draw_text_box(HELP)
-        elif self.overlay in ("sheet", "journal"):
+        elif self.overlay in ("sheet", "journal", "casebook"):
             self.draw_text_box(self.overlay_text)
         elif self.overlay in ("won", "lost", "doom"):
             self.draw_text_box(self.overlay_text,
