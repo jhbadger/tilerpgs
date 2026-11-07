@@ -14,6 +14,7 @@ and music, and tiles drawn in code, so there are no image or sound files.
 | [Larkspur Hall](#larkspur-hall) | an English country house, the week of the Master's birthday | Maid RPG (Ryo Kamiya) |
 | [Nine Lives](#nine-lives) | a Nevada company town, the week before Omnicorp's Firmware 9 | a light mix of Homeroom's, Larkspur's and Clover Vale's rules |
 | [Some Assembly Required](#some-assembly-required) | a sunny suburb in 2041, the week you buy a Daffodil | The Black Hack (David Black) |
+| [Dead Drop](#dead-drop) | London and four cities of eight, the week before ORCUS fires, 1965 | the classic secret agent RPG (Victory Games, 1983) |
 
 ## Running a game
 
@@ -45,6 +46,10 @@ The games need only Python 3 with Tk; there is nothing to install.
 
 ```bash
 ./daffodil
+```
+
+```bash
+./deaddrop
 ```
 
 If Python reports `No module named '_tkinter'`, install your Python's Tk
@@ -81,8 +86,9 @@ Every game has a few things in common:
   four-leaf clover with a horseshoe, Lazarus Deep the Dig tower on the
   ice under a gas giant, Larkspur Hall a teacup with its steam rising
   in a heart, Nine Lives a catgirl's silhouette against a desert
-  sunset, and Some Assembly Required a daffodil and a power button. It
-  is the window icon on every system, and the app icon on macOS.
+  sunset, Some Assembly Required a daffodil and a power button, and
+  Dead Drop a gold globe at midnight with a strip of microfilm across
+  it. It is the window icon on every system, and the app icon on macOS.
 - **Self-test:** `./<game> --selftest` builds every map, room, level and
   tune of several generated games without opening a window.
 
@@ -1103,6 +1109,168 @@ View shows the map and Start opens the menu.
 - `daffodil`: the game
 - `~/.daffodil.json`: the saved game
 - `~/.cache/daffodil/`: cached music
+
+---
+
+## Dead Drop
+
+*A secret agent adventure across the great cities of the 1960s.*
+
+London, Friday the 1st of October, 1965. The courier carrying the arming
+package of HESPERUS, NATO's new orbital rocket, has been found dead in a
+Brussels hotel, and the package is gone. ORCUS, the Organisation for
+Revenge, Coercion, Usurpation and Subversion, means to fire it at midnight
+on Sunday the 10th and blind East and West at once, each sure the other did
+it. ORCUS runs its business through cells in the world's great cities, and
+each cell chief holds a strip of microfilm cut from the plan. Get the four
+strips to London, find the base, and stop the launch.
+
+Each turn is a minute. You start in the Admiral's outer office.
+
+### Every mission is different
+
+A new game deals four cities of eight: Paris, Rome, Berlin, Moscow, New
+York, Hong Kong, Istanbul and Tokyo. London, where the Service has its
+headquarters behind the brass plate of an insurance company, is always
+there too. Every city has its own map, its own music and its own
+landmarks:
+
+- **London:** Big Ben and the Houses of Parliament, Tower Bridge, St
+  Paul's, Nelson's Column, red buses and telephone boxes.
+- **Paris:** the Eiffel Tower, the Arc de Triomphe, Notre-Dame on its
+  island in the Seine, café tables and newspaper kiosks.
+- **Rome:** St Peter's, the Colosseum, the Trevi Fountain, the Pantheon,
+  and scooters everywhere.
+- **Berlin:** the Wall and its death strip, Checkpoint Charlie, the
+  Brandenburg Gate (on the wrong side), the Reichstag, the broken spire of
+  the Memorial Church, and the television tower going up in the East.
+- **Moscow:** the Kremlin and its red walls, Red Square, St Basil's,
+  Lenin's Mausoleum and the Bolshoi.
+- **New York:** the Empire State and Chrysler Buildings, Times Square, the
+  United Nations, the Brooklyn Bridge, the Statue of Liberty and yellow
+  cabs.
+- **Hong Kong:** Victoria Harbour, junks, the Star Ferry, the clock tower
+  at Tsim Sha Tsui, the Man Mo Temple, and neon.
+- **Istanbul:** the Hagia Sophia, the Blue Mosque, the Galata Tower and
+  bridge, the Grand Bazaar and the Bosphorus.
+- **Tokyo:** Tokyo Tower, the Imperial Palace and its moat, the
+  Kaminarimon and the pagoda at Sensō-ji, a torii, and the Ginza's neon.
+
+The ORCUS cell in each city works from behind a front (a perfumer over the
+Paris catacombs, a film studio over Roman cellars, the stockrooms of GUM
+over a secret Metro line, a carpet shop over a forgotten cistern) and is
+run by its own chief: the Perfumer, the Gladiator, Fräulein Klinge, the
+Bear, Mr. Silk, the Abacus, the Pehlivan or Kurogane. The base is one of
+four: a hollow volcano in the Aegean, a fortress in the Alps, a station
+under the sea off the Bahamas, or an oil platform in the North Sea. The
+Chairman of ORCUS is one of six of the international set, met at the
+casinos and nightclubs along the way.
+
+### Agents
+
+Choose a background (Naval Commander, Racing Driver, Cat Burglar,
+Cryptanalyst, Commando, Society Darling, Foreign Correspondent or Police
+Inspector), whether you are a man or a woman and whom you are drawn to,
+and roll the five characteristics, Strength, Dexterity, Willpower,
+Perception and Intelligence, from 5 to 15. The rules are the classic secret
+agent roleplaying game's:
+
+- **Primary Chance:** a characteristic, or the average of two, plus the
+  Skill Level. Seduction is Willpower plus your Charisma level, halved,
+  plus its own. An untrained skill takes -3 to its Ease Factor.
+- **Ease Factor:** 5 for an ordinary task, less for a hard one, more for an
+  easy one. The Success Chance is the Primary Chance times the Ease
+  Factor, and every roll is shown in the log.
+- **Quality:** a D100 under the Success Chance succeeds, and how far under
+  gives a Quality from 1 (Excellent) to 4 (Acceptable). Quality decides how
+  much a contact tells you, how well a seduction goes and how badly a
+  bullet hurts.
+- **Hero Points:** a Quality 1 earns one, and so does each strip you get
+  home. A Hero Point turns a failed roll that matters into a success, and
+  turns aside the bullet that would have put you down. Turn them off in
+  the menu if you'd rather keep them.
+- **Wounds:** the Wound Level Chart, by Quality and the weapon's Damage
+  Class. Wounds add up, Light to Medium to Heavy to Incapacitated to
+  Killed; each makes every task harder, and a Pain Resistance roll keeps
+  you on your feet. Rest, a doctor or a first aid kit heals them.
+- **Speed:** from Perception and Dexterity. A faster agent sometimes acts
+  before slower enemies can.
+- **Fame:** gunfire, big wins at the tables and close escapes make your
+  face known, and ORCUS sends more men after you. A disguise helps.
+- **Experience:** each strip that reaches London raises every skill you
+  used well since the last.
+
+Cell chiefs and the Chairman have Survival Points, which let them twist
+aside from what would have finished them.
+
+### Tradecraft
+
+- **The stations:** every mission city has a Head of Station who briefs
+  you, draws on the station's float, takes your strips for the diplomatic
+  bag and sells forged papers. The armourer sells ammunition and the
+  doctor treats wounds. The files next door look up any word heard in
+  CAPITALS; the Registry in London is the best of all.
+- **Gadgets:** Tinker's Workshop issues Smoke Pellets and a Skeleton Key,
+  and sends something new with every strip: a Dart Pen, Limpet Mines, a
+  Radio Lighter, a Signet Camera, a Rebreather and a Wire Watch.
+- **Hearts:** each city has someone close to its cell. Ask them to DINNER:
+  a good Seduction roll brings their secrets and the key to the front
+  door; a bad one brings a telephone call to ORCUS.
+- **Cards:** baccarat, chemin de fer, poker, skat, mahjong and more, at
+  the house's tables or against the international set for a hundred
+  pounds a hand. Losing, they say too much.
+- **Questions:** a hood who puts up their hands, or one you've knocked
+  cold, can be questioned with Interrogation or Charisma.
+- **Chases:** carry a strip out of a cell's hideout, or let ORCUS learn
+  your face, and a car pulls away from the kerb. Bid an Ease Factor each
+  round, flat out or careful, with Driving if you've hired a car and
+  Evasion if you're on foot.
+- **Deathtraps:** ORCUS never simply shoots a captured agent. Get out of
+  the gas, the flood, the lion pit or the descending ceiling with a gadget,
+  a skill or a Hero Point.
+- **Flights:** every air terminal flies to London and the mission's
+  cities, in hours that come off the clock. Checkpoint Charlie needs
+  papers or a good face, and in Hong Kong the Star Ferry crosses the
+  harbour.
+
+The strips reach London in any order and show, in turn, the region of the
+base, a photograph of the Chairman with one telltale detail, half the
+abort sequence, and the rest. With all four, charter a flight to the base
+and run the abort sequence at the console: three stages, interrupted at
+your peril. Unmask the Chairman first, if you can tell who it is.
+
+### The end
+
+The ending runs a page at a time: the morning paper, the report with your
+honours (Not Strictly Diplomatic, The Bank Has Been Broken, Irresistible,
+Always Escapes, and more), a memorial for any agents lost along the way,
+and what became of everyone. If HESPERUS goes up, you get midnight.
+
+### Keys
+
+| Key | Action |
+| --- | --- |
+| Arrows / WASD | Move (walk into people to talk, into ORCUS to fight) |
+| Space | Wait a turn, and take cover |
+| E | Search |
+| F / R | Fire / reload |
+| G | Use a gadget |
+| U | Use or ready something |
+| I | Dossier |
+| P | Mission file: what's to do, your dossier, the international set |
+| J | Journal: the mission and the intelligence |
+| M | Map |
+| ? | Help |
+
+Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X
+fires, Y uses a gadget, LB uses something, RB opens the mission file, View
+shows the map and Start opens the menu.
+
+### Files
+
+- `deaddrop`: the game
+- `~/.deaddrop.json`: the saved game
+- `~/.cache/deaddrop/`: cached music
 
 ---
 
