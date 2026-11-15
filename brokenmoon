@@ -6810,6 +6810,12 @@ class Game:
             self.say(desc, "info")
             self.sound.play("bump")
             return
+        if t == "gate":                     # the lair's last door: it yields
+            a.grid[y][x] = "dfloor"
+            self.say("You heave the gate open. It grinds aside.", "info")
+            self.sound.play("bump")
+            self.end_turn()
+            return
         if t not in WALKABLE:
             self.touch(t, x, y)
             return
