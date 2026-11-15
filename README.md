@@ -1266,11 +1266,44 @@ Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X
 fires, Y uses a gadget, LB uses something, RB opens the mission file, View
 shows the map and Start opens the menu.
 
+### Kivy and Android
+
+Where [Kivy](https://kivy.org) is installed, `./deaddrop --kivy` (or
+`DEADDROP_UI=kivy`) plays the same game in a Kivy window; a Python without
+Tk uses Kivy by itself. The game never imports Kivy by name, so Pydroid 3 on
+Android still runs it with Tk.
+
+`./deaddrop --build-android [DIR]` makes a folder (`deaddrop-android/` by
+default) for [Buildozer](https://buildozer.readthedocs.io) to turn into an
+APK: the game as `main.py`, its icon, a `buildozer.spec`, and a `build.sh`
+for building in Docker. Run it again after changing the game; it leaves your
+changes to the spec alone. The app is built for 64-bit ARM phones.
+
+On a Mac, build in Docker with an engine such as
+[Colima](https://github.com/abiosoft/colima), started with Rosetta on Apple
+silicon (`colima start --vm-type vz --vz-rosetta --cpu 4 --memory 8 --disk
+60`), then:
+
+```bash
+deaddrop-android/build.sh
+```
+
+It uses the same `buildozer-home` and `buildozer-platform` Docker volumes as
+Penultimate and Apple Blossom Village, so nothing need be downloaded or
+compiled again; build one project at a time. Keep
+`deaddrop-android/.android`: it holds the debug key the APK is signed with,
+and without it the app (saved game and all) must be uninstalled before the
+next build installs. The APK lands in `deaddrop-android/bin/`; install it
+with `adb install -r deaddrop-android/bin/*.apk`. The app saves when you
+switch away from it, and the phone's Back button closes menus and
+conversations.
+
 ### Files
 
 - `deaddrop`: the game
 - `~/.deaddrop.json`: the saved game
 - `~/.cache/deaddrop/`: cached music
+- `deaddrop-android/`: made by `--build-android` (not kept in git)
 
 ---
 
