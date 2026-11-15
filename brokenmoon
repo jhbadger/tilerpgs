@@ -3184,9 +3184,17 @@ CITY_TALK = {
                     "it, sell to the king. We'd break it if we could.",
             "news": "War gorillas on the stairs of the Spire. Don't fight "
                     "them where they've room to swing.",
+            "job": "I keep the Tinkers fed, armed, and out of sight of "
+                   "GORRAK. Two out of three, most days.",
         },
+        "trader": {"job": "Bits, bolts and bullets. Food and TORCHES too, "
+                          "and salve. Say TRADE.",
+                   "news": "Gorrak's apes raided the bolt market. Bolts "
+                           "are dear now. Bananas, oddly, are cheap."},
         "camper": {"news": "Rats the size of dogs in the subways. Dogs the "
-                           "size of ponies in the streets."},
+                           "size of ponies in the streets.",
+                   "job": "I fix things. Clocks, radios, locks. Mostly I "
+                          "listen to the DRUMS and count the beats."},
     },
     "boston": {
         "leader": {
@@ -3203,9 +3211,17 @@ CITY_TALK = {
                          "stay out of her sight.",
             "news": "We hang lanterns in the Old North steeple when her "
                     "machines come up to hunt.",
+            "job": "I keep the bells rung and the ringers together. And "
+                   "out of the TUNNELS, which is harder.",
         },
+        "trader": {"job": "Junk! Lovely junk. Food, TORCHES, arrows and "
+                          "salve as well. Say TRADE.",
+                   "news": "Copper's not for sale. Not to anyone. The "
+                           "Gearwitch has ears in every wall."},
         "camper": {"news": "Sentry robots on the lower levels. They don't "
-                           "sleep, but they don't climb stairs either."},
+                           "sleep, but they don't climb stairs either.",
+                   "job": "I ring the warning bell when the machines come "
+                          "up. My arms are enormous. Look."},
     },
     "baltimore": {
         "leader": {
@@ -3219,14 +3235,24 @@ CITY_TALK = {
                     "Baron's slavers fill it every full moon.",
             "news": "Bog crocs in the lower tunnels. They swim faster "
                     "than you run.",
+            "job": "I keep the boats afloat and the Baron's tithe as "
+                   "small as I dare. Smaller every year. He's noticed.",
         },
+        "trader": {"job": "Bait and blades. TORCHES and salve too, and "
+                          "crab. Say TRADE.",
+                   "news": "The crabs are walking inland. Never seen that "
+                           "before. Don't like it."},
         "camper": {"news": "The Baron's claws can hold you fast. Cut your "
-                           "way out or wriggle."},
+                           "way out or wriggle.",
+                   "job": "Fish. Mend the nets. Fish again. Hide the catch "
+                          "from the Baron's men."},
     },
     "washington": {
         "rebel": {}, "camper": {"news": "Skull knights in the Dome. "
                                         "Banish them, if you've a priest's "
-                                        "tongue."},
+                                        "tongue.",
+                                "job": "Run messages. Steal bread. Keep "
+                                       "off the Mall in daylight."},
     },
 }
 TOWNS_TALK = {
@@ -3234,16 +3260,133 @@ TOWNS_TALK = {
               "Hollis can fix anything with an edge.",
               "Ring the bell when you free someone. That's the custom.",
               "Night's dangerous even here. Rats come in off the river.",
-              "Sister Moss can mend a broken leg in an afternoon. Ow."],
+              "Sister Moss can mend a broken leg in an afternoon. Ow.",
+              "Big Tobiah waters the beer. Everyone knows. Nobody says.",
+              "A raptor tried to buy my goat last week. With a radio.",
+              "They say Rudi Salt once sold a man his own boots.",
+              "Three new families came in from the pens this month. "
+              "Thin as rakes, but free.",
+              "Lilt's been singing about you. Well, about someone with a "
+              "sword. Could be you.",
+              "The river's high. Good for the gardens, bad for the "
+              "cellars.",
+              "Somebody painted 'No Kings' on the old Hall again. Good.",
+              "Ask Wren about the lizards, then ask again about the "
+              "biting.",
+              "Old Ambrose read me a book once. All about interest "
+              "rates. I cried.",
+              "The night watch saw lights to the south. Gilded "
+              "lanterns, moving north.",
+              "Don't eat the blue mushrooms. Or do, and tell me what "
+              "happens."],
     "newyork": ["The drums never stop.",
                 "Don't drink the river. Don't swim in it either.",
-                "The Tinkers trade for any old-world gear you find."],
+                "The Tinkers trade for any old-world gear you find.",
+                "The apes took the bridge last spring. We take it back "
+                "every autumn.",
+                "Heard Gorrak can count to twenty now. Terrifying.",
+                "There's a garden on the roof of the old library. Best "
+                "beans in the city.",
+                "Jax had a brother. The apes got him. Don't ask Jax."],
     "boston": ["Listen for the bells.", "The rails hum before a machine "
-               "comes.", "Gearlings hate water. Rust, you see."],
+               "comes.", "Gearlings hate water. Rust, you see.",
+               "The harbor's full of tea, they say. Old-world tea. "
+               "Nobody's brave enough to drink it.",
+               "Mother Coggins hasn't slept since the Breaking. Or so "
+               "she tells us.",
+               "A gearling took my cousin's kettle. Walked off with it. "
+               "Bold as brass.",
+               "Two lanterns in the steeple means run. One means walk "
+               "quickly."],
     "baltimore": ["Mind the crabs.", "The Baron's tide is red today.",
-                  "Fish? Fish!"],
+                  "Fish? Fish!",
+                  "The Baron eats off a plate made of a hubcap. Classy.",
+                  "Bosun Pike lost two fingers to a croc and kept the "
+                  "croc's teeth. Fair trade.",
+                  "Gulls steal anything shiny. Mind your rings.",
+                  "The Clock Tower stopped at a quarter to the Breaking. "
+                  "Never started again."],
     "washington": ["Keep your head down.", "Don't look at the guards' "
-                   "masks. They don't like it.", "Run."],
+                   "masks. They don't like it.", "Run.",
+                   "They're polishing the Dome. For the night of the "
+                   "Shard, they say.",
+                   "Nyla's lost more rebels this month than she's "
+                   "found."],
+}
+# What the folk do, by their title: each has his or her own.
+FOLK_JOBS = {
+    "a survivor": ["Staying alive. You?",
+                   "I used to make shoes. Now I make do.",
+                   "Whatever keeps the rats off my children.",
+                   "Waiting for the rest of the Moon to fall, mostly.",
+                   "Breathing, eating when I can. Same as anyone."],
+    "a forager": ["Dandelions, cattails, the odd sad apple. Whatever "
+                  "grows wild.",
+                  "Mushrooms, roots, eggs from the high nests. Don't ask "
+                  "what laid them.",
+                  "The parks are orchards now, if you know where to look.",
+                  "I bring back anything you can eat. Some days that's "
+                  "nothing."],
+    "a scrapper": ["I pull copper out of the walls. Old-world wire's worth "
+                   "more than bread.",
+                   "Pipes, wire, tins with no labels. Every tin's a "
+                   "gamble.",
+                   "I take the old world apart a bolt at a time.",
+                   "Glass, nails, hinges. If it's nailed down I take the "
+                   "nails too."],
+    "a gardener": ["Beans on the rooftops, squash in the bathtubs. We eat, "
+                   "mostly.",
+                   "I grow what the rats leave me.",
+                   "The soil's good where the old roads cracked open.",
+                   "Tomatoes. Don't laugh. A good tomato's worth a "
+                   "knife round here."],
+    "a lookout": ["I watch the roads and shout if anything gilded comes "
+                  "down them.",
+                  "I sit up high and try not to fall asleep. Or off.",
+                  "I count raiders. Today's count is better than "
+                  "yesterday's.",
+                  "Eyes on the ruins, all day. I saw you coming an hour "
+                  "ago."],
+    "a water-carrier": ["I haul water from the clean spring. Forty trips, "
+                        "some days.",
+                        "Everybody needs water and nobody wants to carry "
+                        "it. So I do.",
+                        "I boil it, I carry it, and I stop fools drinking "
+                        "from the river.",
+                        "Two buckets and a yoke. Don't knock me over."],
+}
+FOLK_GREETS = ["Hey.", "Who're you?", "Free folk?", "Hm?",
+               "Keep your voice down.", "Oh! Thought you were a raider.",
+               "Another stranger. Busy week.", "Well met, I suppose.",
+               "If you're selling, I'm not buying.", "Make it quick, friend.",
+               "Moon's up early. Don't stay out late.", "What now?"]
+CITY_GREETS = {
+    "phila": ["Welcome to the Hold.", "Rung the bell yet?"],
+    "newyork": ["Hear the drums?", "Tinker or traveller?"],
+    "boston": ["Shh. Was that a bell?", "Mind the rails."],
+    "baltimore": ["Smell that? Low tide.", "Watch your fingers."],
+    "washington": ["Quiet! The guards...", "You're not gilded. Good."],
+}
+# What folk think of what everyone's talking about: a different view each.
+FOLK_VIEWS = {
+    "red shard": ["Don't look at it. My gran says it looks back.",
+                  "Brighter every night. I've stopped going out after "
+                  "dark.",
+                  "Pretty, isn't it? That's the worst part.",
+                  "Some say it'll fall. I'd rather it fell than rose."],
+    "malgorath": ["Don't say his name so loud.",
+                  "Gold skin, they say. Gold eyes. Gold teeth, I bet.",
+                  "He took my brother for the pens. I'd like a word with "
+                  "him. Several.",
+                  "Kings come and go. This one's taking his time going."],
+    "moonstones": ["Moonstones? I found a bit once. Sold it for a goat. "
+                   "Best goat I ever had.",
+                   "They hum, if you hold them close. So I hear.",
+                   "Leave the stones to the sorcerers. They're welcome to "
+                   "them."],
+    "pens": ["I was in the pens, two winters. I don't talk about it.",
+             "If you break a pen open, bring them here. We'll find room.",
+             "Every city he owns has one. Every one."],
 }
 
 
@@ -3284,9 +3427,17 @@ def make_folk(world, cid, rng, i, x, y):
     m.role = "folk"
     m.title = rng.choice(("a survivor", "a forager", "a scrapper",
                           "a gardener", "a lookout", "a water-carrier"))
-    m.greet = rng.choice(("Hey.", "Who're you?", "Free folk?", "Hm?"))
-    m.talk = {"news": rng.choice(TOWNS_TALK[cid]),
-              "job": "Staying alive. You?"}
+    # Each has a say of his or her own, from a random of their own (so
+    # as not to move anyone else), and a piece of news no neighbour has.
+    own = random.Random("%s:folk:%s:%d" % (world["seed"], cid, i))
+    news = list(TOWNS_TALK[cid])
+    random.Random("%s:news:%s" % (world["seed"], cid)).shuffle(news)
+    m.greet = own.choice(FOLK_GREETS + CITY_GREETS.get(cid, []))
+    m.talk = {"news": news[i % len(news)],
+              "job": own.choice(FOLK_JOBS.get(m.title,
+                                              FOLK_JOBS["a survivor"]))}
+    for topic, views in FOLK_VIEWS.items():
+        m.talk[topic] = own.choice(views)
     m.roam = CITY_GROUND - {"bridge"}
     m.home = (x, y)
     return m
@@ -5629,30 +5780,67 @@ class KivyShell:
         except OSError:
             pass
 
-    def run(self):
-        root, game = self.root, self.game
-        Clock = self.kv["Clock"]
+    def run(self, make_game):
+        """Open the window saying the game is on its way, and only then
+        make it (make_game(): the slow part, with every tile to draw and
+        every tune to write), and put it in the window in place of that.
+        A phone takes a while over it, and a blank window looks stuck."""
+        kv, shell = self.kv, self
+        Clock, Window = kv["Clock"], kv["Window"]
+        Window.clearcolor = kivy_rgba(PANEL)
+        loading = kv["BoxLayout"](orientation="vertical")
+        size = min(Window.width, Window.height)
+        loading.add_widget(kv["Widget"]())
+        loading.add_widget(kv["Label"](
+            text="Broken Moon", bold=True, color=kivy_rgba(ACCENT),
+            font_size=max(18, size // 11), size_hint_y=None,
+            height=max(30, size // 7)))
+        loading.add_widget(kv["Label"](
+            text="Loading...", color=kivy_rgba(INK_DIM),
+            font_size=max(12, size // 22), size_hint_y=None,
+            height=max(20, size // 10)))
+        loading.add_widget(kv["Widget"]())
 
-        class BrokenMoon(self.kv["App"]):
+        class BrokenMoon(kv["App"]):
             title = "Broken Moon"
+            game = None
 
             def build(app):
-                return root
+                return loading
 
             def on_start(app):
-                """Fit the window once it's up: a phone's comes up at its
-                size without ever being resized."""
+                """The game, once "Loading..." has been drawn (twice, as
+                the first frame on a phone can come before the window's
+                shown)."""
+                Window.bind(on_flip=app.drawn)
+
+            def drawn(app, *args):
+                app.flips = getattr(app, "flips", 0) + 1
+                if app.flips == 2:
+                    Window.unbind(on_flip=app.drawn)
+                    Clock.schedule_once(app.begin, 0)
+
+            def begin(app, dt):
+                game = make_game()
+                Window.remove_widget(loading)
+                Window.add_widget(shell.root)
+                app.root = shell.root
+                app.game = game
+                # Fit the window now it's up: a phone's comes up at its
+                # size without ever being resized.
                 Clock.schedule_once(lambda dt: game.fit(True), 0)
 
             def on_pause(app):
                 """Switched away from: Android may close the app without
                 another word, so the game is saved now."""
-                game.save()
-                game.sound.stop_music()
+                if app.game:
+                    app.game.save()
+                    app.game.sound.stop_music()
                 return True
 
             def on_resume(app):
-                game.sound.tick()
+                if app.game:
+                    app.game.sound.tick()
         self.app = BrokenMoon()
         self.app.run()
 
@@ -9505,8 +9693,10 @@ def main():
     if "--kivy" in sys.argv or os.environ.get("BROKENMOON_UI") == "kivy" \
             or tk is None:
         shell = KivyShell()
-    else:
-        shell = TkShell(tk.Tk())
+        shell.set_icon()
+        shell.run(lambda: Game(shell))      # (after "Loading..." is up)
+        return
+    shell = TkShell(tk.Tk())
     Game(shell)
     shell.set_icon()
     shell.run()

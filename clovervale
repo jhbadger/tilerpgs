@@ -5794,30 +5794,67 @@ class KivyShell:
         except OSError:
             pass
 
-    def run(self):
-        root, game = self.root, self.game
-        Clock = self.kv["Clock"]
+    def run(self, make_game):
+        """Open the window saying the game is on its way, and only then
+        make it (make_game(): the slow part, with every tile to draw and
+        every tune to write), and put it in the window in place of that.
+        A phone takes a while over it, and a blank window looks stuck."""
+        kv, shell = self.kv, self
+        Clock, Window = kv["Clock"], kv["Window"]
+        Window.clearcolor = kivy_rgba(PANEL)
+        loading = kv["BoxLayout"](orientation="vertical")
+        size = min(Window.width, Window.height)
+        loading.add_widget(kv["Widget"]())
+        loading.add_widget(kv["Label"](
+            text="Clover Vale", bold=True, color=kivy_rgba(ACCENT),
+            font_size=max(18, size // 11), size_hint_y=None,
+            height=max(30, size // 7)))
+        loading.add_widget(kv["Label"](
+            text="Loading...", color=kivy_rgba(INK_DIM),
+            font_size=max(12, size // 22), size_hint_y=None,
+            height=max(20, size // 10)))
+        loading.add_widget(kv["Widget"]())
 
-        class CloverVale(self.kv["App"]):
+        class CloverVale(kv["App"]):
             title = "Clover Vale"
+            game = None
 
             def build(app):
-                return root
+                return loading
 
             def on_start(app):
-                """Fit the window once it's up: a phone's comes up at its
-                size without ever being resized."""
+                """The game, once "Loading..." has been drawn (twice, as
+                the first frame on a phone can come before the window's
+                shown)."""
+                Window.bind(on_flip=app.drawn)
+
+            def drawn(app, *args):
+                app.flips = getattr(app, "flips", 0) + 1
+                if app.flips == 2:
+                    Window.unbind(on_flip=app.drawn)
+                    Clock.schedule_once(app.begin, 0)
+
+            def begin(app, dt):
+                game = make_game()
+                Window.remove_widget(loading)
+                Window.add_widget(shell.root)
+                app.root = shell.root
+                app.game = game
+                # Fit the window now it's up: a phone's comes up at its
+                # size without ever being resized.
                 Clock.schedule_once(lambda dt: game.fit(True), 0)
 
             def on_pause(app):
                 """Switched away from: Android may close the app without
                 another word, so the game is saved now."""
-                game.save()
-                game.sound.stop_music()
+                if app.game:
+                    app.game.save()
+                    app.game.sound.stop_music()
                 return True
 
             def on_resume(app):
-                game.sound.tick()
+                if app.game:
+                    app.game.sound.tick()
         self.app = CloverVale()
         self.app.run()
 
@@ -11084,8 +11121,10 @@ def main():
     if "--kivy" in sys.argv or os.environ.get("CLOVERVALE_UI") == "kivy" \
             or tk is None:
         shell = KivyShell()
-    else:
-        shell = TkShell(tk.Tk())
+        shell.set_icon()
+        shell.run(lambda: Game(shell))      # (after "Loading..." is up)
+        return
+    shell = TkShell(tk.Tk())
     Game(shell)
     shell.set_icon()
     shell.run()
