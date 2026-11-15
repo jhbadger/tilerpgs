@@ -230,11 +230,22 @@ Arkham is the first place. The roads out of town, toward Innsmouth,
 Kingsport and Dunwich, and the bus and train ticket clerks are where more
 places are meant to go.
 
+### Kivy and Android
+
+Like [Dead Drop](#dead-drop), `./miskatonic --kivy` (or `MISKATONIC_UI=kivy`)
+plays in a Kivy window, and `./miskatonic --build-android` makes
+`miskatonic-android/` for Buildozer:
+
+```bash
+miskatonic-android/build.sh
+```
+
 ### Files
 
 - `miskatonic`: the game
 - `~/.miskatonic.json`: the saved game
 - `~/.cache/miskatonic/`: cached music
+- `miskatonic-android/`: made by `--build-android` (not kept in git)
 
 ---
 
