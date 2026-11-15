@@ -1171,11 +1171,22 @@ Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X uses
 an app or a trick, Y spends Luck, LB uses something, RB opens your phone,
 View shows the map and Start opens the menu.
 
+### Kivy and Android
+
+Like [Dead Drop](#dead-drop), `./daffodil --kivy` (or `DAFFODIL_UI=kivy`)
+plays in a Kivy window, and `./daffodil --build-android` makes
+`daffodil-android/` for Buildozer:
+
+```bash
+daffodil-android/build.sh
+```
+
 ### Files
 
 - `daffodil`: the game
 - `~/.daffodil.json`: the saved game
 - `~/.cache/daffodil/`: cached music
+- `daffodil-android/`: made by `--build-android` (not kept in git)
 
 ---
 
