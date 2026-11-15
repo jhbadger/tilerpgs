@@ -378,11 +378,22 @@ Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X fires,
 Y uses a power, LB uses a gadget, RB opens the journal, View shows the map and
 Start opens the menu.
 
+### Kivy and Android
+
+Like [Dead Drop](#dead-drop), `./homeroom --kivy` (or `HOMEROOM_UI=kivy`)
+plays in a Kivy window, and `./homeroom --build-android` makes
+`homeroom-android/` for Buildozer:
+
+```bash
+homeroom-android/build.sh
+```
+
 ### Files
 
 - `homeroom`: the game
 - `~/.homeroom.json`: the saved game
 - `~/.cache/homeroom/`: cached music
+- `homeroom-android/`: made by `--build-android` (not kept in git)
 
 ---
 
