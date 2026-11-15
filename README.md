@@ -796,11 +796,22 @@ Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X does
 a chore, Y spends Favor, LB uses something, RB opens the journal, View shows
 the map and Start opens the menu.
 
+### Kivy and Android
+
+Like [Dead Drop](#dead-drop), `./larkspur --kivy` (or `LARKSPUR_UI=kivy`)
+plays in a Kivy window, and `./larkspur --build-android` makes
+`larkspur-android/` for Buildozer:
+
+```bash
+larkspur-android/build.sh
+```
+
 ### Files
 
 - `larkspur`: the game
 - `~/.larkspur.json`: the saved game
 - `~/.cache/larkspur/`: cached music
+- `larkspur-android/`: made by `--build-android` (not kept in git)
 
 ---
 
