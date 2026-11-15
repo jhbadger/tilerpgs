@@ -503,7 +503,7 @@ Tk uses Kivy by itself. Pydroid 3 on Android still runs it with Tk.
 
 `./clovervale --build-android [DIR]` makes a folder (`clovervale-android/`
 by default) for [Buildozer](https://buildozer.readthedocs.io), built in
-Docker just as [Dead Drop's](#kivy-and-android) is:
+Docker just as [Dead Drop's](#dead-drop) is:
 
 ```bash
 clovervale-android/build.sh
@@ -650,11 +650,22 @@ Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X fires,
 Y reloads, LB uses something, RB opens the journal, View shows the map and
 Start opens the menu.
 
+### Kivy and Android
+
+Like [Dead Drop](#dead-drop), `./lazarus --kivy` (or `LAZARUS_UI=kivy`) plays
+in a Kivy window, and `./lazarus --build-android` makes `lazarus-android/`
+for Buildozer:
+
+```bash
+lazarus-android/build.sh
+```
+
 ### Files
 
 - `lazarus`: the game
 - `~/.lazarus.json`: the saved game
 - `~/.cache/lazarus/`: cached music
+- `lazarus-android/`: made by `--build-android` (not kept in git)
 
 ---
 
