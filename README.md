@@ -984,11 +984,22 @@ Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X uses
 an ability, Y spends Purr Points, LB uses something, RB opens your phone,
 View shows the map and Start opens the menu.
 
+### Kivy and Android
+
+Like [Dead Drop](#dead-drop), `./ninelives --kivy` (or `NINELIVES_UI=kivy`)
+plays in a Kivy window, and `./ninelives --build-android` makes
+`ninelives-android/` for Buildozer:
+
+```bash
+ninelives-android/build.sh
+```
+
 ### Files
 
 - `ninelives`: the game
 - `~/.ninelives.json`: the saved game
 - `~/.cache/ninelives/`: cached music
+- `ninelives-android/`: made by `--build-android` (not kept in git)
 
 ---
 
