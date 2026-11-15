@@ -15,6 +15,7 @@ and music, and tiles drawn in code, so there are no image or sound files.
 | [Nine Lives](#nine-lives) | a Nevada company town, the week before Omnicorp's Firmware 9 | a light mix of Homeroom's, Larkspur's and Clover Vale's rules |
 | [Some Assembly Required](#some-assembly-required) | a sunny suburb in 2041, the week you buy a Daffodil | The Black Hack (David Black) |
 | [Dead Drop](#dead-drop) | London and four cities of eight, the week before ORCUS fires, 1965 | the classic secret agent RPG (Victory Games, 1983) |
+| [Broken Moon](#broken-moon) | the ruined cities of the Atlantic seaboard, ages after the Moon broke | The Black Hack, as used by Barbarians of the Ruined Earth (Mike Evans) |
 
 ## Running a game
 
@@ -50,6 +51,10 @@ The games need only Python 3 with Tk; there is nothing to install.
 
 ```bash
 ./deaddrop
+```
+
+```bash
+./brokenmoon
 ```
 
 If Python reports `No module named '_tkinter'`, install your Python's Tk
@@ -1322,6 +1327,124 @@ conversations.
 - `~/.deaddrop.json`: the saved game
 - `~/.cache/deaddrop/`: cached music
 - `deaddrop-android/`: made by `--build-android` (not kept in git)
+
+---
+
+## Broken Moon
+
+*A barbarian adventure in the ruins of the Atlantic seaboard.*
+
+Ages ago the Moon broke. Its pieces still hang in the sky, and some of them
+fell: sorcery came down with the moonstone, and the old cities of the coast
+went to ruin and weeds. Malgorath the Gilded, the Sorcerer-King, rules from
+the cracked dome of the Capitol in Washington, and when the Red Shard rises
+full, at midnight at the end of the twenty-first day, he means to use its
+light to make a slave of every living thing between the mountains and the
+sea. His door is sealed by a Moon Ward that only three Moonstones open, and
+his three warlords hold them. Win the stones, walk through the ward, and
+end him.
+
+Each turn is a minute. You start in the Meeting Hall of the Free Hold of
+Philadelphia, the morning after you walked in off the road with the chain
+still on your wrists.
+
+### The coast
+
+Five ruined cities, each its own map and its own music, and each with its
+old landmarks painted across several squares and then ruined: bitten off,
+cracked, rubble at their feet and vines climbing them.
+
+- **Philadelphia, the Free Hold:** the cracked Liberty Bell, hung again in a
+  frame of salvaged beams; Independence Hall; City Hall, its bronze statue
+  lying in the courtyard where it fell; and the Art Steps. The Elder, a
+  smith, a trader, a healer, an inn and a lizard-keeper.
+- **New York, the Drowned City:** the Spire (the Empire State, broken off a
+  third of the way down, with the Ape-King on top), the Steel Needle with its
+  spire snapped, the Drowned Lady standing in the harbor with her head at
+  her feet, and the Broken Bridge. The Tinkers' Camp, and a slave pen.
+- **Boston, the City of Bells:** the Old North steeple, the Granite Needle on
+  its hill, the Gold Dome with the old train tunnels beneath it, and the Iron
+  Ship aground in the harbor. The Bell-ringers' hall and a junk shop.
+- **Baltimore, the Crab Coast:** the Star Fort on the point, the White
+  Column, the Clock Tower, and the great Red Letters over the harbor, half of
+  them dark. The fishers' camp, a bait shop, and a slave pen.
+- **Washington, the Gilded City:** the Shattered Dome with the Moon Ward on
+  its steps, the Broken Needle with its tip in the grass, the Seated Giant's
+  temple and the White House. A rebels' cellar and the great slave pen.
+
+The roads between them take days on foot (a riding lizard halves them), and
+something may follow you in off the road. The lairs below (or, in New York,
+up) are three levels each, and dark: light a torch.
+
+### Heroes and rules
+
+The rules are The Black Hack's, as Barbarians of the Ruined Earth uses
+them; the names, places and story are the game's own. Six stats are rolled
+2d6+5. Everything that might fail is a d20 rolled under a stat: Strength to
+hit or block in melee, Dexterity to shoot or dodge, Constitution against
+poison, Intelligence for spells and traps, Wisdom to search, Charisma to
+haggle. Foes never roll to hit; you roll to get out of the way, and their
+Hit Dice decide the damage. A foe two Hit Dice above your level gives you
+Disadvantage. Armor soaks hits, a shield takes a big one and breaks. At zero
+hit points you roll on the Out of Action table (a knock on the head, a
+cracked skull, a lost limb, or worse), and a Destiny Point lets you roll
+again. Food, torches and ammunition have usage dice that step down as you
+use them. You go up a level for each Moonstone, and when the Hold hears
+you've broken two slave pens.
+
+Eight classes, each with its own hit die, damage, weapons, armor and
+tricks: the **Barbarian** (big and stout), the **Beastman** (claws, sees in
+the dark, a hide that thickens when hurt), the **Scavenger** (strikes from
+the shadows, finds more), the **Robot** (plating, no need to eat, but
+lightning hurts), the **Death Priest** (miracles: Heal, Heighten, Banish,
+Deathsight), the **Sorcerer** (spells on an Intelligence test: Firebolt,
+Sleep, Ward, Mend), the **Urchin** (small, sneaky and bossy) and the
+**Raptor** (pounces, clever, coaxes life from dead power cells).
+
+### Talking
+
+Walk into people to talk; choose a word or type one. Everyone knows NAME,
+JOB and NEWS; words in capitals are worth asking about. Traders, the smith
+and the lizard-keeper TRADE (and can be haggled with), the healer HEALS,
+and the innkeeper has beds.
+
+### Keys
+
+| Key | Does |
+| --- | --- |
+| Arrows / WASD | Move; walk into foes to fight, people to talk, doors to go in |
+| Tap / click | Walk there; next to you, step or fight or talk |
+| Space | Wait |
+| Z | Rest an hour |
+| E | Search |
+| F | Fire, throw or shoot |
+| C | Cast a spell or call a miracle |
+| U | Use, eat, light a torch, wield or wear something |
+| I | Your hero |
+| J | Journal |
+| M | Map |
+| ? | Help |
+
+Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X fires,
+Y casts, LB uses something, RB opens the journal, View shows the map and
+Start opens the menu.
+
+### Kivy and Android
+
+Like Dead Drop, `./brokenmoon --kivy` (or `BROKENMOON_UI=kivy`) plays in a
+Kivy window, and `./brokenmoon --build-android` makes `brokenmoon-android/`
+for Buildozer:
+
+```bash
+brokenmoon-android/build.sh
+```
+
+### Files
+
+- `brokenmoon`: the game
+- `~/.brokenmoon.json`: the saved game
+- `~/.cache/brokenmoon/`: cached music
+- `brokenmoon-android/`: made by `--build-android` (not kept in git)
 
 ---
 
