@@ -16,6 +16,7 @@ and music, and tiles drawn in code, so there are no image or sound files.
 | [Some Assembly Required](#some-assembly-required) | a sunny suburb in 2041, the week you buy a Daffodil | The Black Hack (David Black) |
 | [Dead Drop](#dead-drop) | London and four cities of eight, the week before ORCUS fires, 1965 | the classic secret agent RPG (Victory Games, 1983) |
 | [Broken Moon](#broken-moon) | the ruined cities of the Atlantic seaboard, ages after the Moon broke | The Black Hack, as used by Barbarians of the Ruined Earth (Mike Evans) |
+| [Ashen Clover](#ashen-clover) | the pony wasteland around the ruins of Clover Vale, two hundred years after the megaspells | The Black Hack, as Broken Moon plays it |
 
 ## Running a game
 
@@ -57,6 +58,10 @@ The games need only Python 3 with Tk; there is nothing to install.
 ./brokenmoon
 ```
 
+```bash
+./ashenclover
+```
+
 If Python reports `No module named '_tkinter'`, install your Python's Tk
 package (for example `brew install python-tk` on macOS with Homebrew Python,
 or `sudo apt install python3-tk` on Debian and Ubuntu).
@@ -91,9 +96,10 @@ Every game has a few things in common:
   four-leaf clover with a horseshoe, Lazarus Deep the Dig tower on the
   ice under a gas giant, Larkspur Hall a teacup with its steam rising
   in a heart, Nine Lives a catgirl's silhouette against a desert
-  sunset, Some Assembly Required a daffodil and a power button, and
+  sunset, Some Assembly Required a daffodil and a power button,
   Dead Drop a gold globe at midnight with a strip of microfilm across
-  it. It is the window icon on every system, and the app icon on macOS.
+  it, and Ashen Clover a four-leaf clover in front of Stable Two's
+  cog-shaped door. It is the window icon on every system, and the app icon on macOS.
 - **Self-test:** `./<game> --selftest` builds every map, room, level and
   tune of several generated games without opening a window.
 
@@ -1511,6 +1517,130 @@ brokenmoon-android/build.sh
 - `~/.brokenmoon.json`: the saved game
 - `~/.cache/brokenmoon/`: cached music
 - `brokenmoon-android/`: made by `--build-android` (not kept in git)
+
+---
+
+## Ashen Clover
+
+*A pony adventure in the wasteland, two hundred years after the
+megaspells.*
+
+Two hundred years ago the ponies and the zebras ended their war with
+megaspells, and the world burned. A grey cloud hides the sun, and the Pink
+Cloud still sits on the old capital. Clover Vale is ruins and ash, and the
+ponies who hid in Stable Two under its hill have only now opened the door.
+In Coltchester, the Foundry City, the slaver Red Eye is making a Goddess
+in his Cathedral: a mind of many minds. At midnight at the end of the
+twenty-first day she wakes, and her Unity spell will take every mind in
+the wasteland into hers. The Cathedral is sealed by an old Ministry seal
+that only three Ministry passkeys open, and Red Eye's three lieutenants
+hold them. Win the passkeys, walk through the seal, and end her.
+
+Each turn is a minute. You start in the Town Hall of New Clover, the
+settlement in the ruins, where the Mayor has sent for you.
+
+The setting follows a fan novel of a wasteland of ponies; the ponies
+themselves are Clover Vale's, drawn on the same body shapes. The names,
+places and story are the game's own, with a few of the novel's
+characters (Velvet Remedy, Calamity, Homage, Red Eye) met along the way.
+
+### The wasteland
+
+Five towns, each its own map and its own music, each with its landmarks
+painted across several squares and then ruined.
+
+- **Clover Vale, New Clover:** Stable Two's cog door in the hillside, the
+  Lantern Hall with the Great Lantern cold in its cupola, the Star Tower's
+  split dome, and Grandmare Thistlewick's statue on the green. The Mayor,
+  a gunsmith, a general store, the Last Lantern saloon, Velvet Remedy's
+  clinic and Calamity's sky-wagon.
+- **Maretropolis, the Tower City:** the broken Stable-Tec Tower (Grimjaw
+  and his hellhounds at the top), Tenpony Tower, the Harbor Mare and the
+  Broken Bridge. Homage's Tower Market, and a slave pen.
+- **Crownspire, under the Pink Cloud:** the Palace Spire, the Victory
+  Obelisk, the Ministry of Arcane Science with the Hollow Magister in its
+  vaults, and a Cloud Guard sky-ship fallen into the lake. The Steel
+  Rangers' bunker and their quartermaster. Below, the pink pools in the
+  low places: don't stand in it.
+- **Hoofport, the Rust Coast:** Fort Shackle, where Sawtooth the Raider
+  Queen keeps her passkey, the old lighthouse, the Clock Tower stopped at
+  the minute the bombs fell, and the Sparkle-Cola sign. The fishers' camp,
+  a bait shop, and a slave pen.
+- **Coltchester, the Foundry City:** Red Eye's Cathedral with the seal on
+  its steps, the Twin Stacks, the Old Exchange and the Overseer's Manor. A
+  rebels' cellar and the great slave pen.
+
+The roads between take days on hoof (Calamity's sky-wagon halves them),
+and something may follow you in off the road. The lairs below (or, in
+Maretropolis, up) are three levels each, and dark: light your lantern.
+
+### Wastelanders and rules
+
+The rules are Broken Moon's: The Black Hack's, as Barbarians of the Ruined
+Earth uses them. Six stats rolled 2d6+5; a d20 rolled under a stat for
+everything that might fail; foes who never roll to hit; damage by Hit
+Dice; armor (barding) that soaks it; usage dice for rations, lamp oil and
+ammunition; the Out of Action table and Destiny Points. Caps are bottle
+caps. You go up a level for each passkey, and when New Clover hears you've
+broken two slave pens.
+
+Eight kinds of wastelander, each with its own hit die, damage, weapons,
+armor and tricks: the **Brawler** (an earth pony who bucks first), the
+**Griffon** (a Talon sellsword: talons, sees in the dark, Hard as Nails
+when hurt), the **Stable Dweller** (a unicorn with a PipBuck, whose
+targeting spell strikes from the shadows and whose scanner finds more),
+the **Steel Ranger** (power armor that soaks, sees in the dark and feeds
+you, but lightning shorts it), the **Zebra Shaman** (brews: Heal,
+Heighten, Banish, Night-Eye), the **Unicorn Mage** (spells on an
+Intelligence test: Arcane Bolt, Sleep, Shield, Mend), the **Scamp** (a
+small, sneaky, bossy foal of the ruins) and the **Pegasus** (dives on the
+unready, and coaxes one more charge from a dead spark cell). Ponies shoot
+pistols and rifles from battle saddles.
+
+### Talking
+
+Walk into ponies to talk; choose a word or type one. Everypony knows NAME,
+JOB and NEWS; words in capitals are worth asking about. Traders, the
+gunsmith and Calamity TRADE (and can be haggled with), Velvet Remedy
+HEALS, and the saloon has beds.
+
+### Keys
+
+| Key | Does |
+| --- | --- |
+| Arrows / WASD | Move; walk into foes to fight, ponies to talk, doors to go in |
+| Tap / click | Walk there; next to you, step or fight or talk |
+| Space | Wait |
+| Z | Rest an hour |
+| E | Search |
+| F | Fire, throw or shoot |
+| C | Cast a spell or brew a potion |
+| U | Use, eat, light your lantern, wield or wear something |
+| I | Your PipBuck: stats |
+| J | Your PipBuck: quests |
+| M | Map |
+| ? | Help |
+
+Gamepad: the d-pad or stick moves, A waits or chooses, B backs out, X fires,
+Y casts, LB uses something, RB opens the PipBuck, View shows the map and
+Start opens the menu.
+
+### Kivy and Android
+
+Like Broken Moon, `./ashenclover --kivy` (or `ASHENCLOVER_UI=kivy`) plays
+in a Kivy window, and `./ashenclover --build-android` makes
+`ashenclover-android/` for Buildozer:
+
+```bash
+ashenclover-android/build.sh
+```
+
+### Files
+
+- `ashenclover`: the game
+- `~/.ashenclover.json`: the saved game
+- `~/.cache/ashenclover/`: cached music and tiles
+- `ashenclover-android/`: made by `--build-android` (not kept in git)
 
 ---
 
