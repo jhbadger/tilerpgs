@@ -7973,9 +7973,10 @@ class Game:
                 self.finish_errand(mob, e)
         if "talked" not in self.flags:
             self.flags.add("talked")
-            self.say("(Choose what to ask about, or type a word such as "
-                     "NAME, JOB or NEWS and press Return. BYE, or an empty "
-                     "line, ends the conversation.)", "info")
+            self.say("(Choose what to ask about with the arrow keys and "
+                     "Return, or type a word such as NAME, JOB or NEWS and "
+                     "press Return. BYE, or Escape, ends the "
+                     "conversation.)", "info")
         self.talk_menu()
 
     def talk_menu(self):
