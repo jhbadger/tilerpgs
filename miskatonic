@@ -4208,7 +4208,7 @@ class TkShell:
                               bd=1)
         self.entry.pack(side="left", fill="x", expand=True, padx=(0, 8),
                         pady=4)
-        self.entry.bind("<Return>", lambda e: game.on_entry())
+        self.entry.bind("<Return>", lambda e: game.on_entry() or "break")
         self.entry.bind("<Escape>", lambda e: game.end_talk())
         self.canvas = tk.Canvas(left, bg="black", highlightthickness=0)
         self.canvas.pack(fill="both", expand=True)
@@ -5635,6 +5635,9 @@ class KivyShell:
                 if key == 27:
                     game.end_talk()
                     return True
+                if key in (273, 274) and game.talk:
+                    game.on_key(Key(KIVY_KEYS[key], 0))     # choosing
+                    return True
                 return False            # typing a word to say
             name = KIVY_KEYS.get(key)
             if name is None and codepoint:
@@ -6422,6 +6425,17 @@ class Game:
     # ── Turns ──
 
     def on_key(self, ev):
+        if self.talk and self.menu and not self.busy and \
+                not ev.state & 0x0C:
+            # Talking: the arrow keys choose a word, Return says it.
+            # (Return in the box where you type is on_entry's.)
+            k = ev.keysym
+            if k in ("Up", "KP_Up", "Down", "KP_Down"):
+                self.menu_move(-1 if k.endswith("Up") else 1)
+                return
+            if k in ("Return", "KP_Enter"):
+                self.menu_pick()
+                return
         k = ev.keysym
         if self.talk and k == "Escape":
             self.end_talk()
@@ -8313,6 +8327,9 @@ class Game:
     def on_entry(self, ev=None):
         text = self.shell.take_entry().strip()
         if not self.talk:
+            return
+        if not text and self.menu:
+            self.menu_pick()            # the word the arrow keys chose
             return
         self.menu = None
         self.say("> " + (text or "bye"), "you")
