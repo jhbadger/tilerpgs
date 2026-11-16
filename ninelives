@@ -1862,6 +1862,96 @@ def all_tiles():
         tiles[name + "@1"] = px[1:] + [[None] * 16]     # a bob: up a pixel
     return tiles
 
+
+# Drawing every tile and turning it into RGBA, pixel by pixel in Python, is
+# most of the time a slow tablet takes to start, so the RGBA is kept in a
+# file between runs, named by a checksum of this script: editing the art
+# makes it again.
+
+TILE_CACHE_FORMAT = 1
+
+
+def tile_rgba():
+    """name -> (RGBA bytes, darkened RGBA bytes or None for a sprite), and
+    name -> average colour of each terrain tile; from the cache if it's
+    there.  Like all_tiles(), it fills in SPRITES."""
+    path = None
+    try:
+        with open(os.path.abspath(globals()["__file__"]), "rb") as fh:
+            sig = zlib.crc32(fh.read())
+        path = os.path.join(MUSIC_CACHE, "tiles-%d-%08x.bin" % (
+            TILE_CACHE_FORMAT, sig))
+        with open(path, "rb") as fh:
+            rgba, avg = unpack_tiles(fh.read())
+    except (KeyError, OSError, ValueError, TypeError, IndexError,
+            zlib.error):
+        rgba, avg = make_tile_rgba(all_tiles())
+        if path:
+            save_tiles(path, rgba, avg)
+        return rgba, avg
+    for name, (_, dark) in rgba.items():
+        if dark is None:
+            SPRITES.add(name.split("@")[0])
+    return rgba, avg
+
+
+def make_tile_rgba(tiles):
+    rgba, avg = {}, {}
+    clear = b"\0\0\0\0"
+    for name, px in tiles.items():
+        sprite = name.split("@")[0] in SPRITES
+        flat, dark = bytearray(), bytearray()
+        for row in px:
+            for c in row:
+                if not c:
+                    flat += clear
+                    dark += clear
+                    continue
+                flat += bytes.fromhex(c[1:]) + b"\xff"
+                if not sprite:
+                    dark += bytes.fromhex(shade(c, 0.36)[1:]) + b"\xff"
+        rgba[name] = (bytes(flat), None if sprite else bytes(dark))
+        if not sprite:
+            avg[name] = "#%02x%02x%02x" % tuple(
+                sum(flat[i::4]) // 256 for i in range(3))
+    return rgba, avg
+
+
+def save_tiles(path, rgba, avg):
+    head = json.dumps([[n, d is not None, avg.get(n)]
+                       for n, (_, d) in rgba.items()]).encode()
+    body = b"".join(f + (d or b"") for f, d in rgba.values())
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        for old in os.listdir(os.path.dirname(path)):
+            if old.startswith("tiles-") and old.endswith(".bin"):
+                os.remove(os.path.join(os.path.dirname(path), old))
+        tmp = path + ".tmp"
+        with open(tmp, "wb") as fh:
+            fh.write(zlib.compress(len(head).to_bytes(4, "big") + head +
+                                   body, 1))
+        os.replace(tmp, path)
+    except OSError:
+        pass
+
+
+def unpack_tiles(data):
+    data = zlib.decompress(data)
+    n = int.from_bytes(data[:4], "big")
+    pos, rgba, avg = 4 + n, {}, {}
+    for name, has_dark, colour in json.loads(data[4:pos]):
+        size = 1024 * (2 if has_dark else 1)
+        chunk = data[pos:pos + size]
+        if len(chunk) != size:
+            raise ValueError("short tile cache")
+        pos += size
+        rgba[name] = (chunk[:1024], chunk[1024:] if has_dark else None)
+        if colour:
+            avg[name] = colour
+    if pos != len(data):
+        raise ValueError("long tile cache")
+    return rgba, avg
+
 # ── Copper Springs ───────────────────────────────────────────────────────────
 #
 # A grid of streets in the desert: Main Street and its cross streets, the
@@ -3400,6 +3490,14 @@ class Sound:
             atexit.register(self.stop_music)
             self.dir = tempfile.mkdtemp(prefix="ninelives-")
             atexit.register(shutil.rmtree, self.dir, True)
+
+    def begin(self):
+        """Make the effects and the music, on a thread of their own.  The
+        game calls this once its window is up: Python runs one thread at a
+        time, so making them while the game loads only slows the loading
+        (much, on a slow tablet), and until they're made nothing plays."""
+        if self.player and not getattr(self, "begun", False):
+            self.begun = True
             threading.Thread(target=self.synthesize, daemon=True).start()
 
     @staticmethod
@@ -4703,23 +4801,18 @@ class KivyScreen:
 
     def add_tiles(self, tiles):
         """More tiles, or new looks for old ones, once the game's begun."""
-        for name, px in tiles.items():
-            sprite = name.split("@")[0] in SPRITES
-            flat, dark = bytearray(), bytearray()
-            for row in px:
-                for c in row:
-                    if not c:
-                        flat += b"\0\0\0\0"
-                        continue
-                    flat += bytes((int(c[1:3], 16), int(c[3:5], 16),
-                                   int(c[5:7], 16), 255))
-                    if not sprite:
-                        d = shade(c, 0.36)
-                        dark += bytes((int(d[1:3], 16), int(d[3:5], 16),
-                                       int(d[5:7], 16), 255))
-            self.img[name] = self.texture(16, 16, bytes(flat))
-            if not sprite:
-                self.dimg[name] = self.texture(16, 16, bytes(dark))
+        self.add_rgba(make_tile_rgba(tiles)[0])
+
+    def load_rgba(self, rgba):
+        """Textures of tile_rgba()'s tiles, and of the darkened terrain."""
+        self.img, self.dimg = {}, {}
+        self.add_rgba(rgba)
+
+    def add_rgba(self, rgba):
+        for name, (flat, dark) in rgba.items():
+            self.img[name] = self.texture(16, 16, flat)
+            if dark is not None:
+                self.dimg[name] = self.texture(16, 16, dark)
 
     def set_scale(self, s):
         """(The textures are drawn at whatever size the squares are.)"""
@@ -5616,6 +5709,7 @@ class Game:
             self.restore(saved["game"])
         except (KeyError, TypeError, ValueError, IndexError, zlib.error):
             self.shell.after(50, self.new_game)
+        self.shell.after(300, self.sound.begin)     # once the map's up
         self.music_tick()
         self.animate()
         self.pad = Gamepad()
@@ -5729,6 +5823,13 @@ class Game:
     def load_images(self):
         """The tiles, darkened copies of the terrain for squares remembered
         but not seen, and an average colour of each for the map."""
+        if hasattr(self.screen, "load_rgba"):       # Kivy: from the cache
+            rgba, self.avg = tile_rgba()
+            self.animated = {n for n in rgba if n + "@1" in rgba}
+            self.tile_names = set(rgba)
+            self.screen.load_rgba(rgba)
+            self.screen.set_scale(self.scale)
+            return
         tiles = all_tiles()
         self.avg = {}
         for name, px in tiles.items():
