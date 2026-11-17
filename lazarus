@@ -1753,11 +1753,28 @@ def draw_terrain(name, frame=0):
         rect(g, 4, 6, 11, 9, "#40e090")
         return g
     if name == "stairs_down" or name == "stairs_up":
-        g = grid_of("#1a1c20" if name == "stairs_down" else "#5a5e64")
+        # A ladder, with an arrow on it the way it goes: down into a dark
+        # shaft, or up toward a lit hatch.
+        down = name == "stairs_down"
+        g = grid_of("#1a1c20" if down else "#5a5e64")
+        if down:
+            rect(g, 0, 12, 15, 15, "#08090a")
+        else:
+            rect(g, 0, 0, 15, 3, "#a0a4aa")
         for y in range(1, 16, 3):
             rect(g, 4, y, 11, y, "#c0a020")
         rect(g, 3, 0, 3, 15, "#8a8e94")
         rect(g, 12, 0, 12, 15, "#8a8e94")
+        ink = "#f07020" if down else "#40e090"
+        for k in range(5):              # the arrowhead, 1 to 9 wide
+            y = 10 - k if down else 3 + k
+            rect(g, 7 - k - 1, y - 1, 8 + k + 1, y + 1, "#000000")
+        sy = (2, 6) if down else (7, 12)        # its shaft
+        rect(g, 5, sy[0] - 1, 10, sy[1] + 1, "#000000")
+        rect(g, 6, sy[0], 9, sy[1], ink)
+        for k in range(5):
+            y = 10 - k if down else 3 + k
+            rect(g, 7 - k, y, 8 + k, y, ink)
         return g
     # ── below ──
     if name == "dwall_dig":
@@ -6029,13 +6046,13 @@ class Game:
 
 
 
-    def ask_crew(self, done, title="Out of cryo"):
+    def ask_crew(self, done, title="Out of cryo", name=None, sex=None):
         """Crew creation: name, class, speciality, rolled Stats, in the
         shell's dialog, which calls done(who), or done(None) if
-        cancelled."""
+        cancelled.  name and sex, if given, fill the form to start."""
         rng = random.Random()
         state = {"rolled": self.roll_crew(rng)}
-        sex0 = rng.choice("MF")
+        sex0 = sex or rng.choice("MF")
 
         def who_of(w):
             return {"name": " ".join(w["name"].split())[:24] or "Crew",
@@ -6070,7 +6087,7 @@ class Game:
             done(None if w is None else who_of(w))
         self.shell.ask_form(title, {
             "heading": ("Who's in the pod?", F("Helvetica", 16, "bold")),
-            "name": person_name(rng, sex0),
+            "name": name or person_name(rng, sex0),
             "sexes": (("F", "Woman"), ("M", "Man")), "sex": sex0,
             "fields": [
                 {"kind": "choice", "key": "class", "label": "Class",
@@ -7795,15 +7812,21 @@ class Game:
         sex = "F" if name.split()[0] in FIRST_F else "M"
         if not getattr(self, "headless", False):
             self.ask_crew(lambda w: self.next_crew_go(name, sex, w),
-                          "The next pod opens")
+                          "The next pod opens", name, sex)
             return
         self.next_crew_go(name, sex, None)
 
     def next_crew_go(self, name, sex, who):
         if who is None:
             who = self.default_crew(name, sex)
-        who["name"] = name
-        who["sex"] = sex
+        if who["name"] != name:
+            # The player renamed the sleeper: they're who was in the pod.
+            crew = self.world["crew"]
+            if who["name"] in crew or who["name"] in self.crew_lost:
+                who["name"] = name      # don't let two crew share a name
+            else:
+                crew[crew.index(name)] = who["name"]
+        name = who["name"]
         lost = self.crew_lost
         self.p = self.make_crew(who)
         self.p["on"]["cryosick"] = 60
