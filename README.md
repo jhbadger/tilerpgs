@@ -1608,8 +1608,9 @@ The rules are Broken Moon's: The Black Hack's, as Barbarians of the Ruined
 Earth uses them. Six stats rolled 2d6+5; a d20 rolled under a stat for
 everything that might fail; foes who never roll to hit; damage by Hit
 Dice; armor (barding) that soaks it; usage dice for rations, lamp oil and
-ammunition; the Out of Action table and Destiny Points. Caps are bottle
-caps. You go up a level for each passkey, and when New Clover hears you've
+ammunition; the Out of Action table and Destiny Points. Wounds also close
+on their own, 1 HP every two hours while you're fed and not poisoned.
+Caps are bottle caps. You go up a level for each passkey, and when New Clover hears you've
 broken two slave pens.
 
 Eight kinds of wastelander, each with its own hit die, damage, weapons,

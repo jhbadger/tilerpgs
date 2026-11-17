@@ -105,6 +105,7 @@ SAVE_FILE = os.path.join(HOME_DIR, ".ashenclover.json")
 # day; the Goddess wakes at midnight at the end of the twenty-first.
 
 DAY = 1440
+MEND_EVERY = 120               # minutes for a wound to close by 1 HP
 START_HOUR = 8
 DEADLINE = 21 * DAY - START_HOUR * 60
 
@@ -5490,6 +5491,9 @@ bargain. Foes never roll to hit: you roll to get out of the
 way. A foe two Hit Dice above your level gives you
 Disadvantage (roll twice, keep the worse). Armor soaks hits.
 At 0 hit points you're Out of Action: roll on the table.
+Wounds close by themselves, 1 HP every two hours, while
+you're fed and not poisoned; rest, beds, healers and
+potions are quicker.
 Destiny Points save you from the worst, now and then.
 
 Food, lamp oil and ammunition have a usage die: after use,
@@ -7858,6 +7862,9 @@ class Game:
             p["poison"] -= 1
             if p["poison"] % 20 == 0 and p["hp"] > 1:
                 p["hp"] -= 1
+        elif self.turn % MEND_EVERY == 0 and 0 < p["hp"] < p["maxhp"] \
+                and not p["hungry"]:
+            p["hp"] += 1                # wounds close, slowly, if fed
         if p["torch"] and getattr(self, "area", None) and self.area.dark:
             p["torch_turns"] += 1
             if p["torch_turns"] >= 60:
