@@ -1416,9 +1416,28 @@ sea. His door is sealed by a Moon Ward that only three Moonstones open, and
 his three warlords hold them. Win the stones, walk through the ward, and
 end him.
 
-Each turn is a minute. You start in the Meeting Hall of the Free Hold of
-Philadelphia, the morning after you walked in off the road with the chain
-still on your wrists.
+Each turn is a minute in a city (a square of the wilds takes an hour). You
+start in the Meeting Hall of the Free Hold of Philadelphia, the morning
+after you walked in off the road with the chain still on your wrists.
+
+### The wilds
+
+Between the cities lie the wilds of the old coast, walked a square at a
+time. Walk off the edge of a city to go out into them, and onto a city to
+go in (you come in on the side you came from). Each city is one square,
+and the old highways join them: they are the quickest way and the safest.
+The mountains run down the west and the sea along the east, with the
+Chesapeake reaching up past Baltimore and three rivers coming down to the
+sea. Off the highways are scrub, old woods, hills, marsh, the fallen towns
+of the old world, and craters where pieces of the Moon came down (their
+light makes you moon-sick, unless you're a Robot). Monsters roam the
+wilds, more of them at night and off the highways, and of the kinds that
+live near the nearest city: dogs and raiders round Philadelphia, ape-men
+towards New York, gearlings and ghouls towards Boston, crabs and crocs on
+the bay, the Sorcerer-King's gilded guards near Washington, and ghosts by
+the fallen moonstone. The wilds are drawn fresh for each game; the cities
+and the highways stay where they are. M shows the wilds' map while you're
+in them.
 
 ### The coast
 
@@ -1444,9 +1463,10 @@ cracked, rubble at their feet and vines climbing them.
   its steps, the Broken Needle with its tip in the grass, the Seated Giant's
   temple and the White House. A rebels' cellar and the great slave pen.
 
-The roads between them take days on foot (a riding lizard halves them), and
-something may follow you in off the road. The lairs below (or, in New York,
-up) are three levels each, and dark: light a torch.
+A riding lizard crosses the wilds twice as fast, and walking off the edge
+of a city on one also offers a ride down the highway to any city you've
+already been to. Something may follow you in off the road. The lairs below
+(or, in New York, up) are three levels each, and dark: light a torch.
 
 ### Heroes and rules
 
