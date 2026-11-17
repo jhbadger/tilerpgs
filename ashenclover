@@ -22,7 +22,9 @@ in the wasteland into hers.  The Cathedral is sealed by an old Ministry
 seal that only three Ministry passkeys open, and Red Eye's three
 lieutenants hold them, in Maretropolis, Crownspire and Hoofport.
 
-You start in New Clover, the town in the ruins, by the Lantern Hall.
+You start in Stable Two, which a song from outside has been calling to
+its door.  Between the towns lies the wasteland, walked a square at a time
+as in Penultimate, with monsters of its own.
 
 Classes: Brawler, Griffon, Stable Dweller, Steel Ranger, Zebra Shaman,
 Unicorn Mage, Scamp and Pegasus, each with its own hit die, damage die,
@@ -112,10 +114,12 @@ CITY_GROUND = {"road", "cracked", "pave", "weeds", "grass", "path", "bridge",
                "quay", "sand", "square", "debris", "steps", "bog", "ash"}
 INSIDE_FLOOR = {"floor", "plank", "dirt", "tile", "rug", "marble"}
 DUNGEON_FLOOR = {"dfloor", "rails", "pool", "rubble_low", "glyph", "ooze"}
-WALKABLE = CITY_GROUND | INSIDE_FLOOR | DUNGEON_FLOOR | {
+SITE_TILES = {"site_vale", "site_metro", "site_crown", "site_port",
+              "site_colt"}
+WALKABLE = CITY_GROUND | INSIDE_FLOOR | DUNGEON_FLOOR | SITE_TILES | {
     "door", "exit", "stairs_up", "stairs_down", "hole", "ward_open",
-    "bones"}
-OPAQUE = {"city": set(),
+    "bones", "waste", "waste2", "hills", "pink", "glow"}
+OPAQUE = {"city": set(), "world": {"deadwood", "mountain", "ruin"},
           "inside": {"wall", "wall_brick", "shelf", "palisade"},
           "dungeon": {"dwall"}}
 WATER = {"water"}
@@ -276,24 +280,24 @@ HUMAN = {"Brawler", "Stable Dweller", "Zebra Shaman", "Unicorn Mage",
          "Scamp"}
 SNEAKY = {"Stable Dweller", "Scamp"}
 DARKSIGHT = {"Griffon", "Steel Ranger"}
-# How each comes to be in New Clover on the first morning.
+# How each comes to be in Stable Two on the first morning.
 ORIGIN = {
-    "Stable Dweller": "Two days ago the great door of Stable Two rolled "
-                      "open for the first time in two hundred years, and "
-                      "you were the one sent out, %s, with a PipBuck and a "
-                      "lunch. This morning the Mayor sent for you.",
-    "Steel Ranger": "Your Elder sent you from Crownspire to see what came "
-                    "out of Stable Two, %s. What came out was trouble. "
-                    "This morning the Mayor sent for you.",
-    "Griffon": "You flew in off the wasteland last night, %s, with your "
-               "Talon contract torn up and your pockets empty. This "
-               "morning the Mayor sent for you.",
-    "Zebra Shaman": "You walked in off the road last night, %s, with your "
-                    "potions and your rhymes, and nopony threw anything. "
-                    "This morning the Mayor sent for you.",
-    None: "You came in off the road last night, %s, with the slavers' "
-          "chain marks still on your legs. This morning the Mayor sent for "
-          "you.",
+    "Griffon": "You hatched in Stable Two, %s, from an egg a griffon "
+               "refugee left the night the door shut, and you've been the "
+               "Stable's only griffon ever since. This morning the "
+               "Overmare sent for you.",
+    "Zebra Shaman": "Your great-great-grandmother came into Stable Two "
+                    "with the last refugees before the door shut, %s, and "
+                    "taught your family the old brews. This morning the "
+                    "Overmare sent for you.",
+    "Steel Ranger": "A Steel Ranger sheltered in Stable Two before the "
+                    "bombs, and left her armor in the armory; you're the "
+                    "first since who fits it, %s. This morning the "
+                    "Overmare sent for you.",
+    None: "You were born in Stable Two, %s, like your parents and theirs, "
+          "under the hill, with a PipBuck on your foreleg and two hundred "
+          "years of rock over your head. This morning the Overmare sent "
+          "for you.",
 }
 
 Weapon = namedtuple("Weapon", "ranged twohand ammo cost desc")
@@ -1397,6 +1401,13 @@ PONY_SHAPES = {
           "....x.d...c.d...",
           "....c.d...c.d...",
           "....h.h...h.h..."),
+    "J": _with(_E, mid=("........mcaa....",     # a Stable jumpsuit
+                        ".nn..aaaaaaaa...",
+                        "nnn.aoooooooa...",
+                        "nn..aaaaaaaaa...",
+                        "n...aaaaaaaaa...",
+                        "....a.a...a.a...",
+                        "....a.a...a.a...")),
     "F": ("................",                   # a foal
           "................",
           "................",
@@ -1532,9 +1543,25 @@ PEOPLE = {
     "goddess": pony("A", "#e070c0", "#ffe0ff", "#ffffff", eye="#ff80ff",
                     white="#ffffff", horn="#fff0ff"),
 }
+# the ponies of Stable Two, in blue and yellow
+JUMP, STRIPE = "#3a5aa8", "#e0c030"
+PEOPLE.update({
+    "overmare": pony("J", "#e8d8b0", "#a04060", hat=JUMP, horn=STRIPE),
+    "s_doctor": pony("J", "#f0f0f0", "#40a0a0", hat="#e8e8f0",
+                     horn="#c04040"),
+    "s_cook": pony("J", "#f0b070", "#6a3a1a", hat=JUMP, horn=STRIPE),
+    "s_security": pony("J", "#7a7a8a", "#2a2a3a", hat="#2a3a6a",
+                       horn=STRIPE),
+    "s_quarter": pony("J", "#b0c890", "#4a6a2a", hat=JUMP, horn=STRIPE),
+    "s_friend": pony("J", "#f0c0d0", "#7040c0", hat=JUMP, horn=STRIPE),
+    "s_aide": pony("J", "#c0d0f0", "#303060", hat=JUMP, horn=STRIPE),
+    "s_engineer": pony("J", "#a08060", "#f0a020", hat=JUMP, horn=STRIPE),
+    "s_gardener": pony("F", "#a0e0a0", "#40a040", "#f0e040"),
+})
 TOWNSFOLK_TILES = ["folk%d" % n for n in range(1, 9)]
 WOMEN_TILES = {"brawler_f", "dweller_f", "ranger_f", "zebra_f", "mage_f",
                "scamp_f", "pegasus_f", "healer", "leader_f", "folk2",
+               "overmare", "s_doctor", "s_friend",
                "folk4", "folk6", "captive_f"}
 
 
@@ -1786,8 +1813,8 @@ def draw_terrain(name, frame=0):
         speckle(g, rng, ["#d8c498", "#b8a478", "#e0d0a8"], 0.4)
         return g
     if name == "ash":
-        g = grid_of("#5a5652")
-        speckle(g, rng, ["#6a6662", "#4a4642", "#3a3632"], 0.45)
+        g = grid_of("#7a7670")
+        speckle(g, rng, ["#8a8680", "#6a6662", "#5e5a56"], 0.45)
         return g
     if name == "bog":
         g = grid_of("#3a4a2a")
@@ -2180,6 +2207,140 @@ def draw_terrain(name, frame=0):
         disc(g, 5, 7, 2.2, "#d8d0b8")
         rect(g, 9, 6, 10, 12, "#c8c0a8")
         return g
+    # ── the wasteland between the towns ──
+    if name == "waste":
+        g = grid_of("#7a6a52")
+        speckle(g, rng, ["#86765c", "#6a5a44", "#8e7e62"], 0.4)
+        cracks(g, rng, "#5a4a36", 3, 7)
+        return g
+    if name == "waste2":                # the same, another way cracked
+        g = grid_of("#7e6e54")
+        speckle(g, rng, ["#8a7a5e", "#6e5e46", "#948466"], 0.45)
+        cracks(g, rng, "#5a4a36", 2, 9)
+        return g
+    if name == "deadwood":
+        g = draw_terrain("waste")
+        for tx, ty, hgt in ((4, 7, 8), (11, 4, 9)):
+            rect(g, tx, ty, tx + 1, ty + hgt, "#4a4038")
+            for bx, by in ((-2, 1), (2, 0), (-1, -2), (3, 3)):
+                g[ty + by + 2][tx + bx] = "#5a5048"
+                g[ty + by + 3][tx + bx // 2] = "#5a5048"
+            rect(g, tx - 1, ty + hgt, tx + 2, ty + hgt, "#3a3028")
+        return g
+    if name == "hills":
+        g = draw_terrain("waste")
+        for hx, hy, rw in ((5, 11, 5.5), (11, 8, 4.5)):
+            for y in range(16):
+                for x in range(16):
+                    d = ((x - hx) / rw) ** 2 + ((y - hy) / (rw * 0.7)) ** 2
+                    if d < 1 and y <= hy + 2:
+                        g[y][x] = "#b09a70" if x < hx - 1 else \
+                            "#9a8460" if x <= hx else "#5e4c36"
+                    elif 1 <= d < 1.25 and y > hy:
+                        g[y][x] = "#5a4a34"
+        return g
+    if name == "mountain":
+        g = grid_of("#6a6460")
+        poly_fill(g, [(0, 15), (6, 2), (12, 15)], "#8a847e")
+        poly_fill(g, [(6, 15), (12, 5), (16, 15)], "#7a746e")
+        poly_fill(g, [(5, 4), (6, 2), (7.5, 5)], "#c8c4c0")
+        poly_fill(g, [(11, 7), (12, 5), (13, 7.5)], "#c8c4c0")
+        return g
+    if name == "ruin":                  # a farmhouse, long fallen
+        g = draw_terrain("waste")
+        rect(g, 2, 6, 3, 13, "#8a7a6a")
+        rect(g, 2, 12, 12, 13, "#8a7a6a")
+        rect(g, 11, 9, 12, 13, "#8a7a6a")
+        rect(g, 5, 4, 6, 7, "#9a8a7a")
+        for x, y in ((7, 11), (9, 10), (4, 9), (13, 14), (8, 14)):
+            g[y][x] = "#6a5e52"
+        return g
+    if name == "pink":
+        g = draw_terrain("waste")
+        prng = random.Random("pink" + str(frame))
+        for y in range(16):
+            for x in range(16):
+                t = 0.45 + 0.25 * math.sin((x + y * 0.7 + frame * 3) / 2.5)
+                g[y][x] = mix(g[y][x], "#f0a0d0", t)
+        speckle(g, prng, ["#ffd0f0"], 0.05)
+        return g
+    if name == "glow":
+        g = draw_terrain("ash")
+        disc(g, 7.5, 7.5, 7, "#3a3a32")
+        disc(g, 7.5, 7.5, 5, "#4a5a2a")
+        disc(g, 7.5, 7.5, 3, "#8af040" if frame == 0 else "#5ac030")
+        disc(g, 7.5, 7.5, 1.5, "#e0ffa0")
+        return g
+    if name.startswith("site_"):
+        g = draw_terrain("waste")
+        town = name[5:]
+        if town == "vale":                      # ruined cottages, a hall
+            for x0 in (1, 10):
+                rect(g, x0, 9, x0 + 4, 14, "#c8b890")
+                poly_fill(g, [(x0 - 1, 9.5), (x0 + 6, 9.5), (x0 + 2.5, 6)],
+                          "#7a3a2a")
+            rect(g, 6, 5, 9, 14, "#d8c8a0")
+            poly_fill(g, [(5, 5.5), (11, 5.5), (8, 1)], "#7a3a2a")
+            g[3][8] = "#f0d060"
+        elif town == "metro":                   # broken towers
+            for x0, top in ((1, 4), (6, 1), (11, 6)):
+                rect(g, x0, top, x0 + 3, 15, "#9a9488")
+                for y in range(top + 1, 15, 2):
+                    g[y][x0 + 1] = g[y][x0 + 2] = "#4a5060"
+                g[top][x0 + 3] = g[top + 1][x0 + 3] = "#7a6a52"
+        elif town == "crown":                   # a spire in the pink
+            for y in range(16):
+                for x in range(16):
+                    g[y][x] = mix(g[y][x], "#f0a0d0", 0.45)
+            rect(g, 6, 5, 9, 15, "#e8e4d8")
+            poly_fill(g, [(5.5, 5.5), (10.5, 5.5), (8, 0)], "#a070c0")
+            g[0][8] = GOLD
+            rect(g, 2, 10, 4, 15, "#d8d4c8")
+            rect(g, 11, 9, 13, 15, "#d8d4c8")
+        elif town == "port":                    # the lighthouse, the sea
+            rect(g, 0, 12, 15, 15, "#2a4a5e")
+            for y in range(2, 13):
+                half = 1 + (y - 2) // 4
+                rect(g, 8 - half, y, 8 + half, y,
+                     "#e8e4d8" if (y // 3) % 2 else "#c83a2a")
+            rect(g, 7, 0, 9, 2, "#f0e070")
+            rect(g, 1, 9, 5, 12, "#9a5a3a")
+        elif town == "colt":                    # stacks, smoke, fire
+            for x0 in (3, 9):
+                rect(g, x0, 3, x0 + 2, 15, BRICK)
+                rect(g, x0, 3, x0 + 2, 3, "#3a3a3a")
+            disc(g, 5, 1.5, 1.6, "#6a6670")
+            disc(g, 11, 1, 1.6, "#6a6670")
+            rect(g, 0, 11, 15, 15, "#4a4448")
+            rect(g, 6, 12, 8, 15, "#e05020")
+        return g
+    # ── Stable Two ──
+    if name == "vwall":
+        g = grid_of("#5a6a7a")
+        rect(g, 0, 0, 15, 1, "#7a8a9a")
+        for x in (0, 8):
+            rect(g, x, 0, x, 15, "#3a4a5a")
+        for x, y in ((3, 4), (12, 4), (3, 11), (12, 11)):
+            g[y][x] = "#9aaaba"
+        rect(g, 0, 7, 15, 7, "#e0c030")
+        return g
+    if name == "vfloor":
+        g = grid_of("#8a9098")
+        for k in range(0, 16, 4):
+            rect(g, k, 0, k, 15, "#7a8088")
+            rect(g, 0, k, 15, k, "#7a8088")
+        speckle(g, rng, ["#9aa0a8"], 0.08)
+        return g
+    if name == "cogexit":
+        g = grid_of("#2a2a2e")
+        disc(g, 7.5, 7.5, 7.5, "#9aa0a8")
+        disc(g, 7.5, 7.5, 5.5, "#7a8088")
+        disc(g, 7.5, 7.5, 2, "#5a5e66")
+        for k in range(8):
+            a = math.pi * k / 4
+            g[int(round(7.5 + 7 * math.sin(a)))][
+                int(round(7.5 + 7 * math.cos(a)))] = "#e0c030"
+        return g
     raise KeyError(name)
 
 
@@ -2196,10 +2357,13 @@ TERRAIN = ["grass", "weeds", "road", "cracked", "pave", "square", "steps",
            "shelf", "forge", "anvil", "barrel", "bars", "cauldron", "plant",
            "throne", "crate", "scrap", "exit", "dwall", "dfloor",
            "rubble_low", "rails", "pool", "ooze", "glyph", "stairs_up",
-           "stairs_down", "gate", "console", "bones"] + \
+           "stairs_down", "gate", "console", "bones", "waste",
+           "deadwood", "hills", "mountain", "pink", "glow", "vwall",
+           "waste2", "ruin",
+           "vfloor", "cogexit"] + sorted(SITE_TILES) + \
     [t for pair in THEMES.values() for t in pair]
 ANIMATED_TERRAIN = {"water", "campfire", "forge", "cauldron", "pool",
-                    "glyph", "ward", "console", "bog"}
+                    "glyph", "ward", "console", "bog", "pink", "glow"}
 
 
 # ── Landmarks ────────────────────────────────────────────────────────────────
@@ -2771,7 +2935,8 @@ LANDMARKS = {
     # name: (squares across, down, the ground, the painter, the squares
     # you can walk on, how it is ruined)
     # Clover Vale
-    "stabledoor": (6, 3, "grass", lm_stabledoor, (),
+    "stabledoor": (6, 3, "grass", lm_stabledoor,
+                   tuple((i, 2) for i in range(6)),
                    dict(bites=0, vines=0.6)),
     "lanternhall": (5, 5, "pave", lm_lanternhall, (),
                     dict(bites=3, depth=0.3)),
@@ -3016,6 +3181,7 @@ CITIES = {
         ],
         "fixed": [("campfire", 32, 33), ("tent", 28, 34), ("tent", 34, 34),
                   ("campfire", 21, 9), ("sign", 26, 19)],
+        "stable_door": (6, 8),
         "sites": {
             "hall": ("the Town Hall", "hall", (4, 2, None), "b_brick"),
             "smithy": ("Brass Tack's workshop", "smithy", (4, 3, "L"),
@@ -3315,6 +3481,10 @@ def make_city(world, cid, flags):
     for tile, x, y in spec.get("fixed", ()):
         g[y][x] = tile
         used.add((x, y))
+    if spec.get("stable_door"):
+        x, y = spec["stable_door"]
+        area.links[(x, y)] = ("stable",)
+        area.labels[(x, y)] = "Stable Two"
     if spec.get("lair_door"):
         x, y = spec["lair_door"]
         area.links[(x, y)] = ("lair", cid)
@@ -3548,6 +3718,33 @@ FIXED = {
     ("vale", "stablehand"): ("stablehand", "Calamity", "the sky-wagon "
                              "pilot", "Howdy. Y'need flyin' somewhere? "
                              "Ah fly fast."),
+    ("stable", "overmare"): ("overmare", "Overmare Bright Ledger",
+                             "the Overmare of Stable Two",
+                             "There you are. Sit down. No, don't sit down; "
+                             "there isn't time."),
+    ("stable", "healer"): ("s_doctor", "Doctor Feverfew", "the Stable's "
+                           "doctor", "Out of bed already? Good. Let me "
+                           "look at you before you go."),
+    ("stable", "cook"): ("s_cook", "Cookie Crumb", "the cook",
+                         "Hay casserole again. It's always hay casserole."),
+    ("stable", "smith"): ("s_security", "Chief Steelwool", "the head of "
+                          "security", "Halt. Oh, it's you. At ease."),
+    ("stable", "trader"): ("s_quarter", "Quartermaster Tally",
+                           "the quartermaster",
+                           "Sign here, and here, and here. Then we'll "
+                           "talk about what you can take."),
+    ("stable", "friend"): ("s_friend", "Sunny Side", "your oldest friend",
+                           "You're really going out there? Really "
+                           "really?"),
+    ("stable", "aide"): ("s_aide", "Ledger Line", "the Overmare's aide",
+                         "The Overmare will see you now. Well, she's "
+                         "seeing you now."),
+    ("stable", "engineer"): ("s_engineer", "Gizmo", "the engineer",
+                             "Don't touch that. Or that. Especially not "
+                             "that."),
+    ("stable", "gardener"): ("s_gardener", "Sprout", "a Stable foal",
+                             "Is it true there's a sky? What colour is "
+                             "it?"),
     ("metro", "leader"): ("leader_f", "Homage", "the voice of the radio",
                           "Shh. I'm on air in ten minutes. Talk fast, "
                           "Stable pony."),
@@ -3730,6 +3927,69 @@ ROLE_TALK = {
     },
 }
 CITY_TALK = {
+    "stable": {
+        "overmare": {
+            "job": "I keep Stable Two. For two hundred years the first rule "
+                   "of keeping it has been: the DOOR stays shut. Today I'm "
+                   "breaking it.",
+            "door": "The great door, at the west end of the atrium. It "
+                    "hasn't opened since the bombs fell. It opens today, "
+                    "for you, and shuts behind you.",
+            "singing": "A month ago the radios started picking up a SONG "
+                       "from outside. Now ponies sleepwalk to the door at "
+                       "night, humming it. Three got halfway through the "
+                       "airlock before Security caught them.",
+            "song": "Lovely, and many-voiced, and it wants us. Find out "
+                    "what's singing it, and stop it. That's an order. "
+                    "Well, a request. You're the one going outside.",
+            "outside": "Above us are the ruins of CLOVER VALE. Our last "
+                       "radio contact says ponies live up there now: a "
+                       "town called NEW CLOVER. Find its MAYOR.",
+            "mayor": "Whoever's in charge in New Clover. If anypony "
+                     "outside knows what the song is, they will.",
+            "news": "Two more sleepwalkers last night. Security has "
+                    "chained the airlock wheel. Hurry.",
+        },
+        "healer": {"job": "I keep the Stable healthy. Ask me to HEAL you "
+                          "before you go, and come back if you can.",
+                   "news": "Nopony here has ever seen a sunburn. You'll be "
+                           "the first."},
+        "cook": {"job": "I feed the Stable. Hay casserole, hay soup, hay "
+                        "surprise. The surprise is more hay.",
+                 "news": "I've packed you a lunch. It's hay casserole."},
+        "smith": {"job": "I keep the Stable safe, and the armory locked. "
+                         "For you, it's open: ask to TRADE.",
+                  "news": "Two hundred years and Security's never had to "
+                          "fire a shot. Don't make us start now."},
+        "trader": {"job": "I keep the stores. Rations, lamp oil, potions. "
+                          "Caps, mind: we kept the old money in the vault "
+                          "just in case. Ask to TRADE.",
+                   "news": "The stores say we've food for another hundred "
+                           "years. The song says we won't need it."},
+        "friend": {"job": "Fixing the water pumps with Gizmo. Not that you "
+                          "care, now you're an ADVENTURER.",
+                   "adventurer": "Bring me something from outside. "
+                                 "Anything. A rock. A real rock, from "
+                                 "under a real sky.",
+                   "news": "I heard the song last night too. I didn't "
+                           "follow it. I didn't. I just... listened."},
+        "aide": {"job": "I keep the Overmare's diary and the Stable's "
+                        "records. Every birth, every death, every broken "
+                        "toilet, two hundred years of them.",
+                 "news": "You'll be the first entry in the records under "
+                         "OUTSIDE."},
+        "engineer": {"job": "I keep the reactor humming and the water "
+                            "clean. The DOOR's mine too, technically.",
+                     "door": "Hydraulics are fine. Seals are fine. I've "
+                             "oiled the cog every week for twenty years "
+                             "for exactly nothing. Till today.",
+                     "news": "The radios pick up the song best at night. "
+                             "I've unplugged most of them. Most."},
+        "gardener": {"job": "I help with the carrots! And the tomatoes. "
+                            "The tomatoes are mean.",
+                     "news": "Mama says outside is full of monsters. Is "
+                             "it? Will you bring me one?"},
+    },
     "metro": {
         "leader": {
             "stable-tec tower": "The broken tower. GRIMJAW lives at the "
@@ -4326,6 +4586,248 @@ def make_dungeon(world, lid, level, flags):
         area.mobs.append(m)
     return area
 
+# ── The wasteland ────────────────────────────────────────────────────────────
+#
+# Between the towns lies the wasteland, walked a square at a time as in
+# Penultimate: each town is one square on it, joined to the next by an old
+# road.  Off the roads are ash flats, dead woods, hills, a ring of
+# mountains round Crownspire with the Pink Cloud inside it, a river, the
+# sea along the south, and craters that still glow.  Its shape is drawn
+# fresh for each game; the towns and the roads between them stay put.
+
+WORLD_W, WORLD_H = 80, 60
+WORLD_STEP = 45                 # minutes a square of wasteland takes
+WORLD_SITES = {"vale": (22, 30), "metro": (26, 8), "crown": (64, 11),
+               "port": (32, 49), "colt": (58, 47)}
+WORLD_GROUND = {"waste", "waste2", "ash", "hills", "road", "cracked",
+                "bridge", "pink", "glow", "weeds"}
+# what roams the wasteland near each town
+REGION_DANGER = {"vale": ["bloatsprite", "dog", "raider"],
+                 "metro": ["raider", "raidergun", "hellhound", "dog"],
+                 "crown": ["ghoul", "ghost", "spritebot", "bloatsprite"],
+                 "port": ["raider", "crab", "raidergun", "cragadile"],
+                 "colt": ["slaver", "enforcer", "sniper", "dog"]}
+WORLD_LOOK = {"waste": "Dry, cracked earth, as far as you can see.",
+              "waste2": "Dry, cracked earth, as far as you can see.",
+              "ash": "Grey ash, ankle deep. Nothing grows.",
+              "hills": "Low hills of rubble and dust.",
+              "mountain": "Mountains, grey and sheer. No way over.",
+              "deadwood": "A dead wood: grey trunks, no leaves, no birds.",
+              "pink": "The Pink Cloud, thin here. It smells of candy floss.",
+              "glow": "A crater, glowing green. Your PipBuck clicks.",
+              "ruin": "The bones of a farmhouse."}
+
+
+def smooth_noise(rng, w, h, cell):
+    gw, gh = w // cell + 2, h // cell + 2
+    pts = [[rng.random() for _ in range(gw)] for _ in range(gh)]
+    out = []
+    for y in range(h):
+        gy = y / cell
+        y0 = int(gy)
+        ty = gy - y0
+        ty = ty * ty * (3 - 2 * ty)
+        row = []
+        for x in range(w):
+            gx = x / cell
+            x0 = int(gx)
+            tx = gx - x0
+            tx = tx * tx * (3 - 2 * tx)
+            a = pts[y0][x0] + (pts[y0][x0 + 1] - pts[y0][x0]) * tx
+            b = pts[y0 + 1][x0] + (pts[y0 + 1][x0 + 1] - pts[y0 + 1][x0]) * tx
+            row.append(a + (b - a) * ty)
+        out.append(row)
+    return out
+
+
+def fractal(rng, w, h):
+    layers = [(smooth_noise(rng, w, h, c), wt)
+              for c, wt in ((16, 0.5), (8, 0.3), (4, 0.2))]
+    return [[sum(l[y][x] * wt for l, wt in layers) for x in range(w)]
+            for y in range(h)]
+
+
+def nearest_town(x, y):
+    return min(WORLD_SITES, key=lambda c: abs(WORLD_SITES[c][0] - x) +
+               abs(WORLD_SITES[c][1] - y))
+
+
+def make_wasteland(world):
+    """The wasteland between the towns: the same each time it is made in
+    one game."""
+    import heapq
+    W, H = WORLD_W, WORLD_H
+    rng = random.Random("%s:wasteland" % world["seed"])
+    elev, moist = fractal(rng, W, H), fractal(rng, W, H)
+    cx, cy = WORLD_SITES["crown"]
+
+    def level(field, frac):
+        """The value that frac of the map lies above."""
+        vals = sorted(v for row in field for v in row)
+        return vals[int(len(vals) * (1 - frac))]
+    peak, hill = level(elev, 0.05), level(elev, 0.16)
+    wood, dry = level(moist, 0.16), level(moist, 0.88)
+    g = []
+    for y in range(H):
+        row = []
+        for x in range(W):
+            e, m = elev[y][x], moist[y][x]
+            t = "mountain" if e > peak else "hills" if e > hill else \
+                "deadwood" if m > wood else "ash" if m < dry else "waste"
+            d = math.hypot(x - cx, y - cy)
+            if 9 <= d <= 11.2:
+                t = "mountain"                  # Crownspire's mountains
+            elif d < 9 and d > 1.5 and (e > hill or m > dry):
+                t = "pink"                      # the Pink Cloud
+            elif d < 9 and t == "mountain":
+                t = "hills"
+            if y >= 53 + 2.5 * math.sin(x / 7.0) + 3 * (e - 0.5) or \
+                    (x > 70 and y > 42 + (78 - x) * 0.4):
+                t = "water"                     # the sea
+            row.append(t)
+        g.append(row)
+    for y in range(0, H):                       # the river, to the sea
+        x = int(round(45 + 5 * math.sin(y / 8.0) + 2 * math.sin(y / 3.1)))
+        if g[y][x] != "water" and math.hypot(x - cx, y - cy) > 11.5:
+            g[y][x] = "water"
+    sites = set(WORLD_SITES.values())
+
+    def far_from_sites(x, y, n):
+        return all(abs(x - sx) + abs(y - sy) > n for sx, sy in sites)
+    for _ in range(9):                          # craters that still glow
+        x, y = rng.randrange(3, W - 3), rng.randrange(3, H - 9)
+        if not far_from_sites(x, y, 7) or g[y][x] == "water":
+            continue
+        r = rng.choice((1, 1.5, 2.2))
+        for yy in range(int(y - r), int(y + r) + 1):
+            for xx in range(int(x - r), int(x + r) + 1):
+                if math.hypot(xx - x, yy - y) <= r and \
+                        g[yy][xx] not in ("water", "mountain"):
+                    g[yy][xx] = "glow"
+    for y in range(H):                          # farmhouses, long fallen
+        for x in range(W):
+            if g[y][x] in ("waste", "ash") and rng.random() < 0.02:
+                g[y][x] = "ruin"
+            elif g[y][x] == "waste" and rng.random() < 0.5:
+                g[y][x] = "waste2"
+
+    # the old roads, where they're cheapest to have run
+    def cost(x, y):
+        t = g[y][x]
+        return {"water": 7, "mountain": 9, "deadwood": 3, "glow": 6,
+                "pink": 2, "hills": 2, "road": 0.5,
+                "bridge": 0.5}.get(t, 1.2) + 0.3 * elev[y][x]
+    for a, b in ROADS:
+        start, goal = WORLD_SITES[a], WORLD_SITES[b]
+        dist, prev, q = {start: 0}, {}, [(0, start)]
+        while q:
+            d, p = heapq.heappop(q)
+            if p == goal:
+                break
+            if d > dist.get(p, 1e9):
+                continue
+            for dx, dy in DIRS:
+                n = (p[0] + dx, p[1] + dy)
+                if not (0 <= n[0] < W and 0 <= n[1] < H):
+                    continue
+                if n in sites and n != goal:
+                    continue
+                nd = d + cost(*n)
+                if nd < dist.get(n, 1e9):
+                    dist[n], prev[n] = nd, p
+                    heapq.heappush(q, (nd, n))
+        p = prev.get(goal)
+        while p and p != start:
+            x, y = p
+            g[y][x] = "bridge" if g[y][x] in ("water", "bridge") else \
+                "cracked" if rng.random() < 0.25 else "road"
+            p = prev.get(p)
+    area = Area("world", ("world",), g, "the wasteland", edge="ash")
+    area.sites = {}
+    for cid, (x, y) in WORLD_SITES.items():
+        g[y][x] = "site_" + cid
+        area.links[(x, y)] = ("town", cid)
+        area.labels[(x, y)] = CITIES[cid]["name"]
+        area.sites[(x, y)] = cid
+    sx, sy = WORLD_SITES["vale"]
+    area.start = next((sx + dx, sy + dy) for dx, dy in DIRS
+                      if g[sy + dy][sx + dx] in WORLD_GROUND)
+    return area
+
+
+# ── Stable Two ───────────────────────────────────────────────────────────────
+#
+# Under Clover Vale's hill, behind the cog: four rooms over a corridor and
+# four under it, and the great door at the west end.  W wall, . floor, E
+# bed, S shelf, C counter, T table, R rug, K console, X crate, B barrel,
+# P plant, + the great door, and digits for the ponies who live here.
+
+STABLE_ROWS = (
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WE.E.E.E.EWE.E.E..PPWSCCCCCCCSWKKK...SSSW",
+    "W.........W.........W....3....W.RRRRR...W",
+    "W.........W...2.....WT.T...T.TW.RR1RR..7W",
+    "WE.E...E.EWE.E...E.SWT.T...T.TW.RRRRR..PW",
+    "WWWWW.WWWWWWWWW.WWWWWWWWW.WWWWWWWWW.WWWWW",
+    "W.......................................W",
+    "+...6...................................W",
+    "W.......................................W",
+    "WWWWW.WWWWWWWWW.WWWWWWWWW.WWWWWWWWW.WWWWW",
+    "WXXX......WSSSS.SSSSWKKKK.KKKKWPPPP.PPPPW",
+    "W.........W.........W.........W.........W",
+    "W....4....WCCCC.CCCCW...8.....W...9.....W",
+    "WXX.....XXW....5....WKK.....KKWPP.PPP.PPW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+)
+STABLE_CAST = {"1": "overmare", "2": "healer", "3": "cook", "4": "smith",
+               "5": "trader", "6": "friend", "7": "aide", "8": "engineer",
+               "9": "gardener"}
+STABLE_ROOMS = [((1, 1, 9, 4), "the living quarters"),
+                ((11, 1, 19, 4), "the clinic"),
+                ((21, 1, 29, 4), "the cafeteria"),
+                ((31, 1, 39, 4), "the Overmare's office"),
+                ((1, 6, 39, 8), "the atrium"),
+                ((1, 10, 9, 13), "the armory"),
+                ((11, 10, 19, 13), "the stores"),
+                ((21, 10, 29, 13), "the reactor room"),
+                ((31, 10, 39, 13), "hydroponics")]
+STABLE_DOOR = (1, 7)            # just inside the great door
+STABLE_BED = (2, 2)
+VALE_STABLE = CITIES["vale"]["stable_door"]     # its cog door, outside
+
+
+def stable_room(x, y):
+    for (x0, y0, x1, y1), name in STABLE_ROOMS:
+        if x0 <= x <= x1 and y0 <= y <= y1:
+            return name
+    return "Stable Two"
+
+
+def make_stable(world):
+    tiles = dict(ROOM_TILES, K="console")
+    g, spots = [], []
+    for y, row in enumerate(STABLE_ROWS):
+        line = []
+        for x, ch in enumerate(row):
+            if ch.isdigit():
+                spots.append((STABLE_CAST[ch], x, y))
+                line.append("floor")
+            else:
+                line.append(tiles.get(ch, "floor"))
+        g.append(line)
+    area = Area("inside", ("stable",), g, "Stable Two")
+    area.skin = {"wall": "vwall", "floor": "vfloor", "exit": "cogexit"}
+    area.city = "vale"
+    area.kind_of = "stable"
+    area.start = STABLE_DOOR
+    for role, x, y in spots:
+        m = make_person(world, "stable", role, x, y)
+        m.shop = {"smith": "smith", "trader": "trader"}.get(role)
+        m.city = "vale"
+        area.mobs.append(m)
+    return area
+
+
 # ── Sound ────────────────────────────────────────────────────────────────────
 
 RATE = 22050
@@ -4353,6 +4855,18 @@ MUSIC = {
         "voices": [("triangle", 0.5, 0.22, "R2 - - F2 - -"),
                    ("square", 0.5, 0.03, ". . T4 . . F4")],
         "drums": "k . . h . h",
+    },
+    "wastes": {     # the wasteland: a lonely walk under the cloud
+        "tempo": 180, "bar": 8,
+        "chords": "Dm Dm C Dm  Bb F C Dm",
+        "lead": ("saw", 0.5, 0.04),
+        "melody": """
+            D4 - - - F4 - A4 - | A4 - - - G4 - F4 - | E4 - - - G4 - C5 - |
+            D5 - - - - - . .   | D5 - C5 - Bb4 - A4 - | F4 - - - A4 - C5 - |
+            E4 - G4 - C5 - E4 - | D4 - - - - - . .""",
+        "voices": [("triangle", 0.5, 0.2, "R2 . . . F2 . . ."),
+                   ("square", 0.25, 0.02, ". . T4 . . . . .")],
+        "drums": ". . . . k . . .",
     },
     "pink": {       # Crownspire: a music box under the Pink Cloud
         "tempo": 200, "bar": 8,
@@ -4964,7 +5478,8 @@ F + direction       fire, throw or shoot
 C                   cast a spell or brew a potion
 U                   use, eat, light, wield or wear something
 I                   PipBuck: stats   J  PipBuck: quests
-M                   map of the town  + / -  zoom
+M                   map of the town or wasteland
++ / -               zoom
 V / B               sound / music    N  new game
 Ctrl-Q / Cmd-Q      quit (saved)
 
@@ -4980,6 +5495,9 @@ Destiny Points save you from the worst, now and then.
 Food, lamp oil and ammunition have a usage die: after use,
 roll it; a 1 or 2 means it steps down (d12, d10, d8, d6,
 d4, gone). Caps are bottle caps: the wasteland's money.
+
+Walk off the edge of a town into the wasteland, a square
+at a time; walk onto a town to go in. Roads are safer.
 
 Bring three Ministry passkeys to the Cathedral in
 Coltchester before the Goddess wakes: midnight, the 21st
@@ -6770,16 +7288,13 @@ class Game:
         self.surface = None
         self.reset_view()
         self.shell.log_clear()
-        area = self.get_area(("bld", "vale", "hall"))
-        self.city_pos["vale"] = list(door_step(
-            self.get_area(("city", "vale")), ("bld", "vale", "hall")))
-        self.area, self.pos = area, list(area.start)
-        self.flags.add("been:vale")
-        self.say("New Clover, in the ruins of Clover Vale. The first day.",
-                 "quest")
+        area = self.get_area(("stable",))
+        self.city_pos["vale"] = [VALE_STABLE[0] - 1, VALE_STABLE[1]]
+        self.area, self.pos = area, list(STABLE_BED)
+        self.say("Stable Two, under Clover Vale. The first day.", "quest")
         self.say(ORIGIN.get(cls, ORIGIN[None]) % name)
-        self.say("Mayor Clover Thistlewick waits in the Town Hall, at the "
-                 "far end by the rug. Walk into ponies to talk to them.",
+        self.say("Overmare Bright Ledger waits in her office, at the east "
+                 "end of the Stable. Walk into ponies to talk to them.",
                  "talk")
         self.say("Press ? for help.", "info")
         self.layout()
@@ -6843,8 +7358,8 @@ class Game:
         if getattr(self, "p", None) and getattr(self, "area", None) and \
                 self.overlay != "lost":
             for k, a in self.cache.items():
-                if k[0] == "city":
-                    self.seen[k[1]] = pack_bits(a.seen)
+                if k[0] in ("city", "world"):
+                    self.seen[k[-1]] = pack_bits(a.seen)
             data["game"] = {
                 "seed": self.world["seed"], "player": self.p,
                 "flags": sorted(self.flags), "topics": sorted(self.topics),
@@ -6891,6 +7406,16 @@ class Game:
                         for x in range(area.w) if area.grid[y][x] in lit
                         for dx in range(-3, 4) for dy in range(-3, 4)
                         if abs(dx) + abs(dy) <= 4}
+        elif key[0] == "stable":
+            area = make_stable(w)
+        elif key[0] == "world":
+            area = make_wasteland(w)
+            if "world" in self.seen:
+                try:
+                    area.seen = unpack_bits(self.seen["world"],
+                                            area.w * area.h)
+                except (ValueError, zlib.error):
+                    pass
         elif key[0] == "bld":
             cid, sid = key[1], key[2]
             if cid not in CITIES or sid not in CITIES[cid]["sites"]:
@@ -6953,6 +7478,9 @@ class Game:
 
     def go_outside(self):
         """Out of a building, onto its doorstep."""
+        if self.area.key == ("stable",):
+            self.out_of_stable()
+            return
         cid = self.area.city or self.city
         city = self.get_area(("city", cid))
         self.cache = {k: v for k, v in self.cache.items() if k[0] != "dun"}
@@ -6970,6 +7498,102 @@ class Game:
             return
         if kind == "lair":
             self.at_lair(link[1], x, y)
+        elif kind == "stable":
+            self.city_pos[self.city] = list(self.pos)
+            area = self.get_area(("stable",))
+            self.say("The cog rolls aside for you, grinding, and you go "
+                     "back into Stable Two.", "info")
+            self.enter(area, STABLE_DOOR, "stairs")
+        elif kind == "town":
+            self.enter_town(link[1], x - self.pos[0], y - self.pos[1])
+
+    def out_of_stable(self):
+        """Through the great door, into Clover Vale's ruins."""
+        city = self.get_area(("city", "vale"))
+        self.city = "vale"
+        self.enter(city, self.city_pos.get("vale") or city.start, "stairs")
+        if "been:vale" not in self.flags:
+            self.flags.add("been:vale")
+            self.say("The great cog rolls aside with a scream of old steel, "
+                     "and you step out under the sky for the first time. It "
+                     "isn't blue. It's a lid of grey cloud, from one edge of "
+                     "the world to the other.", "quest")
+            self.say(CITIES["vale"]["intro"], "info")
+            self.say("Find the Mayor of New Clover: the Town Hall is in the "
+                     "middle of town, north of the old Lantern Hall. Walk "
+                     "off the edge of the town into the wasteland, when "
+                     "you're ready.", "talk")
+        else:
+            self.say("You climb out of Stable Two into Clover Vale.", "info")
+
+    def leave_town(self, dx, dy):
+        """Off the edge of a town: out into the wasteland on hoof, or,
+        with Calamity's sky-wagon, anywhere you've been."""
+        if not self.p["lizard"]:
+            self.to_wasteland(dx, dy)
+            return
+        here = self.city
+        items = [("Walk out into the wasteland",
+                  lambda: self.to_wasteland(dx, dy))]
+        for cid in CITY_ORDER:
+            if cid != here and "been:" + cid in self.flags:
+                hours = flight_days(here, cid) * 12
+                items.append(("Fly to %s with Calamity (%d hours)" % (
+                    CITIES[cid]["name"], hours),
+                    lambda cid=cid: self.travel_to(cid)))
+        items.append(("Stay in %s" % CITIES[here]["name"], lambda: None))
+        self.open_menu("Leaving %s" % CITIES[here]["name"], items)
+
+    def to_wasteland(self, dx, dy):
+        cid = self.city
+        self.city_pos[cid] = list(self.pos)
+        self.cache = {k: v for k, v in self.cache.items()
+                      if k[0] in ("city", "world", "stable")}
+        w = self.get_area(("world",))
+        sx, sy = WORLD_SITES[cid]
+        spots = [(sx + dx, sy + dy)] + [(sx + ex, sy + ey)
+                                        for ex, ey in DIRS]
+        pos = next((p for p in spots if w.inside(*p) and
+                    w.grid[p[1]][p[0]] in WORLD_GROUND and
+                    not w.mob_at(*p)), (sx, sy))
+        self.enter(w, pos, "door")
+        self.say("You leave %s for the wasteland. (Towns are red on the "
+                 "map: M.)" % CITIES[cid]["name"], "info")
+
+    def enter_town(self, cid, dx, dy):
+        """Into a town from the wasteland, by the side you came from."""
+        self.city = cid
+        self.cache = {k: v for k, v in self.cache.items()
+                      if k[0] in ("city", "world", "stable")}
+        city = self.get_area(("city", cid))
+        target = (CITY_W - 2 if dx < 0 else 1 if dx > 0 else STREET_X[3],
+                  CITY_H - 2 if dy < 0 else 1 if dy > 0 else STREET_Y[2])
+        reach = getattr(city, "reach", None)
+        if reach is None:
+            reach = city.reach = [p for p in reachable(
+                city, ARRIVE, CITY_GROUND) if p not in city.links]
+        pos = min(reach, key=lambda p: abs(p[0] - target[0]) +
+                  abs(p[1] - target[1]) + (0 if p[0] in (0, CITY_W - 1) or
+                                           p[1] in (0, CITY_H - 1) else 3))
+        self.enter(city, pos, "door")
+        self.arrive(cid)
+
+    def arrive(self, cid):
+        self.say("%s, %s." % (CITIES[cid]["name"], self.date_text()),
+                 "quest")
+        if "been:" + cid not in self.flags:
+            self.flags.add("been:" + cid)
+            self.say(CITIES[cid]["intro"], "info")
+            tip = {"metro": "The Tower Market is in the south-west "
+                            "blocks: free ponies, and Homage.",
+                   "crown": "The Steel Rangers' bunker is in the north. "
+                            "They talk to civilians. Sometimes.",
+                   "port": "The fishers' camp is in the middle of town: "
+                           "free ponies.",
+                   "colt": "Rebels hide in a cellar in the south-west "
+                           "blocks. Find them."}.get(cid)
+            if tip:
+                self.say(tip, "talk")
 
     def on_entering(self, area):
         if area.kind_of == "pen" and any(m.hostile for m in area.mobs):
@@ -7223,9 +7847,9 @@ class Game:
                              "everything until you do.", "bad")
                 p["hungry"] = True
         self.say("Day %d. The Goddess %s." % (
-            day, "wakes tonight!" if left <= 0 else
-            "will wake in %d days" % (left + 1) if left else
-            "will wake tomorrow night"), "quest" if left < 4 else "info")
+            day, "wakes tonight!" if left <= 1 else
+            "will wake tomorrow night" if left == 2 else
+            "will wake in %d days" % left), "quest" if left < 5 else "info")
 
     def timers(self):
         """What wears off, minute by minute."""
@@ -7400,7 +8024,11 @@ class Game:
             if a.kind == "inside":
                 self.go_outside()
             elif a.kind == "city":
-                self.travel_menu()
+                self.leave_town(dx, dy)
+            elif a.kind == "world":
+                self.say("The wasteland goes on and on that way, and "
+                         "there's nothing in it for you.", "info")
+                self.sound.play("bump")
             else:
                 self.bump()
             return
@@ -7457,6 +8085,10 @@ class Game:
             return
         self.step_on(x, y)
         slow = self.underfoot(x, y)
+        if a.kind == "world" and not self.overlay:
+            self.pass_time(WORLD_STEP - 1, quiet=True)  # a square is a walk
+            if self.overlay:
+                return
         self.end_turn()
         if slow and not self.busy and not self.overlay:
             self.end_turn()
@@ -7485,7 +8117,14 @@ class Game:
                              quiet=True)[0]:
                 self.say("The glyph flares: pink sparks bite you.", "bad")
                 self.take_damage(roll("1d4"), "The glyph", armor=False)
-        elif t == "ooze":
+        elif t == "glow":
+            if p["cls"] != "Steel Ranger" and not self.test(
+                    "CON", label="Constitution, against the glow",
+                    adv=1 if p["cls"] == "Brawler" else 0)[0]:
+                p["poison"] = max(p["poison"], 90)
+                self.say("Your PipBuck's clicking turns to a roar. Your "
+                         "teeth ache. Radiation sickness!", "bad")
+        elif t in ("ooze", "pink"):
             if p["cls"] != "Steel Ranger" and not self.test(
                     "CON", label="Constitution, against the pink cloud",
                     adv=1 if p["cls"] == "Brawler" else 0)[0]:
@@ -7586,6 +8225,8 @@ class Game:
                 "console": "Old machines, still blinking."}.get(t)
         if t.startswith("b_"):
             what = "A ruin, its doors long gone or bricked up."
+        if a.kind == "world":
+            what = WORLD_LOOK.get(t, what)
         if what:
             self.say(what, "info")
         self.sound.play("bump")
@@ -7643,13 +8284,14 @@ class Game:
             self.new_day()
         self.timers()
         now = self.phase()
-        if now != before and a.kind == "city":
-            self.say({"dawn": "Grey dawn over the ruins of %s.",
+        if now != before and a.kind in ("city", "world"):
+            self.say({"dawn": "Grey dawn over %s.",
                       "day": "The cloud brightens to day over %s.",
                       "dusk": "The cloud goes red with sunset over %s.",
                       "night": "Night in %s. Far off, the Goddess "
                                "sings."}[now]
-                     % CITIES[self.city]["name"], "info")
+                     % ("the wasteland" if a.kind == "world" else
+                        CITIES[self.city]["name"]), "info")
         if self.turn >= DEADLINE and "won" not in self.flags:
             self.doom()
             return
@@ -7668,6 +8310,8 @@ class Game:
                 self.wander(mob)
         if a.kind == "city":
             self.spawn_city()
+        elif a.kind == "world":
+            self.spawn_world()
         self.render()
 
     def can_go(self, mob, x, y):
@@ -7680,6 +8324,8 @@ class Game:
             return "swim" in traits
         if a.kind == "city":
             return t in CITY_GROUND and (x, y) not in a.links
+        if a.kind == "world":
+            return t in WORLD_GROUND and (x, y) not in a.links
         if a.kind == "inside":
             return t in INSIDE_FLOOR
         if t == "pool":
@@ -7820,6 +8466,32 @@ class Game:
                     or (x, y) in self.visible or a.mob_at(x, y)
                     or abs(x - px) + abs(y - py) < 8):
                 continue
+            a.mobs.append(make_monster(random.choice(kinds), x, y))
+            return
+
+    def spawn_world(self):
+        """The wasteland's hunters, thicker at night and off the roads,
+        and of the kinds that roam near the nearest town."""
+        a = self.area
+        px, py = self.pos
+        a.mobs = [m for m in a.mobs if not m.hostile or
+                  abs(m.x - px) + abs(m.y - py) <= 20]
+        rate = 0.11 if self.phase() == "night" else 0.05
+        if a.grid[py][px] in ("road", "cracked", "bridge"):
+            rate /= 2
+        if random.random() > rate or \
+                sum(m.hostile for m in a.mobs) >= 3 + self.day() // 5:
+            return
+        for _ in range(12):
+            ang = random.random() * 2 * math.pi
+            r = random.uniform(5, 9)
+            x, y = px + round(r * math.cos(ang)), py + round(r * math.sin(ang))
+            if not a.inside(x, y) or a.mob_at(x, y) or \
+                    a.grid[y][x] not in WORLD_GROUND or (x, y) in a.links:
+                continue
+            kinds = REGION_DANGER[nearest_town(x, y)]
+            if a.grid[y][x] == "pink":
+                kinds = ["ghoul", "ghost"]
             a.mobs.append(make_monster(random.choice(kinds), x, y))
             return
 
@@ -8496,7 +9168,9 @@ class Game:
     def ambush(self, text, n=1):
         a = self.area
         kinds = LAIRS[a.lead].monsters if a.kind == "dungeon" else \
-            CITIES[self.city]["danger"] if a.kind == "city" else None
+            CITIES[self.city]["danger"] if a.kind == "city" else \
+            REGION_DANGER[nearest_town(*self.pos)] if a.kind == "world" \
+            else None
         if not kinds:
             return
         px, py = self.pos
@@ -8510,7 +9184,8 @@ class Game:
                     a.mob_at(x, y):
                 continue
             t = a.grid[y][x]
-            if t not in CITY_GROUND and t not in DUNGEON_FLOOR:
+            if t not in CITY_GROUND and t not in DUNGEON_FLOOR and \
+                    (t not in WORLD_GROUND or (x, y) in a.links):
                 continue
             m = make_monster(random.choice(kinds[:3]), x, y)
             m.aware = True
@@ -8522,6 +9197,7 @@ class Game:
     # ── The road ──
 
     def travel_menu(self):
+        """Flights, for a hero with the sky-wagon (see leave_town)."""
         here = self.city
         items = []
         for cid in CITY_ORDER:
@@ -8545,7 +9221,8 @@ class Game:
         frm = self.city
         days = flight_days(frm, cid)
         minutes = int(days * DAY / (2 if p["lizard"] else 1))
-        self.city_pos[frm] = list(self.pos)
+        if self.area.kind == "city":
+            self.city_pos[frm] = list(self.pos)
         self.say("You set out for %s%s." % (
             CITIES[cid]["name"], " in Calamity's sky-wagon" if p["lizard"]
             else ""),
@@ -8555,24 +9232,10 @@ class Game:
             return
         self.city = cid
         self.cache = {k: v for k, v in self.cache.items()
-                      if k[0] == "city"}
+                      if k[0] in ("city", "world", "stable")}
         city = self.get_area(("city", cid))
         self.enter(city, ARRIVE, "door")
-        self.say("%s, %s." % (CITIES[cid]["name"], self.date_text()),
-                 "quest")
-        if "been:" + cid not in self.flags:
-            self.flags.add("been:" + cid)
-            self.say(CITIES[cid]["intro"], "info")
-            tip = {"metro": "The Tower Market is in the south-west "
-                            "blocks: free ponies, and Homage.",
-                   "crown": "The Steel Rangers' bunker is in the north. "
-                            "They talk to civilians. Sometimes.",
-                   "port": "The fishers' camp is in the middle of town: "
-                           "free ponies.",
-                   "colt": "Rebels hide in a cellar in the south-west "
-                           "blocks. Find them."}.get(cid)
-            if tip:
-                self.say(tip, "talk")
+        self.arrive(cid)
         if cid != "vale" and random.random() < min(0.8, 0.3 * days):
             self.ambush("Ambush! %s followed you in off the road." %
                         cap(ENEMIES[CITIES[cid]["danger"][0]].name + "s"),
@@ -8590,6 +9253,8 @@ class Game:
         self.hear(mob.greet)
         if mob.role == "elder":
             self.elder_turns(mob)
+        elif mob.role == "overmare":
+            self.overmare_turns(mob)
         self.talk_menu()
 
     def talk_menu(self):
@@ -8705,6 +9370,32 @@ class Game:
         elif n:
             self.npc_say(mob, "%d passkey%s. %d to go. The Goddess won't "
                               "wait." % (n, "" if n == 1 else "s", 3 - n))
+
+    def overmare_turns(self, mob):
+        """The Overmare sends you out, and is glad to see you back."""
+        p = self.p
+        if "met_overmare" not in self.flags:
+            self.flags.add("met_overmare")
+            self.npc_say(mob, "The radios have been picking up a SINGING "
+                              "from outside, and it's calling our ponies "
+                              "to the door in their sleep. Somepony has to "
+                              "go OUTSIDE and stop it. I've chosen you.")
+            self.npc_say(mob, "Take these. The Stable's caps, from the vault, "
+                              "and a potion from Doctor Feverfew. The great "
+                              "DOOR is at the west end of the atrium.")
+            p["coins"] += 30
+            p["count"]["salve"] = p["count"].get("salve", 0) + 1
+            self.say("(+30 caps and a healing potion.)", "gold")
+            return
+        n = len(p["stones"])
+        if "won" in self.flags:
+            self.npc_say(mob, "The singing's stopped. The sleepwalkers "
+                              "woke up this morning asking for breakfast. "
+                              "You did it.")
+        elif "been:metro" in self.flags or n:
+            self.npc_say(mob, "You came back! What's it like out there? "
+                              "No, don't tell me. The song's louder every "
+                              "night; get back out there.")
 
     def free_captives(self, mob):
         a = self.area
@@ -8915,9 +9606,11 @@ class Game:
                        if f.startswith("freed:"))
         lines += ["", "Slave pens broken: %s" % (", ".join(freed)
                                                  if freed else "none yet")]
-        lines += ["", "The roads (on hoof): Clover Vale to Maretropolis 2 "
-                  "days, Maretropolis to Crownspire 3,", "Clover Vale to "
-                  "Hoofport 2, Hoofport to Coltchester 1."]
+        lines += ["", "The wasteland (M shows it): Maretropolis is north "
+                  "of Clover Vale, and Crownspire far to its east, in the "
+                  "mountains under the Pink Cloud. Hoofport is south, on "
+                  "the coast, and Coltchester east of it along the shore. "
+                  "Old roads join them all, and are safer."]
         if self.topics:
             lines += ["", "Worth asking about: " + ", ".join(
                 sorted(self.topics))]
@@ -9294,7 +9987,7 @@ class Game:
                     self.turn < p["until"].get("deathsight", -1):
                 return 4
             return 1
-        if a.kind != "city":
+        if a.kind not in ("city", "world"):
             return None
         ph = self.phase()
         return None if ph == "day" else 9 if ph in ("dawn", "dusk") else 5
@@ -9402,7 +10095,7 @@ class Game:
     def draw_map(self):
         scr = self.screen
         W, H = scr.size()
-        a = self.area if self.area.kind == "dungeon" else \
+        a = self.area if self.area.kind in ("dungeon", "world") else \
             self.get_area(("city", self.city))
         rows = []
         for y in range(a.h):
@@ -9415,7 +10108,8 @@ class Game:
                     row.append("#e05040" if t in ("door", "hole", "ward",
                                                   "ward_open",
                                                   "stairs_down",
-                                                  "stairs_up") else
+                                                  "stairs_up") or
+                               t in SITE_TILES or (x, y) in a.links else
                                "#f0a040" if t == "campfire" else
                                self.avg.get(a.skin.get(t, t), "#808080"))
             rows.append(row)
@@ -9435,8 +10129,9 @@ class Game:
             px, py = self.city_pos.get(self.city) or a.start
         scr.rect(mx + px * z - 2, my + py * z - 2, mx + (px + 1) * z + 2,
                  my + (py + 1) * z + 2, outline="#ffff00", width=2)
-        title = a.name if a.kind == "dungeon" else "%s, %s" % (
-            CITIES[self.city]["name"], CITIES[self.city]["short"])
+        title = a.name if a.kind == "dungeon" else "The wasteland" \
+            if a.kind == "world" else "%s, %s" % (
+                CITIES[self.city]["name"], CITIES[self.city]["short"])
         scr.text(W / 2, my - 14, "%s   (red: ways in; any key closes)" %
                  title, F(*MONO), ACCENT)
 
@@ -9451,6 +10146,18 @@ class Game:
                     if (self.pos[0] + dx, self.pos[1] + dy) in a.labels]
             if near:
                 here += ", by " + near[0]
+        elif a.kind == "world":
+            px, py = self.pos
+            cid = nearest_town(px, py)
+            tx, ty = WORLD_SITES[cid]
+            here = "The wasteland, %s of %s" % (
+                compass(px - tx, py - ty), CITIES[cid]["name"])
+            near = [a.labels[(px + dx, py + dy)] for dx, dy in DIRS
+                    if (px + dx, py + dy) in a.labels]
+            if near:
+                here = "The wasteland, by " + near[0]
+        elif a.key == ("stable",):
+            here = "Stable Two: " + stable_room(*self.pos)
         elif a.kind == "inside":
             here = "%s, %s" % (a.name, CITIES[a.city]["name"])
         else:
@@ -9508,6 +10215,8 @@ class Game:
         self.shell.set_condition("\n".join(cond))
         if a.kind == "city":
             tune = CITIES[self.city]["tune"]
+        elif a.kind == "world":
+            tune = "wastes"
         elif a.kind == "inside":
             tune = "inside"
         else:
@@ -9737,6 +10446,23 @@ def selftest():
                 for name in {a.skin.get(t, t) for row in a.grid
                              for t in row}:
                     assert name in tiles, (lid, name)
+        # Stable Two, and the wasteland between the towns
+        a = make_stable(w)
+        assert a.grid[STABLE_DOOR[1]][STABLE_DOOR[0]] in INSIDE_FLOOR
+        assert a.grid[STABLE_BED[1]][STABLE_BED[0]] in INSIDE_FLOOR
+        seen = reachable(a, STABLE_DOOR, INSIDE_FLOOR)
+        for m in a.mobs:
+            assert any((m.x + dx, m.y + dy) in seen for dx, dy in DIRS), \
+                m.name
+        for name in {a.skin.get(t, t) for row in a.grid for t in row}:
+            assert name in tiles, ("stable", name)
+        wa = make_wasteland(w)
+        for name in {t for row in wa.grid for t in row}:
+            assert name in tiles, ("world", name)
+        seen = reachable(wa, wa.start, WORLD_GROUND)
+        for cid, (x, y) in WORLD_SITES.items():
+            assert any((x + dx, y + dy) in seen for dx, dy in DIRS), \
+                (seed, cid)
     for a, b in (("vale", "crown"), ("crown", "colt")):
         assert flight_days(a, b) > 0
     for name, tune in MUSIC.items():
@@ -9778,6 +10504,22 @@ def selftest():
             g.new_game((cls, "MF"[n % 2], cls, Game.roll_stats(cls)))
             g.view = (21, 15, 0, 0, 32)
             g.shown = [(None, None)] * (21 * 15)
+            # out of the Stable, out of town, and across the wasteland
+            g.pos = [STABLE_DOOR[0], STABLE_DOOR[1]]
+            g.move(-1, 0)
+            assert g.area.key == ("city", "vale"), g.area.key
+            g.pos = [0, STREET_Y[2]]
+            g.move(-1, 0)
+            assert g.area.kind == "world", g.area.key
+            for _ in range(60):
+                if g.overlay in ("lost", "doom"):
+                    break
+                g.overlay = g.menu = None
+                g.talk = None
+                if g.area.kind != "world":
+                    break
+                g.move(*random.choice(DIRS))
+            g.overlay = g.menu = None
             for city in CITY_ORDER[1:] + ["vale"]:
                 if g.overlay:
                     break
