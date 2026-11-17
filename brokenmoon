@@ -20,7 +20,9 @@ make a slave of every living thing between the mountains and the sea.  His
 door is sealed by a Moon Ward that only three Moonstones open, and his
 three warlords hold them, under New York, Boston and Baltimore.
 
-You start in the Free Hold of Philadelphia, by the cracked bell.
+You start in the Free Hold of Philadelphia, by the cracked bell.  Between
+the cities lie the wilds of the old coast, walked a square at a time, with
+monsters of their own.
 
 Classes: Barbarian, Beastman, Scavenger, Robot, Death Priest, Sorcerer,
 Urchin and Raptor, each with its own hit die, damage die, weapons, armor
@@ -108,10 +110,15 @@ CITY_GROUND = {"road", "cracked", "pave", "weeds", "grass", "path", "bridge",
                "quay", "sand", "square", "debris", "steps", "bog", "ash"}
 INSIDE_FLOOR = {"floor", "plank", "dirt", "tile", "rug", "marble"}
 DUNGEON_FLOOR = {"dfloor", "rails", "pool", "rubble_low", "glyph", "ooze"}
-WALKABLE = CITY_GROUND | INSIDE_FLOOR | DUNGEON_FLOOR | {
-    "door", "exit", "stairs_up", "stairs_down", "hole", "ward_open",
-    "bones"}
-OPAQUE = {"city": set(),
+# the wilds between the cities: each city is one square of them
+SITE_TILES = {"site_phila", "site_newyork", "site_boston", "site_baltimore",
+              "site_washington"}
+WILD_GROUND = {"wild", "wild2", "hills", "road", "cracked", "bridge", "bog",
+               "ash", "moonfall"}
+WALKABLE = CITY_GROUND | INSIDE_FLOOR | DUNGEON_FLOOR | WILD_GROUND | \
+    SITE_TILES | {"door", "exit", "stairs_up", "stairs_down", "hole",
+                  "ward_open", "bones"}
+OPAQUE = {"city": set(), "world": {"forest", "mountain"},
           "inside": {"wall", "wall_brick", "shelf", "palisade"},
           "dungeon": {"dwall"}}
 WATER = {"water"}
@@ -1796,6 +1803,108 @@ def draw_terrain(name, frame=0):
         disc(g, 5, 7, 2.2, "#d8d0b8")
         rect(g, 9, 6, 10, 12, "#c8c0a8")
         return g
+    # ── the wilds between the cities ──
+    if name in ("wild", "wild2"):       # scrub and long grass gone to seed
+        g = grid_of("#5a6a3a" if name == "wild" else "#5e6c3c")
+        speckle(g, rng, ["#66783f", "#4e5e32", "#6e7a44"], 0.4)
+        speckle(g, rng, ["#6a5a3a", "#7a8a4a"], 0.05)
+        if name == "wild2":
+            speckle(g, rng, ["#c0b060", "#b07a9a"], 0.02)    # wildflowers
+        return g
+    if name == "forest":
+        g = draw_terrain("wild")
+        for cx, cy, r in ((4.5, 5, 4.2), (11.5, 6, 4.4), (7.5, 11, 4.6)):
+            disc(g, cx, cy, r, "#24401a", rng, 0.6)
+            disc(g, cx - 0.4, cy - 0.5, r - 1.2, "#2e5222", rng, 0.5)
+            disc(g, cx - 1.2, cy - 1.4, r * 0.4, "#3e6a2e", rng, 0.4)
+        return g
+    if name == "hills":
+        g = draw_terrain("wild")
+        for hx, hy, rw in ((5, 11, 5.5), (11, 8, 4.5)):
+            for y in range(16):
+                for x in range(16):
+                    d = ((x - hx) / rw) ** 2 + ((y - hy) / (rw * 0.7)) ** 2
+                    if d < 1 and y <= hy + 2:
+                        g[y][x] = "#8a9a5a" if x < hx - 1 else \
+                            "#76864c" if x <= hx else "#4a5a2e"
+                    elif 1 <= d < 1.25 and y > hy:
+                        g[y][x] = "#3e4a26"
+        return g
+    if name == "mountain":
+        g = grid_of("#4e5652")
+        poly_fill(g, [(0, 15), (6, 2), (12, 15)], "#6e7672")
+        poly_fill(g, [(6, 15), (12, 5), (16, 15)], "#5e6662")
+        poly_fill(g, [(5, 4), (6, 2), (7.5, 5)], "#d8dce0")
+        poly_fill(g, [(11, 7), (12, 5), (13, 7.5)], "#d8dce0")
+        speckle_within(g, rng, "#4e5652", ["#3e5a32", "#46603a"], 0.5)
+        return g
+    if name == "oldtown":               # a town of the old world, fallen in
+        g = draw_terrain("wild")
+        rect(g, 1, 3, 6, 8, "#8a847a")
+        rect(g, 2, 4, 5, 7, "#3a3430")
+        rect(g, 9, 2, 14, 6, "#7a3a2a")
+        rect(g, 9, 6, 14, 7, "#8a847a")
+        rect(g, 3, 11, 10, 14, "#8a847a")
+        rect(g, 4, 12, 9, 13, "#2e2a26")
+        rect(g, 12, 10, 14, 14, "#9a948a")
+        for x, y in ((7, 4), (11, 9), (2, 10), (13, 1), (8, 9)):
+            g[y][x] = "#6a645a"
+        weeds_in(g, rng, 0.1)
+        return g
+    if name == "moonfall":              # where a piece of the Moon came down
+        g = draw_terrain("ash")
+        disc(g, 7.5, 7.5, 7, "#34343e")
+        disc(g, 7.5, 7.5, 5, "#4a5a72")
+        disc(g, 7.5, 7.5, 3.4, "#a8c8f0" if frame == 0 else "#7aa0d8")
+        poly_fill(g, [(6, 9.5), (7.5, 3), (9.5, 8), (8.5, 11)], "#f0f8ff")
+        return g
+    if name.startswith("site_"):        # each city, as seen from the wilds
+        g = draw_terrain("wild")
+        city = name[5:]
+        if city == "phila":             # the Bell in its frame of beams
+            rect(g, 2, 2, 3, 15, "#6a4a2a")
+            rect(g, 12, 2, 13, 15, "#6a4a2a")
+            rect(g, 1, 2, 14, 3, "#7a5632")
+            poly_fill(g, [(5, 13), (6, 5), (9.5, 5), (10.5, 13)], "#9a6a30")
+            disc(g, 7.75, 5.5, 2.2, "#9a6a30")
+            rect(g, 4, 12, 11, 13, "#b0803a")
+            for y in range(6, 12):      # the crack
+                g[y][7 + (y % 2)] = "#3a2a1a"
+            rect(g, 7, 14, 8, 14, "#3a2a1a")
+        elif city == "newyork":         # the Spire, snapped, in the water
+            rect(g, 0, 12, 15, 15, "#2a4a5e")
+            rect(g, 5, 4, 10, 15, "#9a9488")
+            rect(g, 6, 2, 9, 4, "#8a8478")
+            for y in range(5, 14, 2):
+                for x in (6, 8):
+                    g[y][x] = "#3a4050"
+            poly_fill(g, [(9, 2), (10.5, 0), (11, 4)], "#7a746a")
+            rect(g, 1, 9, 3, 15, "#7a746a")
+            rect(g, 12, 7, 14, 15, "#8a8478")
+        elif city == "boston":          # the Old North steeple
+            rect(g, 4, 9, 11, 15, "#9a3e2a")
+            rect(g, 6, 4, 9, 9, "#e8e4d8")
+            poly_fill(g, [(5.5, 4.5), (10.5, 4.5), (8, 0)], "#d8d4c8")
+            rect(g, 7, 6, 8, 7, "#3a3430")
+            rect(g, 7, 12, 8, 15, "#3a2a1a")
+        elif city == "baltimore":       # the Star Fort on its point
+            rect(g, 0, 11, 15, 15, "#2a4a5e")
+            poly_fill(g, [(7.5, 1), (9.3, 5.5), (14, 5.5), (10.3, 8.5),
+                          (12, 13), (7.5, 10.3), (3, 13), (4.7, 8.5),
+                          (1, 5.5), (5.7, 5.5)], "#6a8a4a")
+            disc(g, 7.5, 7, 2, "#8a7a5a")
+            g[6][7] = g[6][8] = "#c83a2a"
+        elif city == "washington":      # the Shattered Dome, gilded
+            rect(g, 1, 11, 14, 15, "#e8e4d8")
+            rect(g, 3, 8, 12, 11, "#d8d4c8")
+            disc(g, 7.5, 8, 4.4, GOLD)
+            rect(g, 2, 9, 13, 11, "#d8d4c8")
+            rect(g, 7, 2, 8, 4, GOLD)
+            for x, y in ((6, 5), (7, 6), (8, 5), (9, 6)):
+                g[y][x] = "#3a3430"     # the crack
+            for x in range(3, 13, 2):
+                rect(g, x, 12, x, 15, "#b8b4a8")
+        return g
     raise KeyError(name)
 
 
@@ -1812,10 +1921,11 @@ TERRAIN = ["grass", "weeds", "road", "cracked", "pave", "square", "steps",
            "shelf", "forge", "anvil", "barrel", "bars", "cauldron", "plant",
            "throne", "crate", "scrap", "exit", "dwall", "dfloor",
            "rubble_low", "rails", "pool", "ooze", "glyph", "stairs_up",
-           "stairs_down", "gate", "console", "bones"] + \
-    [t for pair in THEMES.values() for t in pair]
+           "stairs_down", "gate", "console", "bones", "wild", "wild2",
+           "forest", "hills", "mountain", "oldtown", "moonfall"] + \
+    sorted(SITE_TILES) + [t for pair in THEMES.values() for t in pair]
 ANIMATED_TERRAIN = {"water", "campfire", "forge", "cauldron", "pool",
-                    "glyph", "ward", "console", "bog"}
+                    "glyph", "ward", "console", "bog", "moonfall"}
 
 
 # ── Landmarks ────────────────────────────────────────────────────────────────
@@ -3176,11 +3286,13 @@ ROLE_TALK = {
                     "GEARWITCH holds Boston, and the CRAB BARON holds "
                     "Baltimore. Each keeps a stone in his lair.",
         "ape-king": "Up the Spire in NEW YORK, with his drums and his "
-                    "apes. Two days north on foot.",
+                    "apes. A day's walk north-east, up the old highway.",
         "gearwitch": "Under the Gold Dome in BOSTON, in the old train "
-                     "tunnels. Three days beyond New York.",
-        "crab baron": "In the Star Fort at BALTIMORE, two days south. "
-                      "Washington is a day further on.",
+                     "tunnels. A day and more beyond New York, up the "
+                     "coast.",
+        "crab baron": "In the Star Fort at BALTIMORE, a day south-west, "
+                      "on the bay. Washington is most of a day further "
+                      "on.",
         "pens": "Slave PENS in every city he owns. Break them open, send "
                 "the people here, and I'll see you rewarded. Three pens "
                 "freed would put heart in everyone.",
@@ -3833,6 +3945,216 @@ def make_dungeon(world, lid, level, flags):
         area.mobs.append(m)
     return area
 
+# ── The wilds ────────────────────────────────────────────────────────────────
+#
+# Between the cities lie the wilds of the old coast, walked a square at a
+# time: each city is one square of them, and the old highways join them.
+# The mountains run down the west, the sea along the east, with the
+# Chesapeake reaching up past Baltimore; rivers come down to the sea, and
+# off the highways are scrub, woods, hills, marsh, the fallen towns of the
+# old world, and craters where pieces of the Moon came down.  Its shape is
+# drawn fresh for each game; the cities and the highways between them
+# stay put.
+
+WILDS_W, WILDS_H = 80, 60
+WILD_STEP = 60                  # minutes a square of the wilds takes
+WILDS_SITES = {"boston": (67, 9), "newyork": (52, 23), "phila": (40, 33),
+               "baltimore": (28, 43), "washington": (21, 50)}
+# the coastline: (row, column), north to south
+COAST = ((0, 73), (12, 71), (18, 62), (25, 56), (34, 55), (42, 51),
+         (59, 45))
+RIVERS = (((50, 0), (52, 12), (53, 21)),                         # Hudson
+          ((45, 0), (43, 14), (42, 30), (44, 37), (48, 42),
+           (52, 45)),                                              # Delaware
+          ((0, 45), (10, 47), (18, 52), (25, 55), (34, 57)))       # Potomac
+ROADWAY = {"road", "cracked", "bridge"}
+# what roams the wilds near each city
+WILDS_DANGER = {"phila": ["dog", "raider", "rat"],
+                "newyork": ["apeman", "raider", "apearcher", "dog"],
+                "boston": ["gearling", "raider", "ghoul", "dog"],
+                "baltimore": ["raider", "crab", "slinger", "croc"],
+                "washington": ["gilded", "gunner", "dog", "ghoul"]}
+WILD_LOOK = {"wild": "Scrub and long grass, gone to seed.",
+             "wild2": "Scrub and wildflowers, as far as you can see.",
+             "hills": "Low green hills.",
+             "mountain": "The mountains, steep and grey. No way over.",
+             "forest": "Old woods, thick and dark. No way through.",
+             "oldtown": "A town of the old world, fallen in on itself. "
+                        "Trees grow out of the roofs.",
+             "moonfall": "A piece of the Moon, glowing in its crater.",
+             "water": "Grey water, too deep and wide to wade."}
+
+
+def smooth_noise(rng, w, h, cell):
+    gw, gh = w // cell + 2, h // cell + 2
+    pts = [[rng.random() for _ in range(gw)] for _ in range(gh)]
+    out = []
+    for y in range(h):
+        gy = y / cell
+        y0 = int(gy)
+        ty = gy - y0
+        ty = ty * ty * (3 - 2 * ty)
+        row = []
+        for x in range(w):
+            gx = x / cell
+            x0 = int(gx)
+            tx = gx - x0
+            tx = tx * tx * (3 - 2 * tx)
+            a = pts[y0][x0] + (pts[y0][x0 + 1] - pts[y0][x0]) * tx
+            b = pts[y0 + 1][x0] + (pts[y0 + 1][x0 + 1] - pts[y0 + 1][x0]) * tx
+            row.append(a + (b - a) * ty)
+        out.append(row)
+    return out
+
+
+def fractal(rng, w, h):
+    layers = [(smooth_noise(rng, w, h, c), wt)
+              for c, wt in ((16, 0.5), (8, 0.3), (4, 0.2))]
+    return [[sum(l[y][x] * wt for l, wt in layers) for x in range(w)]
+            for y in range(h)]
+
+
+def nearest_city(x, y):
+    return min(WILDS_SITES, key=lambda c: abs(WILDS_SITES[c][0] - x) +
+               abs(WILDS_SITES[c][1] - y))
+
+
+def coast_x(y):
+    """Where the sea begins, on row y."""
+    for (y0, x0), (y1, x1) in zip(COAST, COAST[1:]):
+        if y0 <= y <= y1:
+            return x0 + (x1 - x0) * (y - y0) / (y1 - y0)
+    return COAST[-1][1]
+
+
+def make_wilds(world):
+    """The wilds between the cities: the same each time they're made in
+    one game."""
+    import heapq
+    W, H = WILDS_W, WILDS_H
+    rng = random.Random("%s:wilds" % world["seed"])
+    elev, moist = fractal(rng, W, H), fractal(rng, W, H)
+    sites = set(WILDS_SITES.values())
+
+    def level(field, frac):
+        """The value that frac of the map lies above."""
+        vals = sorted(v for row in field for v in row)
+        return vals[int(len(vals) * (1 - frac))]
+    hill, low = level(elev, 0.14), level(elev, 0.88)
+    wood, wet = level(moist, 0.18), level(moist, 0.4)
+    g = []
+    for y in range(H):
+        row = []
+        for x in range(W):
+            e, m = elev[y][x], moist[y][x]
+            ridge = abs(x - (25 - 0.42 * y))    # the mountains
+            t = "mountain" if ridge < 1.4 + 2 * e else \
+                "hills" if ridge < 4.5 + 2 * e or e > hill else \
+                "forest" if m > wood else \
+                "bog" if e < low and m > wet else \
+                "wild" if rng.random() < 0.5 else "wild2"
+            if x > coast_x(y) + 4 * (e - 0.5):
+                t = "water"                     # the sea
+            elif y >= 41 and 30 + (y - 41) * 0.2 <= x <= \
+                    32.5 + (y - 41) * 0.35:
+                t = "water"                     # the Chesapeake
+            row.append(t)
+        g.append(row)
+
+    def wet_cell(x, y):
+        if 0 <= x < W and 0 <= y < H and (x, y) not in sites:
+            g[y][x] = "water"
+    for river in RIVERS:                        # down to the sea
+        for (x0, y0), (x1, y1) in zip(river, river[1:]):
+            n = max(abs(x1 - x0), abs(y1 - y0)) * 2
+            prev = None
+            for i in range(n + 1):
+                x = round(x0 + (x1 - x0) * i / n)
+                y = round(y0 + (y1 - y0) * i / n)
+                if prev and prev[0] != x and prev[1] != y:
+                    wet_cell(x, prev[1])        # no gaps to step through
+                wet_cell(x, y)
+                prev = (x, y)
+
+    def far_from_sites(x, y, n):
+        return all(abs(x - sx) + abs(y - sy) > n for sx, sy in sites)
+    for _ in range(8):                          # where the Moon came down
+        x, y = rng.randrange(3, W - 3), rng.randrange(3, H - 3)
+        if not far_from_sites(x, y, 7) or g[y][x] in ("water", "mountain"):
+            continue
+        r = rng.choice((1, 1.5, 2.2))
+        for yy in range(int(y - r), int(y + r) + 1):
+            for xx in range(int(x - r), int(x + r) + 1):
+                d = math.hypot(xx - x, yy - y)
+                if d <= r and g[yy][xx] not in ("water", "mountain"):
+                    g[yy][xx] = "moonfall" if d <= r - 1 else "ash"
+    for y in range(H):                          # the old world's towns
+        for x in range(W):
+            if g[y][x] in ("wild", "wild2"):
+                near = min(abs(x - sx) + abs(y - sy) for sx, sy in sites)
+                if rng.random() < (0.12 if near <= 6 else 0.02):
+                    g[y][x] = "oldtown"
+
+    # the old highways, where they're cheapest to have run
+    def cost(x, y):
+        return {"water": 7, "mountain": 9, "forest": 3, "moonfall": 6,
+                "ash": 2, "bog": 2.5, "hills": 2, "oldtown": 3,
+                "road": 0.5, "bridge": 0.5}.get(g[y][x], 1.2) + \
+            0.3 * elev[y][x]
+    for a, b in ROADS:
+        start, goal = WILDS_SITES[a], WILDS_SITES[b]
+        dist, prev, q = {start: 0}, {}, [(0, start)]
+        while q:
+            d, p = heapq.heappop(q)
+            if p == goal:
+                break
+            if d > dist.get(p, 1e9):
+                continue
+            for dx, dy in DIRS:
+                n = (p[0] + dx, p[1] + dy)
+                if not (0 <= n[0] < W and 0 <= n[1] < H):
+                    continue
+                if n in sites and n != goal:
+                    continue
+                nd = d + cost(*n)
+                if nd < dist.get(n, 1e9):
+                    dist[n], prev[n] = nd, p
+                    heapq.heappush(q, (nd, n))
+        p = prev.get(goal)
+        while p and p != start:
+            x, y = p
+            g[y][x] = "bridge" if g[y][x] in ("water", "bridge") else \
+                "cracked" if rng.random() < 0.25 else "road"
+            p = prev.get(p)
+    area = Area("world", ("world",), g, "the wilds", edge="wild")
+    area.sites = {}
+    for cid, (x, y) in WILDS_SITES.items():
+        g[y][x] = "site_" + cid
+        area.links[(x, y)] = ("town", cid)
+        area.labels[(x, y)] = CITIES[cid]["name"]
+        area.sites[(x, y)] = cid
+    sx, sy = WILDS_SITES["phila"]
+    area.start = next((sx + dx, sy + dy) for dx, dy in DIRS
+                      if g[sy + dy][sx + dx] in WILD_GROUND)
+    return area
+
+
+def road_squares(area, frm, to):
+    """How many squares of highway lie between two cities."""
+    start, goal = WILDS_SITES[frm], WILDS_SITES[to]
+    dist, q = {start: 0}, deque([start])
+    while q:
+        p = q.popleft()
+        if p == goal:
+            return dist[p]
+        for dx, dy in DIRS:
+            n = (p[0] + dx, p[1] + dy)
+            if n not in dist and area.inside(*n) and (
+                    area.grid[n[1]][n[0]] in ROADWAY or n in area.sites):
+                dist[n] = dist[p] + 1
+                q.append(n)
+    return None
+
 # ── Sound ────────────────────────────────────────────────────────────────────
 
 RATE = 22050
@@ -3872,6 +4194,18 @@ MUSIC = {
         "voices": [("triangle", 0.5, 0.22, "R2 . . R2 . . F2 ."),
                    ("square", 0.25, 0.02, ". . T4 . . . F4 .")],
         "drums": "k . . s k . h s",
+    },
+    "wilds": {      # the wilds: a long walk under the broken Moon
+        "tempo": 190, "bar": 8,
+        "chords": "Am Am F G  Am C G Am",
+        "lead": ("triangle", 0.5, 0.08),
+        "melody": """
+            A3 - - - C4 - E4 -  | A4 - - - G4 - E4 -  | F4 - - - A4 - C5 - |
+            B4 - - - - - . .    | C5 - B4 - A4 - E4 - | G4 - - - E4 - C4 - |
+            D4 - G4 - B4 - D5 - | C5 - - - A4 - - -""",
+        "voices": [("triangle", 0.5, 0.2, "R2 . . . F2 . . ."),
+                   ("square", 0.25, 0.02, ". . T4 . . . F4 .")],
+        "drums": "k . . . . . h .",
     },
     "inside": {     # indoors, by a fire
         "tempo": 260, "bar": 8,
@@ -4459,7 +4793,8 @@ F + direction       fire, throw or shoot
 C                   cast a spell or call a miracle
 U                   use, eat, light, wield or wear something
 I                   your hero        J  the journal
-M                   map of the city  + / -  zoom
+M                   map of the city or the wilds
++ / -               zoom
 V / B               sound / music    N  new game
 Ctrl-Q / Cmd-Q      quit (saved)
 
@@ -4475,6 +4810,10 @@ Destiny Points save you from the worst, now and then.
 Food, torches and ammunition have a usage die: after use,
 roll it; a 1 or 2 means it steps down (d12, d10, d8, d6,
 d4, gone).
+
+Walk off the edge of a city into the wilds, a square (an
+hour) at a time; walk onto a city to go in. The old
+highways are safer.
 
 Bring three Moonstones to the Shattered Dome in Washington
 before the Red Shard rises: midnight, the 21st day.
@@ -6321,7 +6660,8 @@ class Game:
             raise ValueError("bad position")
         if self.area.grid[self.pos[1]][self.pos[0]] not in WALKABLE:
             self.pos = list(self.area.start)
-        self.say("%s, %s." % (CITIES[self.city]["name"], self.date_text()),
+        self.say("%s, %s." % ("The wilds" if self.area.kind == "world" else
+                              CITIES[self.city]["name"], self.date_text()),
                  "quest")
         self.say("Welcome back, %s. Press ? for help." % self.p["name"],
                  "info")
@@ -6338,8 +6678,8 @@ class Game:
         if getattr(self, "p", None) and getattr(self, "area", None) and \
                 self.overlay != "lost":
             for k, a in self.cache.items():
-                if k[0] == "city":
-                    self.seen[k[1]] = pack_bits(a.seen)
+                if k[0] in ("city", "world"):
+                    self.seen[k[-1]] = pack_bits(a.seen)
             data["game"] = {
                 "seed": self.world["seed"], "player": self.p,
                 "flags": sorted(self.flags), "topics": sorted(self.topics),
@@ -6386,6 +6726,14 @@ class Game:
                         for x in range(area.w) if area.grid[y][x] in lit
                         for dx in range(-3, 4) for dy in range(-3, 4)
                         if abs(dx) + abs(dy) <= 4}
+        elif key[0] == "world":
+            area = make_wilds(w)
+            if "world" in self.seen:
+                try:
+                    area.seen = unpack_bits(self.seen["world"],
+                                            area.w * area.h)
+                except (ValueError, zlib.error):
+                    pass
         elif key[0] == "bld":
             cid, sid = key[1], key[2]
             if cid not in CITIES or sid not in CITIES[cid]["sites"]:
@@ -6465,6 +6813,83 @@ class Game:
             return
         if kind == "lair":
             self.at_lair(link[1], x, y)
+        elif kind == "town":
+            self.enter_town(link[1], x - self.pos[0], y - self.pos[1])
+
+    def leave_town(self, dx, dy):
+        """Off the edge of a city: out into the wilds on foot, or, on a
+        riding lizard, down the highway to anywhere you've been."""
+        if not self.p["lizard"]:
+            self.to_wilds(dx, dy)
+            return
+        here = self.city
+        items = [("Walk out into the wilds", lambda: self.to_wilds(dx, dy))]
+        for cid in CITY_ORDER:
+            if cid != here and "been:" + cid in self.flags:
+                items.append(("Ride the highway to %s (%d hours)" % (
+                    CITIES[cid]["name"], -(-self.ride_minutes(here, cid) //
+                                           60)),
+                    lambda cid=cid: self.travel_to(cid)))
+        items.append(("Stay in %s" % CITIES[here]["name"], lambda: None))
+        self.open_menu("Leaving %s" % CITIES[here]["name"], items)
+
+    def ride_minutes(self, frm, to):
+        """Minutes on a lizard from one city to another, by the highways."""
+        n = road_squares(self.get_area(("world",)), frm, to)
+        if n is None:
+            return int(flight_days(frm, to) * DAY / 2)
+        return n * WILD_STEP // 2
+
+    def to_wilds(self, dx, dy):
+        cid = self.city
+        self.city_pos[cid] = list(self.pos)
+        self.cache = {k: v for k, v in self.cache.items()
+                      if k[0] in ("city", "world")}
+        w = self.get_area(("world",))
+        sx, sy = WILDS_SITES[cid]
+        spots = [(sx + dx, sy + dy)] + [(sx + ex, sy + ey)
+                                        for ex, ey in DIRS]
+        pos = next((p for p in spots if w.inside(*p) and
+                    w.grid[p[1]][p[0]] in WILD_GROUND and
+                    not w.mob_at(*p)), (sx, sy))
+        self.enter(w, pos, "door")
+        self.say("You leave %s for the wilds. (The cities are red on the "
+                 "map: M.)" % CITIES[cid]["name"], "info")
+
+    def enter_town(self, cid, dx, dy):
+        """Into a city from the wilds, by the side you came from."""
+        self.city = cid
+        self.cache = {k: v for k, v in self.cache.items()
+                      if k[0] in ("city", "world")}
+        city = self.get_area(("city", cid))
+        target = (CITY_W - 2 if dx < 0 else 1 if dx > 0 else STREET_X[3],
+                  CITY_H - 2 if dy < 0 else 1 if dy > 0 else STREET_Y[2])
+        reach = getattr(city, "reach", None)
+        if reach is None:
+            reach = city.reach = [p for p in reachable(
+                city, ARRIVE, CITY_GROUND) if p not in city.links]
+        pos = min(reach, key=lambda p: abs(p[0] - target[0]) +
+                  abs(p[1] - target[1]) + (0 if p[0] in (0, CITY_W - 1) or
+                                           p[1] in (0, CITY_H - 1) else 3))
+        self.enter(city, pos, "door")
+        self.arrive(cid)
+
+    def arrive(self, cid):
+        self.say("%s, %s." % (CITIES[cid]["name"], self.date_text()),
+                 "quest")
+        if "been:" + cid not in self.flags:
+            self.flags.add("been:" + cid)
+            self.say(CITIES[cid]["intro"], "info")
+            tip = {"newyork": "The Tinkers' Camp is in the south-west "
+                              "blocks: free folk.",
+                   "boston": "The Bell-ringers' hall is in the north: free "
+                             "folk.",
+                   "baltimore": "The fishers' camp is in the middle of "
+                                "town: free folk.",
+                   "washington": "Rebels hide in a cellar in the south-west "
+                                 "blocks. Find them."}.get(cid)
+            if tip:
+                self.say(tip, "talk")
 
     def on_entering(self, area):
         if area.kind_of == "pen" and any(m.hostile for m in area.mobs):
@@ -6888,7 +7313,11 @@ class Game:
             if a.kind == "inside":
                 self.go_outside()
             elif a.kind == "city":
-                self.travel_menu()
+                self.leave_town(dx, dy)
+            elif a.kind == "world":
+                self.say("The wilds go on and on that way, and there's "
+                         "nothing in them for you.", "info")
+                self.sound.play("bump")
             else:
                 self.bump()
             return
@@ -6945,6 +7374,14 @@ class Game:
             return
         self.step_on(x, y)
         slow = self.underfoot(x, y)
+        if a.kind == "world" and not self.overlay:      # a square's a walk
+            before = self.phase()
+            self.pass_time(WILD_STEP // (2 if p["lizard"] else 1) - 1,
+                           quiet=True)
+            if self.overlay:
+                return
+            if self.phase() != before:
+                self.phase_news()
         self.end_turn()
         if slow and not self.busy and not self.overlay:
             self.end_turn()
@@ -6979,6 +7416,13 @@ class Game:
                     adv=1 if p["cls"] == "Barbarian" else 0)[0]:
                 p["poison"] = max(p["poison"], 60)
                 self.say("The ooze burns your skin. Poisoned!", "bad")
+        elif t == "moonfall":
+            if p["cls"] != "Robot" and not self.test(
+                    "CON", label="Constitution, against the moonlight",
+                    adv=1 if p["cls"] == "Barbarian" else 0)[0]:
+                p["poison"] = max(p["poison"], 90)
+                self.say("The fallen moonstone's light gets into your "
+                         "bones. Your teeth ache. Moon-sick!", "bad")
         elif t in ("pool", "bog"):
             return True
         elif t == "rubble_low":
@@ -7070,6 +7514,8 @@ class Game:
                 "console": "Old machines, still blinking."}.get(t)
         if t.startswith("b_"):
             what = "A ruin, its doors long gone or bricked up."
+        if self.area.kind == "world":
+            what = WILD_LOOK.get(t, what)
         if what:
             self.say(what, "info")
         self.sound.play("bump")
@@ -7124,13 +7570,8 @@ class Game:
         if self.clock()[0] != day:
             self.new_day()
         self.timers()
-        now = self.phase()
-        if now != before and a.kind == "city":
-            self.say({"dawn": "Grey dawn over the ruins of %s.",
-                      "day": "The sun is up over %s.",
-                      "dusk": "The sun goes down red over %s.",
-                      "night": "Night in %s. The Red Shard climbs."}[now]
-                     % CITIES[self.city]["name"], "info")
+        if self.phase() != before:
+            self.phase_news()
         if self.turn >= DEADLINE and "won" not in self.flags:
             self.doom()
             return
@@ -7149,7 +7590,24 @@ class Game:
                 self.wander(mob)
         if a.kind == "city":
             self.spawn_city()
+        elif a.kind == "world":
+            self.spawn_world()
         self.render()
+
+    def phase_news(self):
+        """The sky changing, outdoors."""
+        a = self.area
+        if a.kind == "city":
+            where = CITIES[self.city]["name"]
+        elif a.kind == "world":
+            where = "the wilds"
+        else:
+            return
+        self.say({"dawn": "Grey dawn over %s.",
+                  "day": "The sun is up over %s.",
+                  "dusk": "The sun goes down red over %s.",
+                  "night": "Night in %s. The Red Shard climbs."}[
+                      self.phase()] % where, "info")
 
     def can_go(self, mob, x, y):
         a = self.area
@@ -7161,6 +7619,8 @@ class Game:
             return "swim" in traits
         if a.kind == "city":
             return t in CITY_GROUND and (x, y) not in a.links
+        if a.kind == "world":
+            return t in WILD_GROUND and (x, y) not in a.links
         if a.kind == "inside":
             return t in INSIDE_FLOOR
         if t == "pool":
@@ -7299,6 +7759,32 @@ class Game:
                     or (x, y) in self.visible or a.mob_at(x, y)
                     or abs(x - px) + abs(y - py) < 8):
                 continue
+            a.mobs.append(make_monster(random.choice(kinds), x, y))
+            return
+
+    def spawn_world(self):
+        """The wilds' hunters: thicker at night and off the highways, and
+        of the kinds that roam near the nearest city."""
+        a = self.area
+        px, py = self.pos
+        a.mobs = [m for m in a.mobs if not m.hostile or
+                  abs(m.x - px) + abs(m.y - py) <= 20]
+        rate = 0.11 if self.phase() == "night" else 0.05
+        if a.grid[py][px] in ROADWAY:
+            rate /= 2
+        if random.random() > rate or \
+                sum(m.hostile for m in a.mobs) >= 3 + self.day() // 5:
+            return
+        for _ in range(12):
+            ang = random.random() * 2 * math.pi
+            r = random.uniform(5, 9)
+            x, y = px + round(r * math.cos(ang)), py + round(r * math.sin(ang))
+            if not a.inside(x, y) or a.mob_at(x, y) or \
+                    a.grid[y][x] not in WILD_GROUND or (x, y) in a.links:
+                continue
+            kinds = WILDS_DANGER[nearest_city(x, y)]
+            if a.grid[y][x] in ("moonfall", "ash"):
+                kinds = ["ghost", "ghoul"]      # drawn to the fallen stone
             a.mobs.append(make_monster(random.choice(kinds), x, y))
             return
 
@@ -7969,7 +8455,9 @@ class Game:
     def ambush(self, text, n=1):
         a = self.area
         kinds = LAIRS[a.lead].monsters if a.kind == "dungeon" else \
-            CITIES[self.city]["danger"] if a.kind == "city" else None
+            CITIES[self.city]["danger"] if a.kind == "city" else \
+            WILDS_DANGER[nearest_city(*self.pos)] if a.kind == "world" \
+            else None
         if not kinds:
             return
         px, py = self.pos
@@ -7983,7 +8471,8 @@ class Game:
                     a.mob_at(x, y):
                 continue
             t = a.grid[y][x]
-            if t not in CITY_GROUND and t not in DUNGEON_FLOOR:
+            if t not in CITY_GROUND and t not in DUNGEON_FLOOR and \
+                    (t not in WILD_GROUND or (x, y) in a.links):
                 continue
             m = make_monster(random.choice(kinds[:3]), x, y)
             m.aware = True
@@ -7992,33 +8481,16 @@ class Game:
         if placed:
             self.say(text, "bad")
 
-    # ── The road ──
-
-    def travel_menu(self):
-        here = self.city
-        items = []
-        for cid in CITY_ORDER:
-            if cid == here:
-                continue
-            days = flight_days(here, cid)
-            if self.p["lizard"]:
-                days = days / 2.0
-            items.append(("%s, %s (%s)" % (
-                CITIES[cid]["name"], CITIES[cid]["short"],
-                "%g day%s %s" % (days, "" if days == 1 else "s",
-                                 "riding" if self.p["lizard"]
-                                 else "on foot")),
-                lambda cid=cid: self.travel_to(cid)))
-        items.append(("Stay in %s" % CITIES[here]["name"], lambda: None))
-        self.open_menu("The road out of %s. Where to?" % CITIES[here]["name"],
-                       items)
+    # ── The highway ──
 
     def travel_to(self, cid):
+        """Down the highways to a city, in one go: on a riding lizard (see
+        leave_town), or on foot for the self-test."""
         p = self.p
         frm = self.city
-        days = flight_days(frm, cid)
-        minutes = int(days * DAY / (2 if p["lizard"] else 1))
-        self.city_pos[frm] = list(self.pos)
+        minutes = self.ride_minutes(frm, cid) * (1 if p["lizard"] else 2)
+        if self.area.kind == "city":
+            self.city_pos[frm] = list(self.pos)
         self.say("You set out for %s%s." % (
             CITIES[cid]["name"], " on your lizard" if p["lizard"] else ""),
             "info")
@@ -8027,25 +8499,11 @@ class Game:
             return
         self.city = cid
         self.cache = {k: v for k, v in self.cache.items()
-                      if k[0] == "city"}
+                      if k[0] in ("city", "world")}
         city = self.get_area(("city", cid))
         self.enter(city, ARRIVE, "door")
-        self.say("%s, %s." % (CITIES[cid]["name"], self.date_text()),
-                 "quest")
-        if "been:" + cid not in self.flags:
-            self.flags.add("been:" + cid)
-            self.say(CITIES[cid]["intro"], "info")
-            tip = {"newyork": "The Tinkers' Camp is in the south-west "
-                              "blocks: free folk.",
-                   "boston": "The Bell-ringers' hall is in the north: free "
-                             "folk.",
-                   "baltimore": "The fishers' camp is in the middle of "
-                                "town: free folk.",
-                   "washington": "Rebels hide in a cellar in the south-west "
-                                 "blocks. Find them."}.get(cid)
-            if tip:
-                self.say(tip, "talk")
-        if cid != "phila" and random.random() < min(0.8, 0.3 * days):
+        self.arrive(cid)
+        if cid != "phila" and random.random() < min(0.8, minutes / 3000):
             self.ambush("Ambush! %s followed you in off the road." %
                         cap(ENEMIES[CITIES[cid]["danger"][0]].name + "s"),
                         n=random.randint(1, 2))
@@ -8242,7 +8700,7 @@ class Game:
                 cost = LIZARD_COST
                 if p["lizard"]:
                     continue
-                label = "a riding lizard (halves every road)"
+                label = "a riding lizard (the wilds twice as fast)"
             cost = self.price(cost, mob)
             items.append(("%s: %d coins" % (label, cost),
                           lambda k=kind, w=what, c=cost: self.buy(mob, k, w,
@@ -8384,9 +8842,11 @@ class Game:
                        if f.startswith("freed:"))
         lines += ["", "Slave pens broken: %s" % (", ".join(freed)
                                                  if freed else "none yet")]
-        lines += ["", "The roads (on foot): Philadelphia to New York 2 days, "
-                  "New York to Boston 3,", "Philadelphia to Baltimore 2, "
-                  "Baltimore to Washington 1."]
+        lines += ["", "The wilds (M shows them): New York is north-east of "
+                  "Philadelphia, and Boston further on up the coast. "
+                  "Baltimore is south-west, on the bay, and Washington "
+                  "beyond it. The old highways join them all, and are "
+                  "safer."]
         if self.topics:
             lines += ["", "Worth asking about: " + ", ".join(
                 sorted(self.topics))]
@@ -8755,7 +9215,7 @@ class Game:
                     self.turn < p["until"].get("deathsight", -1):
                 return 4
             return 1
-        if a.kind != "city":
+        if a.kind not in ("city", "world"):
             return None
         ph = self.phase()
         return None if ph == "day" else 9 if ph in ("dawn", "dusk") else 5
@@ -8863,7 +9323,7 @@ class Game:
     def draw_map(self):
         scr = self.screen
         W, H = scr.size()
-        a = self.area if self.area.kind == "dungeon" else \
+        a = self.area if self.area.kind in ("dungeon", "world") else \
             self.get_area(("city", self.city))
         rows = []
         for y in range(a.h):
@@ -8876,7 +9336,8 @@ class Game:
                     row.append("#e05040" if t in ("door", "hole", "ward",
                                                   "ward_open",
                                                   "stairs_down",
-                                                  "stairs_up") else
+                                                  "stairs_up") or
+                               t in SITE_TILES else
                                "#f0a040" if t == "campfire" else
                                self.avg.get(a.skin.get(t, t), "#808080"))
             rows.append(row)
@@ -8896,8 +9357,9 @@ class Game:
             px, py = self.city_pos.get(self.city) or a.start
         scr.rect(mx + px * z - 2, my + py * z - 2, mx + (px + 1) * z + 2,
                  my + (py + 1) * z + 2, outline="#ffff00", width=2)
-        title = a.name if a.kind == "dungeon" else "%s, %s" % (
-            CITIES[self.city]["name"], CITIES[self.city]["short"])
+        title = a.name if a.kind == "dungeon" else "The wilds of the coast" \
+            if a.kind == "world" else "%s, %s" % (
+                CITIES[self.city]["name"], CITIES[self.city]["short"])
         scr.text(W / 2, my - 14, "%s   (red: ways in; any key closes)" %
                  title, F(*MONO), ACCENT)
 
@@ -8912,6 +9374,16 @@ class Game:
                     if (self.pos[0] + dx, self.pos[1] + dy) in a.labels]
             if near:
                 here += ", by " + near[0]
+        elif a.kind == "world":
+            px, py = self.pos
+            cid = nearest_city(px, py)
+            tx, ty = WILDS_SITES[cid]
+            here = "The wilds, %s of %s" % (compass(px - tx, py - ty),
+                                            CITIES[cid]["name"])
+            near = [a.labels[(px + dx, py + dy)] for dx, dy in DIRS
+                    if (px + dx, py + dy) in a.labels]
+            if near:
+                here = "The wilds, by " + near[0]
         elif a.kind == "inside":
             here = "%s, %s" % (a.name, CITIES[a.city]["name"])
         else:
@@ -8970,6 +9442,8 @@ class Game:
         self.shell.set_condition("\n".join(cond))
         if a.kind == "city":
             tune = CITIES[self.city]["tune"]
+        elif a.kind == "world":
+            tune = "wilds"
         elif a.kind == "inside":
             tune = "inside"
         else:
@@ -9199,6 +9673,16 @@ def selftest():
                 for name in {a.skin.get(t, t) for row in a.grid
                              for t in row}:
                     assert name in tiles, (lid, name)
+        # the wilds between the cities: every city on its highways
+        wa = make_wilds(w)
+        for name in {t for row in wa.grid for t in row}:
+            assert name in tiles, ("world", name)
+        seen = reachable(wa, wa.start, WILD_GROUND)
+        for cid, (x, y) in WILDS_SITES.items():
+            assert any((x + dx, y + dy) in seen for dx, dy in DIRS), \
+                (seed, cid)
+        for a, b in ROADS:
+            assert road_squares(wa, a, b), (seed, a, b)
     for a, b in (("phila", "boston"), ("boston", "washington")):
         assert flight_days(a, b) > 0
     for name, tune in MUSIC.items():
@@ -9240,6 +9724,33 @@ def selftest():
             g.new_game((cls, "MF"[n % 2], cls, Game.roll_stats(cls)))
             g.view = (21, 15, 0, 0, 32)
             g.shown = [(None, None)] * (21 * 15)
+            # out of Philadelphia, across the wilds, saved and loaded, and
+            # into New York
+            g.enter(g.get_area(("city", "phila")), (0, STREET_Y[2]))
+            g.move(-1, 0)
+            assert g.area.kind == "world", g.area.key
+            for _ in range(60):
+                if g.overlay in ("lost", "doom") or g.area.kind != "world":
+                    break
+                g.overlay = g.menu = g.talk = None
+                g.move(*random.choice(DIRS))
+            g.overlay = g.menu = None
+            if g.area.kind == "world" and g.p["hp"] > 0:
+                g.save()
+                with open(SAVE_FILE) as f:
+                    g.restore(json.load(f)["game"])
+                assert g.area.kind == "world", g.area.key
+                sx, sy = WILDS_SITES["newyork"]
+                wa = g.area
+                wa.mobs = []
+                dx, dy = next((dx, dy) for dx, dy in DIRS
+                              if wa.grid[sy + dy][sx + dx] in WILD_GROUND)
+                g.pos = [sx + dx, sy + dy]
+                g.overlay = g.menu = None
+                g.move(-dx, -dy)
+                assert g.area.key == ("city", "newyork"), g.area.key
+                assert g.city == "newyork"
+            g.overlay = g.menu = g.talk = None
             for city in CITY_ORDER[1:] + ["phila"]:
                 if g.overlay:
                     break
