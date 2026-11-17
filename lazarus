@@ -6281,7 +6281,8 @@ class Game:
         for r in getattr(self, "remains", []):
             if tuple(r["key"]) == tuple(key):
                 pos = tuple(r["pos"])
-                area.items[pos] = "corpse"
+                area.items[pos] = "gear" if r.get("kind") == "kit" \
+                    else "corpse"
                 area.bodies[pos] = r
         self.cache[key] = area
         return area
@@ -7769,9 +7770,10 @@ class Game:
 
     def retire(self):
         p = self.p
-        self.say("%s walks back to the Patience, very calmly, climbs into a "
-                 "cryopod and closes the lid, and does not answer when you "
-                 "knock." % p["name"], "bad")
+        self.say("%s lets go of everything they're carrying, walks back to "
+                 "the Patience, very calmly, climbs into a cryopod and "
+                 "closes the lid, and does not answer when you knock." %
+                 p["name"], "bad")
         self.die("retired")
 
     def die(self, how):
@@ -7785,9 +7787,13 @@ class Game:
         self.busy = True                # nothing more until the next pod
         self.walking = None
         self.sound.play("death")
-        if how != "retired":
-            things = [k for k, v in p["items"].items() for _ in range(v)]
-            pos = tuple(self.pos)
+        things = [k for k, v in p["items"].items() for _ in range(v)]
+        pos = self.drop_spot(tuple(self.pos))
+        if how == "retired":            # their kit, dropped where they stood
+            if things:
+                a.items[pos] = "gear"
+                self.remains_add(a.key, pos, p["name"], things, "kit")
+        else:
             a.items[pos] = "corpse"
             self.remains_add(a.key, pos, p["name"], things)
             self.say({"dead": "%s is dead.", "torn apart": "%s is dead, all "
@@ -7801,10 +7807,31 @@ class Game:
         self.say("...", "info")
         self.shell.after(600, lambda: self.next_crew(crew[0]))
 
-    def remains_add(self, key, pos, who, things):
-        """Your crew's bodies stay where they fell, with their kit."""
+    def drop_spot(self, pos):
+        """Where your body or kit is left: here, or, if something's lying
+        here already, the nearest floor with nothing on it."""
+        a = self.area
+        x0, y0 = pos
+        for d in range(8):
+            for y in range(y0 - d, y0 + d + 1):
+                for x in range(x0 - d, x0 + d + 1):
+                    if max(abs(x - x0), abs(y - y0)) != d or \
+                            not a.inside(x, y):
+                        continue
+                    if (x, y) in a.items or (x, y) in a.bodies or \
+                            (x, y) in a.links:
+                        continue
+                    t = a.grid[y][x]
+                    if d == 0 or (t in WALKABLE and t not in
+                                  ("stairs_up", "stairs_down")):
+                        return (x, y)
+        return pos
+
+    def remains_add(self, key, pos, who, things, kind="corpse"):
+        """Your crew's bodies stay where they fell, with their kit; or
+        their kit alone ("kit") where they dropped it."""
         r = {"key": list(key), "pos": list(pos), "who": who,
-             "things": things}
+             "things": things, "kind": kind}
         self.remains.append(r)
         self.area.bodies[tuple(pos)] = r
 
@@ -8473,7 +8500,21 @@ class Game:
             self.give_item("the tooth")
             self.learn("got_tooth")
         elif thing == "gear":
-            if getattr(a, "charges", None) == (x, y):
+            kit = a.bodies.get((x, y))
+            if kit and kit.get("kind") == "kit":
+                del a.bodies[(x, y)]
+                self.remains.remove(kit)
+                for t in kit["things"]:
+                    self.give_item(t)
+                self.say("%s's kit, where they dropped it: %s." % (
+                    kit["who"], ", ".join(
+                        t + (" x%d" % kit["things"].count(t)
+                             if kit["things"].count(t) > 1 else "")
+                        for t in dict.fromkeys(kit["things"]))), "gold")
+                self.sound.play("gold")
+                if "mining charges" in kit["things"]:
+                    self.flags.add("charges")
+            elif getattr(a, "charges", None) == (x, y):
                 self.give_item("mining charges")
                 self.flags.add("charges")
                 self.learn("charges")
