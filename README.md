@@ -1536,22 +1536,49 @@ the wasteland into hers. The Cathedral is sealed by an old Ministry seal
 that only three Ministry passkeys open, and Red Eye's three lieutenants
 hold them. Win the passkeys, walk through the seal, and end her.
 
-Each turn is a minute. You start in the Town Hall of New Clover, the
-settlement in the ruins, where the Mayor has sent for you.
+Each turn is a minute in town (a square of the wasteland takes three
+quarters of an hour). You start in Stable Two, under the ruins of Clover
+Vale, where nopony has opened the door in two hundred years. A song has
+been getting in over the radios and calling the Stable's ponies to the
+door in their sleep, and the Overmare is sending you out to stop it.
 
 The setting follows a fan novel of a wasteland of ponies; the ponies
 themselves are Clover Vale's, drawn on the same body shapes. The names,
 places and story are the game's own, with a few of the novel's
 characters (Velvet Remedy, Calamity, Homage, Red Eye) met along the way.
 
+### Stable Two
+
+The Stable under the hill: the living quarters, the clinic, the cafeteria,
+the Overmare's office, the armory, the stores, the reactor and
+hydroponics, along a corridor that ends at the great cog of a door. Its
+ponies wear the Stable's blue and yellow; the doctor heals you, Security
+and the quartermaster will sell you a start, and the Overmare is glad to
+see you back. The door opens into the ruins of Clover Vale.
+
 ### The wasteland
+
+Between the towns lies the wasteland, walked a square at a time as in
+Penultimate. Walk off the edge of a town to go out into it, and onto a
+town to go in (you come in on the side you came from). Each town is one
+square, and old roads join them. They are the quickest way and the
+safest. Off the roads are ash flats, dead woods, hills, a river, the sea
+along the south, glowing craters (radiation sickness, unless you're in
+power armor), and, inside a ring of mountains, the Pink Cloud round
+Crownspire. Monsters roam it, more of them at night and off the roads, and
+of the kinds that live near the nearest town: bloatsprites and raiders
+round Clover Vale, hellhounds towards Maretropolis, ghouls and ghosts in
+the pink, crabs and cragadiles on the coast, and Red Eye's slavers near
+Coltchester. The wasteland is drawn fresh for each game; the towns and
+roads stay where they are. M shows the wasteland's map while you're on it.
 
 Five towns, each its own map and its own music, each with its landmarks
 painted across several squares and then ruined.
 
-- **Clover Vale, New Clover:** Stable Two's cog door in the hillside, the
-  Lantern Hall with the Great Lantern cold in its cupola, the Star Tower's
-  split dome, and Grandmare Thistlewick's statue on the green. The Mayor,
+- **Clover Vale, New Clover:** Stable Two's cog door in the hillside (walk
+  into it to go back down), the Lantern Hall with the Great Lantern cold
+  in its cupola, the Star Tower's split dome, and Grandmare Thistlewick's
+  statue on the green. The Mayor,
   a gunsmith, a general store, the Last Lantern saloon, Velvet Remedy's
   clinic and Calamity's sky-wagon.
 - **Maretropolis, the Tower City:** the broken Stable-Tec Tower (Grimjaw
@@ -1570,9 +1597,10 @@ painted across several squares and then ruined.
   its steps, the Twin Stacks, the Old Exchange and the Overseer's Manor. A
   rebels' cellar and the great slave pen.
 
-The roads between take days on hoof (Calamity's sky-wagon halves them),
-and something may follow you in off the road. The lairs below (or, in
-Maretropolis, up) are three levels each, and dark: light your lantern.
+With Calamity's sky-wagon, walking off the edge of a town also offers a
+flight to any town you've already been to. Something may follow you in.
+The lairs below (or, in Maretropolis, up) are three levels each, and
+dark: light your lantern.
 
 ### Wastelanders and rules
 
