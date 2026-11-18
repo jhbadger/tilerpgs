@@ -7138,9 +7138,9 @@ class Game:
                              "everything until you do.", "bad")
                 p["hungry"] = True
         self.say("Day %d. The Red Shard %s." % (
-            day, "rises tonight!" if left <= 0 else
-            "will rise in %d days" % (left + 1) if left else
-            "will rise tomorrow night"), "quest" if left < 4 else "info")
+            day, "rises tonight!" if left <= 1 else
+            "will rise tomorrow night" if left == 2 else
+            "will rise in %d days" % left), "quest" if left < 5 else "info")
 
     def timers(self):
         """What wears off, minute by minute."""
