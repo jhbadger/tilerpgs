@@ -117,7 +117,10 @@ INSIDE_FLOOR = {"floor", "plank", "dirt", "tile", "rug", "marble"}
 DUNGEON_FLOOR = {"dfloor", "rails", "pool", "rubble_low", "glyph", "ooze"}
 SITE_TILES = {"site_vale", "site_metro", "site_crown", "site_port",
               "site_colt"}
-WALKABLE = CITY_GROUND | INSIDE_FLOOR | DUNGEON_FLOOR | SITE_TILES | {
+LAIR_SITES = {"site_sealed", "site_mine"}
+FIND_TILES = {"shack", "skywreck", "wagonwreck"}
+WALKABLE = CITY_GROUND | INSIDE_FLOOR | DUNGEON_FLOOR | SITE_TILES | \
+    LAIR_SITES | {
     "door", "exit", "stairs_up", "stairs_down", "hole", "ward_open",
     "bones", "waste", "waste2", "hills", "pink", "glow"}
 OPAQUE = {"city": set(), "world": {"deadwood", "mountain", "ruin"},
@@ -343,7 +346,8 @@ USAGE_ITEMS = {"rations": ("tinned rations", 5),
                "spark cells": ("spark cells", 25),
                "rifle rounds": ("rifle rounds", 20)}
 # Things you count.
-COUNTED = {"salve": "healing potion", "antidote": "antivenom"}
+COUNTED = {"salve": "healing potion", "antidote": "antivenom",
+           "radpurge": "Rad-Purge"}
 
 SPELLS = {
     "Arcane Bolt": "a lance of magic at a foe in a line: 2d6, more at "
@@ -417,6 +421,10 @@ ENEMIES = {
                      "steel claws as long as knives", 2, ""),
     "sawtooth": Enemy("Sawtooth the Raider Queen", 5, "sawtooth",
                       "a chain flail", 3, "human grab"),
+    "ghoulmare": Enemy("the Ghoul Overmare", 4, "ghoulmare",
+                       "a rusted security baton", 1, "undead"),
+    "gutterclaw": Enemy("Gutterclaw the Raider Boss", 4, "gutterclaw",
+                        "a spiked sledgehammer", 2, "human"),
     "goddess": Enemy("the Goddess", 8, "goddess",
                      "a thousand voices of pink fire", 2,
                      "ranged resist"),
@@ -1558,6 +1566,11 @@ PEOPLE.update({
     "s_aide": pony("J", "#c0d0f0", "#303060", hat=JUMP, horn=STRIPE),
     "s_engineer": pony("J", "#a08060", "#f0a020", hat=JUMP, horn=STRIPE),
     "s_gardener": pony("F", "#a0e0a0", "#40a040", "#f0e040"),
+    # who waits at the bottom of the wasteland's two holes
+    "ghoulmare": pony("J", "#8a9a7a", "#3a3a2a", hat=JUMP, horn=STRIPE,
+                      eye="#f0f040"),
+    "gutterclaw": pony("X", "#4a3a30", "#f0a020", "#2a2a2a",
+                       hat="#3a3a40", eye="#ff3010"),
 })
 TOWNSFOLK_TILES = ["folk%d" % n for n in range(1, 9)]
 WOMEN_TILES = {"brawler_f", "dweller_f", "ranger_f", "zebra_f", "mage_f",
@@ -2272,7 +2285,7 @@ def draw_terrain(name, frame=0):
         disc(g, 7.5, 7.5, 3, "#8af040" if frame == 0 else "#5ac030")
         disc(g, 7.5, 7.5, 1.5, "#e0ffa0")
         return g
-    if name.startswith("site_"):
+    if name.startswith("site_") and name not in LAIR_SITES:
         g = draw_terrain("waste")
         town = name[5:]
         if town == "vale":                      # ruined cottages, a hall
@@ -2342,6 +2355,52 @@ def draw_terrain(name, frame=0):
             g[int(round(7.5 + 7 * math.sin(a)))][
                 int(round(7.5 + 7 * math.cos(a)))] = "#e0c030"
         return g
+    # ── things to dig through, and holes in the hills ──
+    if name == "shack":
+        g = draw_terrain("waste")
+        rect(g, 2, 7, 13, 14, "#7a5a3a")
+        for x in range(3, 13, 3):
+            rect(g, x, 7, x, 14, "#5a3a22")
+        rect(g, 6, 10, 8, 14, "#2a1e14")
+        poly_fill(g, [(1, 7.5), (14.5, 5.5), (14.5, 7.5), (1, 8.5)],
+                  "#8a8a90")
+        g[6][4] = g[6][9] = "#a05a3a"
+        return g
+    if name == "skywreck":
+        g = draw_terrain("waste")
+        poly_fill(g, [(2, 12), (11, 6), (14, 9), (5, 14.5)], "#9aa0a8")
+        poly_fill(g, [(4, 12), (10, 8), (11, 9.5), (6, 13)], "#5a6a7a")
+        poly_fill(g, [(9, 6), (13, 1), (14, 2), (11, 7)], "#c8402a")
+        rect(g, 1, 13, 4, 14, "#3a3a3a")
+        disc(g, 12, 10, 1.2, "#2a2a2e")
+        return g
+    if name == "wagonwreck":
+        g = draw_terrain("waste")
+        rect(g, 1, 6, 12, 11, "#8a6a40")
+        rect(g, 1, 6, 12, 6, "#5a4028")
+        rect(g, 1, 9, 12, 9, "#5a4028")
+        disc(g, 3.5, 12, 2.4, "#4a3a28")
+        disc(g, 3.5, 12, 1, "#8a6a40")
+        disc(g, 12.5, 4, 2.4, "#4a3a28")
+        disc(g, 12.5, 4, 1, "#8a6a40")
+        g[13][9] = g[13][10] = g[12][11] = "#e8e0c8"
+        return g
+    if name in ("site_sealed", "site_mine"):
+        g = draw_terrain("hills")
+        poly_fill(g, [(0, 15), (8, 2), (16, 15)], "#8a7658")
+        poly_fill(g, [(8, 2), (16, 15), (11, 15)], "#6e5c42")
+        if name == "site_sealed":           # a cog door in the hillside
+            disc(g, 8, 10.5, 4.2, "#9aa0a8")
+            disc(g, 8, 10.5, 3, "#5a6a7a")
+            disc(g, 8, 10.5, 1, "#e0c030")
+            rect(g, 4, 14, 12, 15, "#5a5048")
+        else:                               # a mine mouth, timbered
+            rect(g, 5, 8, 11, 15, "#1a1410")
+            rect(g, 4, 7, 12, 7, "#7a5a3a")
+            rect(g, 4, 7, 4, 15, "#7a5a3a")
+            rect(g, 12, 7, 12, 15, "#7a5a3a")
+            g[5][6] = g[5][10] = "#e02020"
+        return g
     raise KeyError(name)
 
 
@@ -2361,10 +2420,12 @@ TERRAIN = ["grass", "weeds", "road", "cracked", "pave", "square", "steps",
            "stairs_down", "gate", "console", "bones", "waste",
            "deadwood", "hills", "mountain", "pink", "glow", "vwall",
            "waste2", "ruin",
-           "vfloor", "cogexit"] + sorted(SITE_TILES) + \
+           "vfloor", "cogexit"] + sorted(SITE_TILES) + sorted(LAIR_SITES) + \
+    sorted(FIND_TILES) + \
     [t for pair in THEMES.values() for t in pair]
 ANIMATED_TERRAIN = {"water", "campfire", "forge", "cauldron", "pool",
                     "glyph", "ward", "console", "bog", "pink", "glow"}
+THEMES["stable"] = ("vwall", "vfloor")          # a Stable gone bad
 
 
 # ── Landmarks ────────────────────────────────────────────────────────────────
@@ -4328,7 +4389,78 @@ LAIRS = {
             "A page in Red Eye's hand: 'She will end the hunger and the "
             "fear and the loneliness. That the price is everypony is a "
             "price I am willing to pay. -R.E.'"]),
+    # out in the wasteland, nothing to do with Red Eye
+    "sealed": Lair(
+        "Stable Eighty-Eight", "stable", 2, ["ghoul", "junkbot", "ghoul",
+                                             "sentry", "ghost"],
+        "ghoulmare", "glow", "crate", [
+            "A Stable log, the last page: 'Reactor shielding failed on "
+            "level two. Overmare says the door stays shut. Overmare says "
+            "we'll be fine.'",
+            "Scratched on the Overmare's desk, over and over: THE DOOR "
+            "STAYS SHUT. THE DOOR STAYS SHUT."]),
+    "mine": Lair(
+        "the Gutter Mine", "tunnel", 2, ["raider", "raidergun", "dog",
+                                         "slaver"],
+        "gutterclaw", "rubble_low", "crate", [
+            "A raider's tally on a pit prop: scratches for caps, skulls for "
+            "ponies. There are more skulls.",
+            "A note pinned with a knife: 'Gutterclaw. The Goddess's ponies "
+            "pay double for live ones. -R.E.' Someone has drawn a "
+            "smiley face on it."]),
 }
+# what's waiting at the bottom of each, once its boss is down
+SIDE_LAIRS = {"sealed": "the Ghoul Overmare's office safe",
+              "mine": "Gutterclaw's strongbox"}
+
+
+STRANGERS = {"caravan", "wounded", "toll", "helped"}
+TOLL = 10
+TOLD = {"sealed": "A Stable, but its door's open, and what's inside "
+                  "isn't ponies any more. They say the Overmare's still "
+                  "down there.",
+        "mine": "Gutterclaw's raiders hole up there, and sell what they "
+                "catch to Red Eye. Somepony ought to stop them."}
+RAIDER_NAMES = ["Scab", "Gristle", "Rustbucket", "Knuckles", "Grin",
+                "Splinter", "Hacksaw", "Bonesaw"]
+CARAVAN_NEWS = [
+    "Stable Eighty-Eight's in the hills somewhere. Door's open. Don't go "
+    "in.",
+    "Gutterclaw's raiders have a mine out here. They pay Red Eye in "
+    "ponies.",
+    "Craters that glow'll eat into you. Rad-Purge, friend: I sell it.",
+    "Wrecks and shacks all over the waste. Most are picked clean. Most.",
+    "Raiders on the roads want ten caps. Sometimes paying's cheaper than "
+    "bleeding."]
+
+
+def make_stranger(kind, x, y):
+    sex = random.choice("MF")
+    if kind == "toll":
+        m = Mob("raider", random.choice(RAIDER_NAMES), x, y)
+        m.title = "a raider at a roadblock"
+        m.greet = random.choice((
+            "Toll road, pony. Ten caps, or we take it out of your hide.",
+            "Nice saddlebags. Ten caps and you keep them."))
+    elif kind == "caravan":
+        m = Mob("trader", random.choice(FIRST[sex]), x, y)
+        m.title = "a caravan trader"
+        m.greet = "Mind the cart. Need anything? I've come a long way, " \
+                  "and I'm going further."
+        m.shop = "camp"
+        m.roam = WORLD_GROUND
+        m.home = (x, y)
+        m.talk = {"job": "I haul goods town to town, and the guards keep "
+                         "me alive while I do it. Want to trade?",
+                  "news": random.choice(CARAVAN_NEWS)}
+    else:
+        m = Mob(random.choice(TOWNSFOLK_TILES), random.choice(FIRST[sex]),
+                x, y)
+        m.title = "a wounded pony"
+        m.greet = "Help... please. Raiders. My leg..."
+    m.role = kind
+    m.asked = False
+    return m
 
 
 def flight_days(frm, to):
@@ -4533,7 +4665,8 @@ def make_dungeon(world, lid, level, flags):
                     if spots:
                         x, y = rng.choice(spots)
                         area.mobs.append(make_monster(kind, x, y, rng=rng))
-        elif "stone:" + lid not in flags:
+        elif ("boss:" if lid in SIDE_LAIRS else "stone:") + lid \
+                not in flags:
             if info.boss == "sawtooth":
                 for dx in (-1, 0, 1):
                     for dy in (-1, 0, 1):
@@ -4616,7 +4749,17 @@ WORLD_LOOK = {"waste": "Dry, cracked earth, as far as you can see.",
               "deadwood": "A dead wood: grey trunks, no leaves, no birds.",
               "pink": "The Pink Cloud, thin here. It smells of candy floss.",
               "glow": "A crater, glowing green. Your PipBuck clicks.",
-              "ruin": "The bones of a farmhouse."}
+              "ruin": "The bones of a farmhouse.",
+              "shack": "A fallen-in shack. You've picked it clean.",
+              "skywreck": "A crashed sky-wagon. You've picked it clean.",
+              "wagonwreck": "An overturned caravan cart, picked clean."}
+# what you find when you first dig through one
+FIND_TEXT = {"shack": "You pull the tin roof off the shack and dig "
+                      "through what's under it.",
+             "skywreck": "You climb into the crashed sky-wagon. The "
+                         "pilot's still strapped in, and past caring.",
+             "wagonwreck": "You crawl under the overturned cart. Its "
+                           "cargo spilled long ago, but not all of it."}
 
 
 def smooth_noise(rng, w, h, cell):
@@ -4653,7 +4796,7 @@ def nearest_town(x, y):
                abs(WORLD_SITES[c][1] - y))
 
 
-def make_wasteland(world):
+def make_wasteland(world, flags=()):
     """The wasteland between the towns: the same each time it is made in
     one game."""
     import heapq
@@ -4753,6 +4896,63 @@ def make_wasteland(world):
     sx, sy = WORLD_SITES["vale"]
     area.start = next((sx + dx, sy + dy) for dx, dy in DIRS
                       if g[sy + dy][sx + dx] in WORLD_GROUND)
+
+    # two holes in the hills, and things to dig through: placed where
+    # they can be walked to, and where they won't block the way
+    reach = reachable(area, area.start, WORLD_GROUND)
+    frng = random.Random("%s:finds" % world["seed"])
+
+    def open_ground(x, y):
+        return (x, y) in reach and g[y][x] in ("waste", "waste2", "ash",
+                                               "hills") and \
+            0 < x < W - 1 and 0 < y < H - 1 and \
+            sum(g[y + dy][x + dx] in WORLD_GROUND for dx, dy in DIRS) >= 3
+    area.lairs = {}
+
+    def blocks(x, y, tile):
+        """Put tile at (x, y), unless that cuts off any of the wasteland
+        (then put back what was there, and say so)."""
+        nonlocal reach
+        was, g[y][x] = g[y][x], tile
+        after = reachable(area, area.start, WORLD_GROUND)
+        if len(after) != len(reach) - 1:
+            g[y][x] = was
+            return True
+        reach = after
+        return False
+    for lid, tile in (("sealed", "site_sealed"), ("mine", "site_mine")):
+        spots = [(x, y) for y in range(H) for x in range(W)
+                 if open_ground(x, y) and g[y][x] == "hills"
+                 and far_from_sites(x, y, 10)
+                 and all(abs(x - lx) + abs(y - ly) > 20
+                         for lx, ly in area.lairs.values())]
+        if not spots:
+            spots = [(x, y) for y in range(H) for x in range(W)
+                     if open_ground(x, y) and far_from_sites(x, y, 8)]
+        frng.shuffle(spots)
+        for x, y in spots:
+            if blocks(x, y, tile):
+                continue
+            break
+        area.links[(x, y)] = ("lair", lid)
+        area.labels[(x, y)] = LAIRS[lid].name
+        area.lairs[lid] = (x, y)
+        sites.add((x, y))
+    finds = []
+    spots = [(x, y) for y in range(H) for x in range(W)
+             if open_ground(x, y) and far_from_sites(x, y, 4)]
+    frng.shuffle(spots)
+    for x, y in spots:
+        if len(finds) >= 26:
+            break
+        if (x, y) not in reach or \
+                any(abs(x - fx) + abs(y - fy) < 6 for fx, fy in finds) or \
+                blocks(x, y, frng.choice(("shack", "shack", "skywreck",
+                                          "wagonwreck"))):
+            continue
+        finds.append((x, y))
+        if "loot:world:%d:%d" % (x, y) not in flags:
+            area.loot.add((x, y))
     return area
 
 
@@ -5502,6 +5702,9 @@ d4, gone). Caps are bottle caps: the wasteland's money.
 
 Walk off the edge of a town into the wasteland, a square
 at a time; walk onto a town to go in. Roads are safer.
+Walk into shacks and wrecks to dig through them. Glowing
+craters give rads: each takes a point off the most HP you
+can heal to, until Rad-Purge or a healer clears them.
 
 Bring three Ministry passkeys to the Cathedral in
 Coltchester before the Goddess wakes: midnight, the 21st
@@ -6993,14 +7196,16 @@ SHOP_STOCK = {
              [("armor", a) for a in ARMOR] + [("shield", s) for s in SHIELDS],
     "trader": [("usage", u) for u in ("rations", "lamp oil", "bullets",
                                       "stones", "darts", "spark cells")] +
-              [("count", "salve"), ("count", "antidote")],
+              [("count", "salve"), ("count", "antidote"),
+               ("count", "radpurge")],
     "camp": [("usage", u) for u in ("rations", "lamp oil", "bullets",
                                     "spark cells", "rifle rounds")] +
-            [("count", "salve"), ("weapon", "Spark Pistol"),
+            [("count", "salve"), ("count", "radpurge"),
+             ("weapon", "Spark Pistol"),
              ("weapon", "Hunting Rifle"), ("weapon", "Spark Rifle")],
     "stablehand": [("lizard", "the sky-wagon")],
 }
-COUNT_COST = {"salve": 8, "antidote": 6}
+COUNT_COST = {"salve": 8, "antidote": 6, "radpurge": 12}
 LIZARD_COST = 60
 
 
@@ -7211,7 +7416,7 @@ class Game:
              "count": {"salve": 1}, "stones": [], "lizard": False,
              "torch": False, "torch_turns": 0, "temp": [], "until": {},
              "used": {}, "hungry": False, "held": 0, "poison": 0,
-             "heighten": 0}
+             "rads": 0, "heighten": 0}
         return p
 
     def hero_tile(self, p=None):
@@ -7413,7 +7618,7 @@ class Game:
         elif key[0] == "stable":
             area = make_stable(w)
         elif key[0] == "world":
-            area = make_wasteland(w)
+            area = make_wasteland(w, self.flags)
             if "world" in self.seen:
                 try:
                     area.seen = unpack_bits(self.seen["world"],
@@ -7651,6 +7856,13 @@ class Game:
         elif lid == "crown":
             self.say("The air below is sweet as candy floss. Keep out of "
                      "the pink.", "info")
+        elif lid == "sealed":
+            self.say("The cog door was forced long ago. Inside, the lights "
+                     "still flicker, your PipBuck clicks, and something in "
+                     "a blue jumpsuit shuffles out of sight.", "info")
+        elif lid == "mine":
+            self.say("The mine smells of smoke and blood. Somewhere below, "
+                     "raiders are laughing.", "info")
         self.enter(area, area.start, "stairs")
         if not self.light_radius() or self.light_radius() <= 2:
             self.say("It's dark in here. (Light your lantern: U.)", "info")
@@ -7862,7 +8074,7 @@ class Game:
             p["poison"] -= 1
             if p["poison"] % 20 == 0 and p["hp"] > 1:
                 p["hp"] -= 1
-        elif self.turn % MEND_EVERY == 0 and 0 < p["hp"] < p["maxhp"] \
+        elif self.turn % MEND_EVERY == 0 and 0 < p["hp"] < self.top_hp() \
                 and not p["hungry"]:
             p["hp"] += 1                # wounds close, slowly, if fed
         if p["torch"] and getattr(self, "area", None) and self.area.dark:
@@ -8125,12 +8337,17 @@ class Game:
                 self.say("The glyph flares: pink sparks bite you.", "bad")
                 self.take_damage(roll("1d4"), "The glyph", armor=False)
         elif t == "glow":
-            if p["cls"] != "Steel Ranger" and not self.test(
-                    "CON", label="Constitution, against the glow",
-                    adv=1 if p["cls"] == "Brawler" else 0)[0]:
-                p["poison"] = max(p["poison"], 90)
+            if p["cls"] == "Steel Ranger":
+                self.say("Your armor's counter ticks. Inside it, you're "
+                         "fine.", "info")
+            elif self.test("CON", label="Constitution, against the glow",
+                           adv=1 if p["cls"] == "Brawler" else 0)[0]:
+                self.say("Your PipBuck clicks. You hurry through.", "info")
+                self.irradiate(1)
+            else:
                 self.say("Your PipBuck's clicking turns to a roar. Your "
-                         "teeth ache. Radiation sickness!", "bad")
+                         "teeth ache. Radiation!", "bad")
+                self.irradiate(roll("1d4") + 1)
         elif t in ("ooze", "pink"):
             if p["cls"] != "Steel Ranger" and not self.test(
                     "CON", label="Constitution, against the pink cloud",
@@ -8242,7 +8459,12 @@ class Game:
         a, p = self.area, self.p
         a.loot.discard((x, y))
         key = a.key
-        if a.kind == "dungeon":
+        if a.kind == "world":
+            self.flags.add("loot:world:%d:%d" % (x, y))
+            self.say(FIND_TEXT.get(a.grid[y][x], "You dig through it."),
+                     "info")
+            self.pass_time(19, quiet=True)
+        elif a.kind == "dungeon":
             self.flags.add("loot:%s:%d:%d:%d" % (key[1], key[2], x, y))
             a.grid[y][x] = "rubble_low"
         else:
@@ -8279,7 +8501,12 @@ class Game:
             elif arm not in p["armors"]:
                 p["armors"].append(arm)
                 found.append(arm)
-        self.say("You break it open: %s." % ", ".join(found), "gold")
+        if a.kind == "world" and random.random() < 0.3:
+            p["count"]["radpurge"] = p["count"].get("radpurge", 0) + 1
+            found.append("a dose of Rad-Purge")
+        self.say("%s: %s." % ("You find" if a.kind == "world" else
+                              "You break it open", ", ".join(found)),
+                 "gold")
         self.end_turn()
 
     def end_turn(self):
@@ -8313,6 +8540,8 @@ class Game:
                 continue
             if mob.hostile:
                 self.monster_act(mob)
+            elif mob.role == "toll":
+                self.toll_step(mob)
             else:
                 self.wander(mob)
         if a.kind == "city":
@@ -8481,11 +8710,15 @@ class Game:
         and of the kinds that roam near the nearest town."""
         a = self.area
         px, py = self.pos
-        a.mobs = [m for m in a.mobs if not m.hostile or
-                  abs(m.x - px) + abs(m.y - py) <= 20]
+        a.mobs = [m for m in a.mobs if abs(m.x - px) + abs(m.y - py) <= 20]
         rate = 0.11 if self.phase() == "night" else 0.05
         if a.grid[py][px] in ("road", "cracked", "bridge"):
             rate /= 2
+        if not any(m.role in STRANGERS for m in a.mobs) and \
+                random.random() < (0.015 if self.phase() == "night"
+                                   else 0.035):
+            self.meet_stranger()
+            return
         if random.random() > rate or \
                 sum(m.hostile for m in a.mobs) >= 3 + self.day() // 5:
             return
@@ -8501,6 +8734,171 @@ class Game:
                 kinds = ["ghoul", "ghost"]
             a.mobs.append(make_monster(random.choice(kinds), x, y))
             return
+
+    def meet_stranger(self):
+        """Not everyone out here wants to eat you: a caravan, a pony who
+        needs help, or raiders who'd settle for your caps."""
+        a = self.area
+        px, py = self.pos
+        kind = random.choice(("caravan", "wounded", "toll"))
+        for _ in range(12):
+            ang = random.random() * 2 * math.pi
+            r = random.uniform(3, 6)
+            x, y = px + round(r * math.cos(ang)), py + round(r * math.sin(ang))
+            if not a.inside(x, y) or a.mob_at(x, y) or \
+                    a.grid[y][x] not in WORLD_GROUND or (x, y) in a.links:
+                continue
+            m = make_stranger(kind, x, y)
+            a.mobs.append(m)
+            self.say({"caravan": "A trader's cart creaks along %s, guards "
+                                 "and all." % where((px, py), (x, y)),
+                      "wounded": "Someone's lying in the dirt %s, "
+                                 "groaning." % where((px, py), (x, y)),
+                      "toll": "A raider steps out %s, grinning. Not "
+                              "attacking. Yet." % where((px, py), (x, y))
+                      }[kind], "info")
+            return
+
+    def toll_step(self, mob):
+        """The toll raider comes to you."""
+        px, py = self.pos
+        if abs(mob.x - px) + abs(mob.y - py) <= 1:
+            if not (self.talk or self.menu or self.overlay or self.busy):
+                self.start_talk(mob)
+            return
+        dx = (px > mob.x) - (px < mob.x)
+        dy = (py > mob.y) - (py < mob.y)
+        for sx, sy in ((dx, 0), (0, dy)) if random.random() < 0.5 else \
+                ((0, dy), (dx, 0)):
+            if (sx or sy) and self.can_go(mob, mob.x + sx, mob.y + sy):
+                mob.x, mob.y = mob.x + sx, mob.y + sy
+                return
+
+    def stranger(self, mob):
+        p = self.p
+        self.say("%s (%s): %s" % (mob.name, mob.title, mob.greet), "talk")
+        self.hear(mob.greet)
+        if mob.role == "wounded":
+            items = []
+            if p["count"].get("salve"):
+                items.append(("Give them a healing potion (%d)" %
+                              p["count"]["salve"],
+                              lambda: self.help_wounded(mob, True)))
+            items.append(("Patch them up (Intelligence)",
+                          lambda: self.help_wounded(mob, False)))
+            items.append(("Walk on", lambda: self.say(
+                "You walk on. The groaning follows you a long way.",
+                "info")))
+            self.open_menu("%s is hurt" % mob.name, items)
+        else:
+            items = []
+            if p["coins"] >= TOLL:
+                items.append(("Pay %d caps" % TOLL,
+                              lambda: self.pay_toll(mob)))
+            items.append(("Talk your way past (Charisma)",
+                          lambda: self.talk_past(mob)))
+            items.append(("Fight", lambda: self.toll_fight(mob)))
+            self.open_menu("%s wants %d caps" % (mob.name, TOLL), items,
+                           cancel=lambda: self.toll_fight(mob))
+
+    def help_wounded(self, mob, potion):
+        p, a = self.p, self.area
+        if potion:
+            p["count"]["salve"] -= 1
+            self.say("You tip the potion between their teeth. The bleeding "
+                     "stops.", "good")
+        else:
+            self.pass_time(20, quiet=True)
+            ok, _ = self.test("INT", 1 if p["cls"] in (
+                "Stable Dweller", "Unicorn Mage") else 0,
+                label="Intelligence, binding wounds")
+            if not ok:
+                self.say("You do what you can. It isn't enough: they "
+                         "thank you, and close their eyes, and don't "
+                         "open them again.", "bad")
+                if mob in a.mobs:
+                    a.mobs.remove(mob)
+                self.render()
+                return
+            self.say("You splint the leg and bind the cuts. They'll live.",
+                     "good")
+        mob.role, mob.title = "helped", "a grateful pony"
+        mob.greet = "Thank you. I can make it to town from here."
+        mob.talk = {"job": "I was a scavenger. I think I'll be something "
+                           "else now.",
+                    "news": "Raiders. They're always raiders."}
+        n = roll("2d6") + 3
+        p["coins"] += n
+        told = next((lid for lid in ("sealed", "mine")
+                     if "told:" + lid not in self.flags and
+                     "boss:" + lid not in self.flags), None)
+        if told:
+            self.flags.add("told:" + told)
+            lx, ly = a.lairs[told]
+            for yy in range(ly - 2, ly + 3):
+                for xx in range(lx - 2, lx + 3):
+                    if a.inside(xx, yy):
+                        a.seen[yy * a.w + xx] = 1
+            self.npc_say(mob, "Here, it's all I've got: %d caps. And "
+                              "listen: %s, %s of here. %s" % (
+                                  n, LAIRS[told].name,
+                                  compass(lx - self.pos[0],
+                                          ly - self.pos[1]),
+                                  TOLD[told]))
+            self.say("(It's on your map now: M.)", "info")
+        else:
+            self.npc_say(mob, "Here, it's all I've got: %d caps." % n)
+        self.tally("helped")
+        self.render()
+
+    def pay_toll(self, mob):
+        self.p["coins"] -= TOLL
+        self.sound.play("gold")
+        self.npc_say(mob, "Pleasure doing business. Mind how you go.")
+        if mob in self.area.mobs:
+            self.area.mobs.remove(mob)
+        self.render()
+
+    def talk_past(self, mob):
+        p = self.p
+        mob.asked = True
+        ok, _ = self.test("CHA", 1 if p["cls"] == "Scamp" else
+                          -1 if p["cls"] == "Steel Ranger" else 0,
+                          label="Charisma, talking your way past")
+        if ok:
+            self.npc_say(mob, random.choice((
+                "...Fine. You're not worth the bother.",
+                "Huh. You've got guts. Go on, before I change my mind.",
+                "Red Eye's ponies are hunting you? Then you're none of "
+                "mine. Go.")))
+            if mob in self.area.mobs:
+                self.area.mobs.remove(mob)
+            self.render()
+        else:
+            self.npc_say(mob, "Nice try.")
+            self.toll_fight(mob)
+
+    def toll_fight(self, mob):
+        a = self.area
+        if mob not in a.mobs:
+            return
+        self.say("%s whistles, and another raider rises out of the dirt "
+                 "with a gun." % mob.name, "bad")
+        a.mobs.remove(mob)
+        foe = make_monster("raider", mob.x, mob.y)
+        foe.name = mob.name
+        foe.aware = True
+        a.mobs.append(foe)
+        px, py = self.pos
+        for dx, dy in ((2, 0), (-2, 0), (0, 2), (0, -2), (2, 2), (-2, -2)):
+            x, y = mob.x + dx, mob.y + dy
+            if a.inside(x, y) and not a.mob_at(x, y) and [x, y] != \
+                    self.pos and a.grid[y][x] in WORLD_GROUND:
+                gun = make_monster("raidergun", x, y)
+                gun.aware = True
+                a.mobs.append(gun)
+                break
+        self.render()
 
     # ── Fighting ──
 
@@ -8606,7 +9004,10 @@ class Game:
                              if "robot" in e.traits else
                              "crumbles to dust" if "undead" in e.traits
                              else "is dead"), "good")
-        if mob.stone:
+        if mob.stone in SIDE_LAIRS:
+            self.flags.add("boss:" + mob.stone)
+            self.side_prize(mob.stone)
+        elif mob.stone:
             a.items[(mob.x, mob.y)] = "moonstone"
             self.flags.add("boss:" + mob.stone)
             self.say("Something clatters from the lieutenant's chain: a "
@@ -8618,6 +9019,28 @@ class Game:
             self.flags.add("pen_won:" + a.city)
             self.say("The pen is yours. The captives stare at you, not "
                      "daring to hope. (Walk into them.)", "quest")
+
+    def side_prize(self, lid):
+        p = self.p
+        n = 40 + roll("2d20")
+        p["coins"] += n
+        p["count"]["salve"] = p["count"].get("salve", 0) + 2
+        found = ["%d caps" % n, "two healing potions"]
+        if lid == "sealed":
+            p["count"]["radpurge"] = p["count"].get("radpurge", 0) + 2
+            found.append("two doses of Rad-Purge")
+        else:
+            w = next((w for w in ("Hunting Rifle", "Spark Rifle",
+                                  "Sledgehammer") if w not in p["weapons"]),
+                     None)
+            if w:
+                p["weapons"].append(w)
+                found.append(WEAPONS[w].desc)
+        self.sound.play("gold")
+        self.say("You crack open %s: %s." % (SIDE_LAIRS[lid],
+                                             ", ".join(found)), "gold")
+        self.level_up("You've cleared %s." % LAIRS[lid].name)
+        self.save()
 
     def monster_attack(self, mob, ranged=False):
         """A foe's attack: you test STR (in melee) or DEX (a shot) to get
@@ -9014,10 +9437,24 @@ class Game:
     def heal(self, n, text):
         p = self.p
         before = p["hp"]
-        p["hp"] = min(p["maxhp"], p["hp"] + n)
+        p["hp"] = max(p["hp"], min(self.top_hp(), p["hp"] + n))
         self.sound.play("potion")
-        self.say("%s. (+%d: %d of %d)" % (text, p["hp"] - before, p["hp"],
-                                         p["maxhp"]), "good")
+        self.say("%s. (+%d: %d of %d%s)" % (
+            text, p["hp"] - before, p["hp"], self.top_hp(),
+            ", for the rads" if p.get("rads") else ""), "good")
+
+    def top_hp(self):
+        """The most hit points you can heal to: radiation eats into it."""
+        p = self.p
+        return max(1, p["maxhp"] - p.get("rads", 0))
+
+    def irradiate(self, n):
+        p = self.p
+        p["rads"] = min(p["maxhp"] - 1, p.get("rads", 0) + n)
+        if p["hp"] > self.top_hp():
+            p["hp"] = self.top_hp()
+        self.say("(Rads %d: you can't heal past %d HP until they're "
+                 "purged.)" % (p["rads"], self.top_hp()), "bad")
 
     # ── Things ──
 
@@ -9029,6 +9466,9 @@ class Game:
         if p["count"].get("salve"):
             items.append(("Drink a healing potion (%d)" % p["count"]["salve"],
                           self.use_salve))
+        if p["count"].get("radpurge") and p.get("rads"):
+            items.append(("Drink Rad-Purge (%d)" % p["count"]["radpurge"],
+                          self.use_radpurge))
         if p["count"].get("antidote") and p["poison"]:
             items.append(("Drink antivenom (%d)" % p["count"]["antidote"],
                           self.use_antidote))
@@ -9063,6 +9503,14 @@ class Game:
         p["count"]["salve"] -= 1
         self.heal(roll("1d6") + 2, "The potion tastes of cherries, and "
                   "the hurt fades")
+        self.end_turn()
+
+    def use_radpurge(self):
+        p = self.p
+        p["count"]["radpurge"] -= 1
+        p["rads"] = max(0, p.get("rads", 0) - roll("2d6") - 2)
+        self.say("The Rad-Purge tastes of chalk and orange peel. You feel "
+                 "sick, and then better. (Rads %d)" % p["rads"], "good")
         self.end_turn()
 
     def use_antidote(self):
@@ -9253,6 +9701,9 @@ class Game:
     def start_talk(self, mob):
         if mob.role == "captive":
             self.free_captives(mob)
+            return
+        if mob.role in ("wounded", "toll"):
+            self.stranger(mob)
             return
         self.talk = {"mob": mob}
         self.shell.show_entry(focus=not ANDROID)
@@ -9541,20 +9992,23 @@ class Game:
     def healer(self, mob):
         p = self.p
         lost = p["maxhp"] - p["hp"]
+        rads = p.get("rads", 0)
         cracked = [t for t in p["temp"] if t[2] > self.turn]
-        if not lost and not p["poison"] and not cracked:
+        if not lost and not p["poison"] and not cracked and not rads:
             self.npc_say(mob, "You're as well as you'll ever be. Shoo.")
             self.talk_menu()
             return
-        cost = min(p["coins"], 2 + lost // 2)
+        cost = min(p["coins"], 2 + lost // 2 + rads)
         p["coins"] -= cost
+        p["rads"] = 0
         p["hp"] = p["maxhp"]
         p["poison"] = 0
         p["temp"] = []
         p["until"]["fathead"] = -1
         self.pass_time(60, quiet=True)
         self.sound.play("potion")
-        self.npc_say(mob, "There. Splinted, salved and sewn. %s" % (
+        self.npc_say(mob, "There. Splinted, salved, sewn%s. %s" % (
+            " and purged" if rads else "",
             "That's %d caps." % cost if cost else "Pay me when you can."))
         self.talk_menu()
 
@@ -9646,8 +10100,9 @@ class Game:
                                                p["stats"][s] else "")
                                 for s in STATS))
         lines = ["PIPBUCK: STATS", ""] + lines
-        lines += ["", "Hit points %d of %d (d%d)   Destiny %d   Caps %d" % (
-            p["hp"], p["maxhp"], c["hd"], p["destiny"], p["coins"]),
+        lines += ["", "Hit points %d of %d (d%d)%s   Destiny %d   Caps %d" % (
+            p["hp"], p["maxhp"], c["hd"], ", rads %d" % p["rads"]
+            if p.get("rads") else "", p["destiny"], p["coins"]),
             "Damage d%d%s   Armor soaks %d%s" % (
                 self.damage_die(), " +2 (two-handed)" if
                 WEAPONS[p["melee"]].twohand else "", self.armor_rp(),
@@ -10175,7 +10630,8 @@ class Game:
             cap(self.date_text()), "%dd %dh" % (left // DAY, left % DAY // 60)
             if left >= DAY else "%dh %dm" % (left // 60, left % 60)))
         lines = [p["name"], "Level %d %s" % (p["level"], p["cls"]), "",
-                 "HP      %d/%d" % (p["hp"], p["maxhp"]),
+                 "HP      %d/%d" % (p["hp"], p["maxhp"])] + (
+                     ["Rads    %d" % p["rads"]] if p.get("rads") else []) + [
                  "Destiny %d" % p["destiny"],
                  "Caps    %d" % p["coins"], "",
                  "STR %2d  DEX %2d  CON %2d" % tuple(self.stat(s)
@@ -10205,6 +10661,8 @@ class Game:
             cond.append("HUNGRY")
         if p["poison"]:
             cond.append("POISONED")
+        if p.get("rads"):
+            cond.append("IRRADIATED")
         if p["held"]:
             cond.append("HELD FAST")
         if self.turn < p["until"].get("fathead", -1):
@@ -10470,6 +10928,15 @@ def selftest():
         for cid, (x, y) in WORLD_SITES.items():
             assert any((x + dx, y + dy) in seen for dx, dy in DIRS), \
                 (seed, cid)
+        assert set(wa.lairs) == {"sealed", "mine"}, seed
+        for lid, (x, y) in wa.lairs.items():
+            assert any((x + dx, y + dy) in seen for dx, dy in DIRS), \
+                (seed, lid)
+        assert len(wa.loot) >= 15, (seed, len(wa.loot))
+        for x, y in wa.loot:
+            assert wa.grid[y][x] in FIND_TILES, (seed, x, y)
+            assert any((x + dx, y + dy) in seen for dx, dy in DIRS), \
+                (seed, x, y)
     for a, b in (("vale", "crown"), ("crown", "colt")):
         assert flight_days(a, b) > 0
     for name, tune in MUSIC.items():

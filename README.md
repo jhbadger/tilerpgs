@@ -1583,14 +1583,40 @@ Penultimate. Walk off the edge of a town to go out into it, and onto a
 town to go in (you come in on the side you came from). Each town is one
 square, and old roads join them. They are the quickest way and the
 safest. Off the roads are ash flats, dead woods, hills, a river, the sea
-along the south, glowing craters (radiation sickness, unless you're in
-power armor), and, inside a ring of mountains, the Pink Cloud round
+along the south, glowing craters (radiation, unless you're in power
+armor), and, inside a ring of mountains, the Pink Cloud round
 Crownspire. Monsters roam it, more of them at night and off the roads, and
 of the kinds that live near the nearest town: bloatsprites and raiders
 round Clover Vale, hellhounds towards Maretropolis, ghouls and ghosts in
 the pink, crabs and cragadiles on the coast, and Red Eye's slavers near
 Coltchester. The wasteland is drawn fresh for each game; the towns and
 roads stay where they are. M shows the wasteland's map while you're on it.
+
+There is more out there than monsters:
+
+- **Things to dig through.** About two dozen fallen-in shacks, crashed
+  sky-wagons and overturned caravan carts lie scattered off the roads.
+  Walk into one to dig through it for caps, potions, ammunition, gear and
+  Rad-Purge. Each can be picked over once.
+- **Two holes in the hills.** Stable Eighty-Eight, whose door was forced
+  long ago, is full of ghouls and still-running robots, with the Ghoul
+  Overmare at the bottom and leaking reactors on the way. The Gutter Mine
+  is where Gutterclaw's raiders hole up and sell their captives to Red
+  Eye. Both are two levels deep and nothing to do with the passkeys.
+  Beating either boss opens a strongbox (caps, potions, and Rad-Purge or a
+  rifle) and is worth a level.
+- **Strangers on the road.** A caravan trader sells supplies, guns and
+  Rad-Purge, and passes on rumors. A wounded pony needs a potion or a
+  successful Intelligence roll to bind their wounds. Help them and they
+  pay what they can and tell you where one of the two holes is, marking
+  it on your map. A raider at a roadblock walks up and wants 10 caps. Pay,
+  talk your way past (Charisma), or fight them and the gunner hiding in
+  the dirt.
+- **Radiation.** Walking through a glowing crater gives you rads: one if
+  you pass a Constitution roll, 2 to 5 if you don't. Steel Rangers are
+  safe in their armor. Each rad takes a point off the most HP you can heal
+  to, until a dose of Rad-Purge (from traders and caravans) or a healer
+  clears them.
 
 Five towns, each its own map and its own music, each with its landmarks
 painted across several squares and then ruined.
