@@ -427,7 +427,7 @@ ENEMIES = {
                         "a spiked sledgehammer", 2, "human"),
     "goddess": Enemy("the Goddess", 8, "goddess",
                      "a thousand voices of pink fire", 2,
-                     "ranged resist"),
+                     "ranged"),
 }
 
 FUR = "#6a4a2a"
@@ -4551,8 +4551,8 @@ def make_monster(kind, x, y, boss=False, rng=random):
     mob.hd = e.hd
     if "mook" in e.traits:
         mob.hp = 1
-    elif boss:
-        mob.hp = e.hd * 8
+    elif boss:                  # tough, but a fight you can win
+        mob.hp = e.hd * (4 if kind == "goddess" else 3)
     else:
         mob.hp = max(e.hd * 2, roll("%dd8" % e.hd, rng))
     mob.maxhp = mob.hp
@@ -5690,7 +5690,8 @@ stat: STR to hit or block in melee, DEX to shoot or dodge,
 CON against poison, INT for magic, WIS to notice, CHA to
 bargain. Foes never roll to hit: you roll to get out of the
 way. A foe two Hit Dice above your level gives you
-Disadvantage (roll twice, keep the worse). Armor soaks hits.
+Disadvantage (roll twice, keep the worse), though bosses
+don't. Armor soaks hits.
 At 0 hit points you're Out of Action: roll on the table.
 Wounds close by themselves, 1 HP every two hours, while
 you're fed and not poisoned; rest, beds, healers and
@@ -8927,7 +8928,15 @@ class Game:
     # ── Fighting ──
 
     def powerful(self, mob):
-        return mob.hd >= self.p["level"] + 2
+        """A foe two Hit Dice above your level: Disadvantage against it.
+        (Not the bosses: they're hard enough already.)"""
+        return mob.hd >= self.p["level"] + 2 and not mob.boss
+
+    @staticmethod
+    def hit_dice_damage(mob):
+        """What a foe's blow does: by its Hit Dice, though a boss's hurts
+        no more than 1d10."""
+        return HD_DAMAGE[min(3 if mob.boss else 10, mob.hd)]
 
     def attack(self, mob, free=False, ranged=False):
         """Your blow (or shot) at a foe: a STR test, or DEX for a shot."""
@@ -9082,7 +9091,7 @@ class Game:
             STAT_NAMES[stat], "dodging" if ranged else "blocking"),
             physical=True)
         if not ok and self.destiny_auto and p["destiny"] > 0 and \
-                p["hp"] <= roll(HD_DAMAGE[min(10, mob.hd)]) + 1:
+                p["hp"] <= roll(self.hit_dice_damage(mob)) + 1:
             p["destiny"] -= 1
             self.say("Destiny! You roll again. (%d left)" % p["destiny"],
                      "gold")
@@ -9097,7 +9106,7 @@ class Game:
                 self.say("An opening! You strike back.", "good")
                 self.attack(mob, free=True)
             return
-        dmg = roll(HD_DAMAGE[min(10, mob.hd)])
+        dmg = roll(self.hit_dice_damage(mob))
         if r == 20:
             dmg *= 2
             self.say("A terrible blow!", "bad")

@@ -1656,6 +1656,9 @@ everything that might fail; foes who never roll to hit; damage by Hit
 Dice; armor (barding) that soaks it; usage dice for rations, lamp oil and
 ammunition; the Out of Action table and Destiny Points. Wounds also close
 on their own, 1 HP every two hours while you're fed and not poisoned.
+Bosses are gentler than Broken Moon's: fewer hit points (3 per Hit Die, 4
+for the Goddess), blows of at most 1d10, no Disadvantage for being
+outclassed, and the Goddess takes full damage from weapons.
 Caps are bottle caps. You go up a level for each passkey, and when New Clover hears you've
 broken two slave pens.
 
