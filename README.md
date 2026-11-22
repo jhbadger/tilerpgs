@@ -537,8 +537,9 @@ Docker just as [Dead Drop's](#dead-drop) is:
 clovervale-android/build.sh
 ```
 
-Keep `clovervale-android/.android`, which holds the key the APK is signed
-with. The APK lands in `clovervale-android/bin/`.
+The key the APK is signed with is kept in
+`~/.android-keys/org.badgerjh.clovervale/`, out of the build folder; back
+it up. The APK lands in `clovervale-android/bin/`.
 
 ### Files
 
@@ -1385,10 +1386,10 @@ deaddrop-android/build.sh
 
 It uses the same `buildozer-home` and `buildozer-platform` Docker volumes as
 Penultimate and Apple Blossom Village, so nothing need be downloaded or
-compiled again; build one project at a time. Keep
-`deaddrop-android/.android`: it holds the debug key the APK is signed with,
-and without it the app (saved game and all) must be uninstalled before the
-next build installs. The APK lands in `deaddrop-android/bin/`; install it
+compiled again; build one project at a time. The debug key the APK is
+signed with is kept in `~/.android-keys/org.badgerjh.deaddrop/`; back it
+up, since without it the app (saved game and all) must be uninstalled
+before the next build installs. The APK lands in `deaddrop-android/bin/`; install it
 with `adb install -r deaddrop-android/bin/*.apk`. The app saves when you
 switch away from it, and the phone's Back button closes menus and
 conversations.
